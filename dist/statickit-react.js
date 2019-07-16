@@ -25,7 +25,7 @@
   function useForm(id, apiUrl) {
     const [submitting, setSubmitting] = react.useState(false);
     const [succeeded, setSucceeded] = react.useState(false);
-    const [errors, setErrors] = react.useState(errors);
+    const [errors, setErrors] = react.useState([]);
 
     const submit = e => {
       const form = e.target;
