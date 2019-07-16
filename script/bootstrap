@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# script/bootstrap: Set up the local development environment.
+
+npm install
