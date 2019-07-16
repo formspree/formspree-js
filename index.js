@@ -21,7 +21,7 @@ function ValidationError(props) {
 function useForm(id, apiUrl) {
   const [submitting, setSubmitting] = useState(false);
   const [succeeded, setSucceeded] = useState(false);
-  const [errors, setErrors] = useState(errors);
+  const [errors, setErrors] = useState([]);
 
   const submit = e => {
     const form = e.target;
