@@ -2,17 +2,21 @@
   "name": "@statickit/react",
   "version": "0.1.0",
   "description": "The React component library for StaticKit",
-  "main": "index.js",
+  "main": "dist/statickit-react.js",
   "homepage": "https://statickit.com",
   "scripts": {
+    "build": "rollup -c -o dist/statickit-react.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Derrick Reimer",
   "license": "MIT",
-  "dependencies": {
-    "react": ">= 16.8.0"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "prettier": "^1.18.2"
+    "@babel/core": "^7.5.4",
+    "@babel/preset-react": "^7.0.0",
+    "prettier": "^1.18.2",
+    "react": ">= 16.8.0",
+    "rollup": "^1.17.0",
+    "rollup-plugin-babel": "^4.3.3"
   }
 }
