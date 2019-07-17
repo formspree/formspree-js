@@ -1,5 +1,5 @@
 #!/bin/sh
 
-# script/bootstrap: Set up the local development environment.
+# script/bootstrap: Install dependencies and perform setup tasks.
 
 npm install
