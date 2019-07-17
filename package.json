@@ -1,15 +1,21 @@
 {
   "name": "@statickit/react",
-  "version": "0.1.0",
+  "version": "1.0.0-beta.0",
   "description": "The React component library for StaticKit",
-  "main": "dist/statickit-react.js",
   "homepage": "https://statickit.com",
-  "scripts": {
-    "build": "rollup -c -o dist/statickit-react.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "author": "Derrick Reimer",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/levelhq/statickit-react.git"
+  },
+  "main": "dist/statickit-react.umd.js",
+  "module": "dist/statickit-react.esm.js",
+  "scripts": {
+    "build": "rollup -c",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prettier": "npx prettier --write 'src/**/*.js'"
+  },
   "dependencies": {},
   "devDependencies": {
     "@babel/core": "^7.5.4",

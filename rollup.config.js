@@ -1,20 +1,36 @@
-import babel from 'rollup-plugin-babel'
+import babel from 'rollup-plugin-babel';
 
-const config = {
-  input: 'index.js',
-  external: ['react'],
-  plugins: [
-    babel({
-      exclude: 'node_modules/**'
-    })
-  ],
-  output: {
-    format: 'umd',
-    name: 'statickit-react',
-    globals: {
-      react: 'React'
+const plugins = [
+  babel({
+    exclude: 'node_modules/**'
+  })
+];
+
+export default [
+  {
+    input: 'src/index.js',
+    external: ['react'],
+    plugins: plugins,
+    output: {
+      format: 'umd',
+      file: __dirname + '/dist/statickit-react.umd.js',
+      name: 'statickit-react',
+      globals: {
+        react: 'React'
+      }
+    }
+  },
+  {
+    input: 'src/index.js',
+    external: ['react'],
+    plugins: plugins,
+    output: {
+      format: 'esm',
+      file: __dirname + '/dist/statickit-react.esm.js',
+      name: 'statickit-react',
+      globals: {
+        react: 'React'
+      }
     }
   }
-};
-
-export default config;
+];
