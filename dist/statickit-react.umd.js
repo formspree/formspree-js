@@ -62,7 +62,7 @@
       });
     };
 
-    return [submitting, succeeded, errors, submit];
+    return [submit, submitting, succeeded, errors];
   }
 
   exports.ValidationError = ValidationError;

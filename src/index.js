@@ -65,7 +65,7 @@ function useForm(id, apiUrl) {
       });
   };
 
-  return [submitting, succeeded, errors, submit];
+  return [submit, submitting, succeeded, errors];
 }
 
 export { useForm, ValidationError };
