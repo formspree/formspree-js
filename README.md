@@ -2,9 +2,9 @@
 
 The React component library for [StaticKit](https://statickit.com).
 
-## Getting Started
+## Quick Start Guide
 
-Install the package in your React project:
+### Install the package
 
 ```
 npm install @statickit/react
@@ -14,7 +14,7 @@ This package assumes that you already have React available as a dependency.
 
 Since we use [React Hooks](https://reactjs.org/docs/hooks-intro.html), **you must be on React >= 16.8.0**.
 
-### Forms
+### Build your form component
 
 Here's a simple example of a StaticKit-powered form:
 
@@ -34,15 +34,7 @@ function MyForm() {
 }
 ```
 
-At a minimum, all you have to do is use a `<form>` element and pass `submit` as the `onSubmit` handler.
-
-The other values provided by the hook allow you to respond to different stages of the form lifecycle:
-
-- `submitting` changes to `true` when the request is being made to the server
-- `succeeded` changes to `true` when the submission is successfully sent
-- `errors` gets populated with an array of validation errors from the server (when applicable)
-
-Here's a more advanced example:
+At a minimum, all you have to do is use a `<form>` element and pass `submit` as the `onSubmit` handler. Here's a more advanced example that displays validation errors and a success message:
 
 ```jsx
 import { ValidationError, useForm } from '@statickit/react';
