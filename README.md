@@ -23,7 +23,7 @@ import { useForm } from '@statickit/react';
 
 function MyForm() {
   // Call the `useForm` hook in your function component
-  const [submitting, succeeded, errors, submit] = useForm('XXXXXXXXX');
+  const [submit, submitting, succeeded, errors] = useForm('XXXXXXXXX');
 
   return (
     <form onSubmit={submit}>
@@ -34,16 +34,13 @@ function MyForm() {
 }
 ```
 
-Note the requirements:
+At a minimum, all you have to do is use a `<form>` element and pass `submit` as the `onSubmit` handler.
 
-- Replace `XXXXXXXXX` with your StaticKit form id
-- Use a `<form>` element and pass `submit` for `onSubmit`
+The other values provided by the hook allow you to respond to different stages of the form lifecycle:
 
-The other values from the hook allow you to react to different stages of the form lifecycle:
-
-- `submitting` becomes `true` when the request is being made to the server
-- `succeeded` becomes `true` when the submission is successfully sent
-- `errors` gets populated with an array of validation errors (when applicable)
+- `submitting` changes to `true` when the request is being made to the server
+- `succeeded` changes to `true` when the submission is successfully sent
+- `errors` gets populated with an array of validation errors from the server (when applicable)
 
 Here's a more advanced example:
 
@@ -51,7 +48,7 @@ Here's a more advanced example:
 import { ValidationError, useForm } from '@statickit/react';
 
 function MyForm() {
-  const [submitting, succeeded, errors, submit] = useForm('XXXXXXXXX');
+  const [submit, submitting, succeeded, errors] = useForm('XXXXXXXXX');
 
   // Display success message in place of the form
   if (succeeded) {
