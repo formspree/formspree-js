@@ -14,7 +14,7 @@ export default [
     output: {
       format: 'umd',
       file: __dirname + '/dist/statickit-react.umd.js',
-      name: 'statickit-react',
+      name: 'StaticKitReact',
       globals: {
         react: 'React'
       }
@@ -27,7 +27,7 @@ export default [
     output: {
       format: 'esm',
       file: __dirname + '/dist/statickit-react.esm.js',
-      name: 'statickit-react',
+      name: 'StaticKitReact',
       globals: {
         react: 'React'
       }
