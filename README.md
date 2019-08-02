@@ -14,7 +14,7 @@ This package assumes that you already have React available as a dependency.
 
 Since we use [React Hooks](https://reactjs.org/docs/hooks-intro.html), you must be on React >= 16.8.0.
 
-### Build your form component
+### Simple example
 
 Here's a simple example of a StaticKit-powered form:
 
@@ -24,6 +24,13 @@ import { useForm } from '@statickit/react';
 function MyForm() {
   // Call the `useForm` hook in your function component
   const [state, submit] = useForm('XXXXXXXXX');
+
+  // Display success message in place of the form
+  if (state.succeeded) {
+    return (
+      <div>Thank you for signing up!</div>
+    )
+  }
 
   return (
     <form onSubmit={submit}>
@@ -53,7 +60,9 @@ The `errors` objects include the following:
 | `message`      | The error message (e.g. "is required")             |
 | `code`         | The error code (e.g. "REQUIRED" or "EMAIL_FORMAT") |
 
-Here's a more advanced example that displays validation errors and a success message:
+### Rendering validation errors
+
+Here's a more advanced example that displays validation errors for the `email` field:
 
 ```jsx
 import { ValidationError, useForm } from '@statickit/react';
@@ -61,7 +70,6 @@ import { ValidationError, useForm } from '@statickit/react';
 function MyForm() {
   const [state, submit] = useForm('XXXXXXXXX');
 
-  // Display success message in place of the form
   if (state.succeeded) {
     return (
       <div>Thank you for signing up!</div>
