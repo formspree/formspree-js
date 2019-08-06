@@ -34,7 +34,7 @@ function MyForm() {
 
   return (
     <form onSubmit={submit}>
-      <label for="email">Email</label>
+      <label htmlFor="email">Email</label>
       <input id="email" type="email" name="email" />
       <button type="submit">Sign up</button>
     </form>
@@ -79,6 +79,7 @@ function MyForm() {
   // Render email validation errors and disable the submit button when submitting
   return (
     <form onSubmit={submit}>
+      <label htmlFor="email">Email</label>
       <input type="email" name="email" required />
       <ValidationError field="email" prefix="Email" errors={state.errors} />
       <button type="submit" disabled={state.submitting}>Sign up</button>
