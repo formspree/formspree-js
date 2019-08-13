@@ -1,4 +1,4 @@
-# @statickit/react
+# StaticKit React
 
 The React component library for [StaticKit](https://statickit.com).
 
