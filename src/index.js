@@ -62,15 +62,15 @@ function useForm(props) {
           setSucceeded(false);
           setErrors(errors);
         }
-      } catch (e) {
-        if (debug) console.log(id, 'Unexpected error', e);
+      } catch (error) {
+        if (debug) console.log(id, 'Unexpected error', error);
         setSucceeded(false);
       } finally {
         setSubmitting(false);
       }
     };
 
-    e.preventDefault();
+    event.preventDefault();
     setSubmitting(true);
     sendRequest();
     return true;
