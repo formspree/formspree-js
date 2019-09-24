@@ -1022,8 +1022,11 @@
     const [errors, setErrors] = React.useState([]);
     const [client, setClient] = React.useState(undefined);
     React.useEffect(() => {
-      setClient(index());
-      return () => client.teardown();
+      const client = index();
+      setClient(client);
+      return () => {
+        client.teardown();
+      };
     }, []);
     const id = typeof props === 'object' ? props.id : props;
     if (!id) throw new Error('You must define an `id` property');
