@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.0-beta.7
+
+- Use `useRef` internally to store the StaticKit client
+
 ## 1.0.0-beta.6
 
 - Bug fix with form component teardown
