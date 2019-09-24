@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
@@ -1014,12 +1014,11 @@ function useForm(props) {
   const [submitting, setSubmitting] = useState(false);
   const [succeeded, setSucceeded] = useState(false);
   const [errors, setErrors] = useState([]);
-  const [client, setClient] = useState(undefined);
+  const client = useRef(undefined);
   useEffect(() => {
-    const client = index();
-    setClient(client);
+    client.current = index();
     return () => {
-      client.teardown();
+      if (client.current) client.current.teardown();
     };
   }, []);
   const id = typeof props === 'object' ? props.id : props;
@@ -1034,7 +1033,7 @@ function useForm(props) {
 
     const sendRequest = async () => {
       try {
-        const result = await client.submitForm({
+        const result = await client.current.submitForm({
           id: id,
           endpoint: endpoint,
           data: formData

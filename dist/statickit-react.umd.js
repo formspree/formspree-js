@@ -1020,12 +1020,11 @@
     const [submitting, setSubmitting] = React.useState(false);
     const [succeeded, setSucceeded] = React.useState(false);
     const [errors, setErrors] = React.useState([]);
-    const [client, setClient] = React.useState(undefined);
+    const client = React.useRef(undefined);
     React.useEffect(() => {
-      const client = index();
-      setClient(client);
+      client.current = index();
       return () => {
-        client.teardown();
+        if (client.current) client.current.teardown();
       };
     }, []);
     const id = typeof props === 'object' ? props.id : props;
@@ -1040,7 +1039,7 @@
 
       const sendRequest = async () => {
         try {
-          const result = await client.submitForm({
+          const result = await client.current.submitForm({
             id: id,
             endpoint: endpoint,
             data: formData

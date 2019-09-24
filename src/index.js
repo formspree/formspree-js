@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import StaticKit from '@statickit/core';
 
 function ValidationError(props) {
@@ -23,14 +23,13 @@ function useForm(props) {
   const [submitting, setSubmitting] = useState(false);
   const [succeeded, setSucceeded] = useState(false);
   const [errors, setErrors] = useState([]);
-  const [client, setClient] = useState(undefined);
+  const client = useRef(undefined);
 
   useEffect(() => {
-    const client = StaticKit();
-    setClient(client);
+    client.current = StaticKit();
 
     return () => {
-      client.teardown();
+      if (client.current) client.current.teardown();
     };
   }, []);
 
@@ -50,7 +49,7 @@ function useForm(props) {
 
     const sendRequest = async () => {
       try {
-        const result = await client.submitForm({
+        const result = await client.current.submitForm({
           id: id,
           endpoint: endpoint,
           data: formData
