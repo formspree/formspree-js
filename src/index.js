@@ -26,8 +26,8 @@ function useForm(props) {
   const [client, setClient] = useState(undefined);
 
   useEffect(() => {
-    const client = StaticKit();
-    setClient(client);
+    setClient(StaticKit());
+    return () => client.teardown();
   }, []);
 
   const id = typeof props === 'object' ? props.id : props;

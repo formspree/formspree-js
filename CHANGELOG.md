@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.0-beta.4
+
+- Update StaticKit Core
+- Teardown the client when form components are unmounted
+
 ## 1.0.0-beta.3
 
 Use the `@statickit/core` client library.
