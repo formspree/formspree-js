@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.0-beta.5
+
+- Update StaticKit Core to prevent messing with `window` object
+
 ## 1.0.0-beta.4
 
 - Update StaticKit Core
