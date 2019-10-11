@@ -47,14 +47,16 @@ function useForm(props) {
 
     const formData = new FormData(form);
 
-    const sendRequest = async () => {
-      try {
-        const result = await client.current.submitForm({
-          id: id,
-          endpoint: endpoint,
-          data: formData
-        });
+    event.preventDefault();
+    setSubmitting(true);
 
+    client.current
+      .submitForm({
+        id: id,
+        endpoint: endpoint,
+        data: formData
+      })
+      .then(result => {
         if (result.response.status == 200) {
           if (debug) console.log(id, 'Submitted', result);
           setSucceeded(true);
@@ -65,17 +67,15 @@ function useForm(props) {
           setSucceeded(false);
           setErrors(errors);
         }
-      } catch (error) {
+      })
+      .catch(error => {
         if (debug) console.log(id, 'Unexpected error', error);
         setSucceeded(false);
-      } finally {
+      })
+      .finally(() => {
         setSubmitting(false);
-      }
-    };
+      });
 
-    event.preventDefault();
-    setSubmitting(true);
-    sendRequest();
     return true;
   };
 

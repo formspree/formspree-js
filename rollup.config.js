@@ -14,29 +14,23 @@ const plugins = [
 
 export default [
   {
+    external: ['react', '@statickit/core'],
     input: 'src/index.js',
-    external: ['react'],
     plugins: plugins,
     output: {
-      format: 'umd',
-      file: __dirname + '/dist/statickit-react.umd.js',
-      name: 'StaticKitReact',
-      globals: {
-        react: 'React'
-      }
+      format: 'cjs',
+      file: __dirname + '/dist/statickit-react.cjs.js',
+      name: 'StaticKitReact'
     }
   },
   {
+    external: ['react', '@statickit/core'],
     input: 'src/index.js',
-    external: ['react'],
     plugins: plugins,
     output: {
       format: 'esm',
       file: __dirname + '/dist/statickit-react.esm.js',
-      name: 'StaticKitReact',
-      globals: {
-        react: 'React'
-      }
+      name: 'StaticKitReact'
     }
   }
 ];
