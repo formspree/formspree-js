@@ -13,7 +13,9 @@ export default function useForm(props) {
     }
 
     return () => {
-      if (client.current) client.current.teardown();
+      if (client.current) {
+        client.current.teardown();
+      }
     };
   }, []);
 
@@ -70,8 +72,6 @@ export default function useForm(props) {
       .finally(() => {
         setSubmitting(false);
       });
-
-    return true;
   };
 
   return [{ submitting, succeeded, errors }, submit];

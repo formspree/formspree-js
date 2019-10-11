@@ -1,21 +1,25 @@
 # Changelog
 
+## 1.0.0
+
+- Refactor npm packaging and add tests.
+
 ## 1.0.0-beta.7
 
-- Use `useRef` internally to store the StaticKit client
+- Use `useRef` internally to store the StaticKit client.
 
 ## 1.0.0-beta.6
 
-- Bug fix with form component teardown
+- Bug fix with form component teardown.
 
 ## 1.0.0-beta.5
 
-- Update StaticKit Core to prevent messing with `window` object
+- Update StaticKit Core to prevent messing with `window` object.
 
 ## 1.0.0-beta.4
 
-- Update StaticKit Core
-- Teardown the client when form components are unmounted
+- Update StaticKit Core.
+- Teardown the client when form components are unmounted.
 
 ## 1.0.0-beta.3
 
@@ -32,7 +36,7 @@ We've retained backward-compatibility.
 
 ## 1.0.0-beta.2
 
-Renamed the UMD global export from `statickit-react` to `StaticKitReact`
+Renamed the UMD global export from `statickit-react` to `StaticKitReact`.
 
 ## 1.0.0-beta.1
 
