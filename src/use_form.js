@@ -8,7 +8,9 @@ export default function useForm(props) {
   const client = useRef(props.client);
 
   useEffect(() => {
-    if (!client.current) client.current = StaticKit();
+    if (!client.current) {
+      client.current = StaticKit();
+    }
 
     return () => {
       if (client.current) client.current.teardown();
@@ -32,23 +34,34 @@ export default function useForm(props) {
     event.preventDefault();
     setSubmitting(true);
 
-    client.current
+    return client.current
       .submitForm({
         id: id,
         endpoint: endpoint,
         data: formData
       })
       .then(result => {
-        if (result.response.status == 200) {
-          if (debug) console.log(id, 'Submitted', result);
-          setSucceeded(true);
-          setErrors([]);
-        } else {
-          const errors = result.body.errors;
-          if (debug) console.log(id, 'Validation error', result);
-          setSucceeded(false);
-          setErrors(errors);
+        switch (result.response.status) {
+          case 200:
+            if (debug) console.log(id, 'Submitted', result);
+            setSucceeded(true);
+            setErrors([]);
+            break;
+
+          case 422:
+            const errors = result.body.errors;
+            if (debug) console.log(id, 'Validation error', result);
+            setSucceeded(false);
+            setErrors(errors);
+            break;
+
+          default:
+            if (debug) console.log(id, 'Unexpected error', result);
+            setSucceeded(false);
+            break;
         }
+
+        return result;
       })
       .catch(error => {
         if (debug) console.log(id, 'Unexpected error', error);
