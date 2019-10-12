@@ -19,8 +19,7 @@ export default [
     plugins: plugins,
     output: {
       format: 'cjs',
-      file: __dirname + '/dist/statickit-react.cjs.js',
-      name: 'StaticKitReact'
+      file: __dirname + '/dist/statickit-react.cjs.js'
     }
   },
   {
@@ -29,8 +28,20 @@ export default [
     plugins: plugins,
     output: {
       format: 'esm',
-      file: __dirname + '/dist/statickit-react.esm.js',
-      name: 'StaticKitReact'
+      file: __dirname + '/dist/statickit-react.esm.js'
+    }
+  },
+  {
+    external: ['react'],
+    input: 'src/index.js',
+    plugins: plugins,
+    output: {
+      format: 'iife',
+      file: __dirname + '/dist/statickit-react.iife.js',
+      name: 'StaticKitReact',
+      globals: {
+        react: 'React'
+      }
     }
   }
 ];

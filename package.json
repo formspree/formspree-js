@@ -13,7 +13,8 @@
   "main": "dist/statickit-react.cjs.js",
   "files": [
     "dist/statickit-react.esm.js",
-    "dist/statickit-react.cjs.js"
+    "dist/statickit-react.cjs.js",
+    "dist/statickit-react.iife.js"
   ],
   "publishConfig": {
     "access": "public"
