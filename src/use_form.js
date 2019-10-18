@@ -20,7 +20,10 @@ export default function useForm(props) {
   }, []);
 
   const id = typeof props === 'object' ? props.id : props;
-  if (!id) throw new Error('You must define an `id` property');
+
+  if (!id && !(props.site && props.key)) {
+    throw new Error('You must set an `id` or `site` & `key` properties');
+  }
 
   const endpoint = props.endpoint || 'https://api.statickit.com';
   const debug = !!props.debug;
@@ -39,26 +42,28 @@ export default function useForm(props) {
     return client.current
       .submitForm({
         id: id,
+        site: props.site,
+        key: props.key,
         endpoint: endpoint,
         data: formData
       })
       .then(result => {
         switch (result.response.status) {
           case 200:
-            if (debug) console.log(id, 'Submitted', result);
+            if (debug) console.log('Form submitted', result);
             setSucceeded(true);
             setErrors([]);
             break;
 
           case 422:
             const errors = result.body.errors;
-            if (debug) console.log(id, 'Validation error', result);
+            if (debug) console.log('Validation error', result);
             setSucceeded(false);
             setErrors(errors);
             break;
 
           default:
-            if (debug) console.log(id, 'Unexpected error', result);
+            if (debug) console.log('Unexpected error', result);
             setSucceeded(false);
             break;
         }
