@@ -27,6 +27,7 @@ export default function useForm(props) {
 
   const endpoint = props.endpoint || 'https://api.statickit.com';
   const debug = !!props.debug;
+  const extraData = props.data;
 
   const submit = event => {
     const form = event.target;
@@ -35,6 +36,17 @@ export default function useForm(props) {
       throw new Error('submit was triggered for a non-form element');
 
     const formData = new FormData(form);
+
+    // Append extra data from config
+    if (typeof extraData === 'object') {
+      for (const prop in extraData) {
+        if (typeof extraData[prop] === 'function') {
+          formData.append(prop, extraData[prop].call(null, config));
+        } else {
+          formData.append(prop, extraData[prop]);
+        }
+      }
+    }
 
     event.preventDefault();
     setSubmitting(true);

@@ -33,6 +33,7 @@ function TestForm(props) {
     id: props.id,
     site: props.site,
     form: props.form,
+    data: props.extraData,
     client: props.client
   });
 
@@ -214,6 +215,37 @@ it('submits successfully with `site` + `form` properties', async () => {
 
   const message = container.querySelector('#message');
   expect(message.textContent).toBe('Thanks!');
+});
+
+it('appends extra data to form data', async () => {
+  const mockClient = {
+    submitForm: props => {
+      expect(props.data.get('extra')).toBe('yep');
+
+      return new Promise(resolve => {
+        resolve({ body: { id: '000', data: {} }, response: { status: 200 } });
+      });
+    },
+    teardown: () => {}
+  };
+
+  act(() => {
+    ReactDOM.render(
+      <TestForm
+        site="xxx"
+        form="newsletter"
+        extraData={{ extra: 'yep' }}
+        client={mockClient}
+      />,
+      container
+    );
+  });
+
+  const form = container.querySelector('form');
+
+  await act(async () => {
+    ReactTestUtils.Simulate.submit(form);
+  });
 });
 
 it('reacts to server-side validation errors', async () => {
