@@ -248,6 +248,41 @@ it('appends extra data to form data', async () => {
   });
 });
 
+it('evaluates functions passed in data', async () => {
+  const mockClient = {
+    submitForm: props => {
+      expect(props.data.get('extra')).toBe('yep');
+
+      return new Promise(resolve => {
+        resolve({ body: { id: '000', data: {} }, response: { status: 200 } });
+      });
+    },
+    teardown: () => {}
+  };
+
+  act(() => {
+    ReactDOM.render(
+      <TestForm
+        site="xxx"
+        form="newsletter"
+        extraData={{
+          extra: () => {
+            return 'yep';
+          }
+        }}
+        client={mockClient}
+      />,
+      container
+    );
+  });
+
+  const form = container.querySelector('form');
+
+  await act(async () => {
+    ReactTestUtils.Simulate.submit(form);
+  });
+});
+
 it('reacts to server-side validation errors', async () => {
   const mockClient = {
     submitForm: _props => {

@@ -41,7 +41,7 @@ export default function useForm(props) {
     if (typeof extraData === 'object') {
       for (const prop in extraData) {
         if (typeof extraData[prop] === 'function') {
-          formData.append(prop, extraData[prop].call(null, config));
+          formData.append(prop, extraData[prop].call(null));
         } else {
           formData.append(prop, extraData[prop]);
         }

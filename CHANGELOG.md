@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.2
+
+- Bug fix: an undeclared variable was referenced when `data` values were functions.
+
 ## 1.1.1
 
 - Accept `data` property for adding programmatic fields to the form payload.
