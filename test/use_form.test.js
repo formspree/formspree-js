@@ -3,10 +3,16 @@ import useForm from '../src/use_form';
 import ReactDOM from 'react-dom';
 import ReactTestUtils from 'react-dom/test-utils';
 import StaticKit from '@statickit/core';
+import { version } from '../package.json';
 
 jest.mock('@statickit/core');
 
 const { act } = ReactTestUtils;
+
+// A fake success result for a mocked `submitForm` call.
+const success = new Promise(resolve => {
+  resolve({ body: { id: '000', data: {} }, response: { status: 200 } });
+});
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -130,10 +136,7 @@ it('submits successfully with legacy arg structure', async () => {
   StaticKit.mockImplementation(() => ({
     submitForm: props => {
       expect(props.id).toBe('xxx');
-
-      return new Promise(resolve => {
-        resolve({ body: { id: '000', data: {} }, response: { status: 200 } });
-      });
+      return success;
     },
     teardown: () => {}
   }));
@@ -155,14 +158,31 @@ it('submits successfully with legacy arg structure', async () => {
   expect(message.textContent).toBe('Thanks!');
 });
 
+it('submits a client name', async () => {
+  const mockClient = {
+    submitForm: props => {
+      expect(props.clientName).toBe(`@statickit/react@${version}`);
+      return success;
+    },
+    teardown: () => {}
+  };
+
+  act(() => {
+    ReactDOM.render(<TestForm id="xxx" client={mockClient} />, container);
+  });
+
+  const form = container.querySelector('form');
+
+  await act(async () => {
+    ReactTestUtils.Simulate.submit(form);
+  });
+});
+
 it('submits successfully with `id` property', async () => {
   const mockClient = {
     submitForm: props => {
       expect(props.id).toBe('xxx');
-
-      return new Promise(resolve => {
-        resolve({ body: { id: '000', data: {} }, response: { status: 200 } });
-      });
+      return success;
     },
     teardown: () => {}
   };
@@ -189,10 +209,7 @@ it('submits successfully with `site` + `form` properties', async () => {
     submitForm: props => {
       expect(props.site).toBe('xxx');
       expect(props.form).toBe('newsletter');
-
-      return new Promise(resolve => {
-        resolve({ body: { id: '000', data: {} }, response: { status: 200 } });
-      });
+      return success;
     },
     teardown: () => {}
   };
@@ -221,10 +238,7 @@ it('appends extra data to form data', async () => {
   const mockClient = {
     submitForm: props => {
       expect(props.data.get('extra')).toBe('yep');
-
-      return new Promise(resolve => {
-        resolve({ body: { id: '000', data: {} }, response: { status: 200 } });
-      });
+      return success;
     },
     teardown: () => {}
   };
@@ -252,10 +266,7 @@ it('evaluates functions passed in data', async () => {
   const mockClient = {
     submitForm: props => {
       expect(props.data.get('extra')).toBe('yep');
-
-      return new Promise(resolve => {
-        resolve({ body: { id: '000', data: {} }, response: { status: 200 } });
-      });
+      return success;
     },
     teardown: () => {}
   };

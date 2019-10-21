@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import StaticKit from '@statickit/core';
+import { version } from '../package.json';
 
 export default function useForm(props) {
   const [submitting, setSubmitting] = useState(false);
@@ -57,6 +58,7 @@ export default function useForm(props) {
         site: props.site,
         form: props.form,
         endpoint: endpoint,
+        clientName: `@statickit/react@${version}`,
         data: formData
       })
       .then(result => {

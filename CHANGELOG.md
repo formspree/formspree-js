@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.0
+
+- Update core to fix body serialization bug.
+- Pass along `clientName` with form submission.
+
 ## 1.1.2
 
 - Bug fix: an undeclared variable was referenced when `data` values were functions.
