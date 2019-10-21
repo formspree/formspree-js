@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1
+
+- Accept `data` property for adding programmatic fields to the form payload.
+
 ## 1.1.0
 
 - Accept `site` + `form` combo (in lieu of `id`) for identifying forms.
