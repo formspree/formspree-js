@@ -32,7 +32,7 @@ function TestForm(props) {
   const [state, submit] = useForm({
     id: props.id,
     site: props.site,
-    key: props.formKey,
+    form: props.form,
     client: props.client
   });
 
@@ -118,7 +118,7 @@ it('fails it initialize without identifying properties', () => {
 
   const heading = container.querySelector('h1');
   expect(heading.textContent).toBe(
-    'You must set an `id` or `site` & `key` properties'
+    'You must set an `id` or `site` & `form` properties'
   );
 
   // React's error logging
@@ -183,11 +183,11 @@ it('submits successfully with `id` property', async () => {
   expect(message.textContent).toBe('Thanks!');
 });
 
-it('submits successfully with `site` + `key` properties', async () => {
+it('submits successfully with `site` + `form` properties', async () => {
   const mockClient = {
     submitForm: props => {
       expect(props.site).toBe('xxx');
-      expect(props.key).toBe('newsletter');
+      expect(props.form).toBe('newsletter');
 
       return new Promise(resolve => {
         resolve({ body: { id: '000', data: {} }, response: { status: 200 } });
@@ -198,7 +198,7 @@ it('submits successfully with `site` + `key` properties', async () => {
 
   act(() => {
     ReactDOM.render(
-      <TestForm site="xxx" formKey="newsletter" client={mockClient} />,
+      <TestForm site="xxx" form="newsletter" client={mockClient} />,
       container
     );
   });

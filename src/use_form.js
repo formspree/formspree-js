@@ -21,8 +21,8 @@ export default function useForm(props) {
 
   const id = typeof props === 'object' ? props.id : props;
 
-  if (!id && !(props.site && props.key)) {
-    throw new Error('You must set an `id` or `site` & `key` properties');
+  if (!id && !(props.site && props.form)) {
+    throw new Error('You must set an `id` or `site` & `form` properties');
   }
 
   const endpoint = props.endpoint || 'https://api.statickit.com';
@@ -43,7 +43,7 @@ export default function useForm(props) {
       .submitForm({
         id: id,
         site: props.site,
-        key: props.key,
+        form: props.form,
         endpoint: endpoint,
         data: formData
       })
