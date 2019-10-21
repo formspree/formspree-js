@@ -3,27 +3,45 @@
   "version": "1.0.1",
   "description": "The React component library for StaticKit",
   "homepage": "https://statickit.com/docs/react",
-  "author": "Derrick Reimer",
-  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/unstacked/statickit-react/issues"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/unstacked/statickit-react.git"
   },
-  "module": "dist/statickit-react.esm.js",
-  "main": "dist/statickit-react.cjs.js",
+  "license": "MIT",
+  "author": "Derrick Reimer",
   "files": [
     "dist/statickit-react.esm.js",
     "dist/statickit-react.cjs.js",
     "dist/statickit-react.iife.js"
   ],
-  "publishConfig": {
-    "access": "public"
-  },
+  "main": "dist/statickit-react.cjs.js",
+  "module": "dist/statickit-react.esm.js",
   "scripts": {
     "build": "rollup -c",
-    "test": "jest",
+    "prepare": "npm run build",
     "release": "np",
-    "prepare": "npm run build"
+    "test": "jest"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,css,json,md}": [
+      "npx prettier --write",
+      "git add"
+    ],
+    "package.json": [
+      "npx sort-package-json",
+      "git add"
+    ]
+  },
+  "dependencies": {
+    "@statickit/core": "^1.4.0"
   },
   "devDependencies": {
     "@babel/core": "^7.5.4",
@@ -43,24 +61,14 @@
     "rollup": "^1.17.0",
     "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-commonjs": "^10.1.0",
-    "rollup-plugin-node-resolve": "^5.2.0"
-  },
-  "dependencies": {
-    "@statickit/core": "^1.3.1"
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "sort-package-json": "^1.22.1"
   },
   "peerDependencies": {
     "react": ">= 16.8.0"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "*.{js,css,json,md}": [
-      "npx prettier --write",
-      "git add"
-    ]
+  "publishConfig": {
+    "access": "public"
   },
   "np": {
     "yarn": false

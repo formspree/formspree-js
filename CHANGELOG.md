@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.0
+
+- Accept `site` + `form` combo (in lieu of `id`) for identifying forms.
+
+## 1.0.1
+
+- Bundle iife for testing in browser.
+
 ## 1.0.0
 
 - Refactor npm packaging and add tests.
