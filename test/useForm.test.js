@@ -1,5 +1,5 @@
 import React from 'react';
-import useForm from '../src/use_form';
+import { useForm } from '../src';
 import ReactDOM from 'react-dom';
 import ReactTestUtils from 'react-dom/test-utils';
 import StaticKit from '@statickit/core';

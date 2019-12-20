@@ -1,4 +1,2 @@
-import useForm from './use_form';
-import ValidationError from './validation_error';
-
-export { useForm, ValidationError };
+export { default as useForm } from './useForm';
+export { default as ValidationError } from './ValidationError';
