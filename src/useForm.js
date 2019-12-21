@@ -1,24 +1,12 @@
-import { useState, useEffect, useRef } from 'react';
-import StaticKit from '@statickit/core';
+import { useState } from 'react';
+import { useStaticKit } from './context';
 import { version } from '../package.json';
 
 export default function useForm(props) {
   const [submitting, setSubmitting] = useState(false);
   const [succeeded, setSucceeded] = useState(false);
   const [errors, setErrors] = useState([]);
-  const client = useRef(props.client);
-
-  useEffect(() => {
-    if (!client.current) {
-      client.current = StaticKit();
-    }
-
-    return () => {
-      if (client.current) {
-        client.current.teardown();
-      }
-    };
-  }, []);
+  const client = useStaticKit();
 
   const id = typeof props === 'object' ? props.id : props;
 
@@ -31,10 +19,17 @@ export default function useForm(props) {
   const extraData = props.data;
 
   const submit = event => {
+    event.preventDefault();
+
     const form = event.target;
 
-    if (form.tagName != 'FORM')
+    if (form.tagName != 'FORM') {
       throw new Error('submit was triggered for a non-form element');
+    }
+
+    if (!client) {
+      throw new Error('The StaticKit client must be instantiated');
+    }
 
     const formData = new FormData(form);
 
@@ -49,10 +44,9 @@ export default function useForm(props) {
       }
     }
 
-    event.preventDefault();
     setSubmitting(true);
 
-    return client.current
+    return client
       .submitForm({
         id: id,
         site: props.site,

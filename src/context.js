@@ -8,11 +8,17 @@ const StaticKitContext = React.createContext({
 StaticKitContext.displayName = 'StaticKit';
 
 export function StaticKit(props) {
-  const [client, setClient] = useState(null);
+  const [client, setClient] = useState(props.client);
   const [site, _] = useState(props.site);
 
+  if (!props.client && !props.site) {
+    throw new Error('site prop is required');
+  }
+
   useEffect(() => {
-    setClient(StaticKitFactory({ site }));
+    if (!client) {
+      setClient(StaticKitFactory({ site }));
+    }
 
     return () => {
       if (client) client.teardown();

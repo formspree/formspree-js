@@ -3,6 +3,7 @@ import { StaticKit, useStaticKit } from '../src';
 import ReactDOM from 'react-dom';
 import ReactTestUtils from 'react-dom/test-utils';
 import StaticKitFactory from '@statickit/core';
+import { ErrorBoundary } from './helpers';
 
 jest.mock('@statickit/core');
 
@@ -41,4 +42,21 @@ it('instantiates a client and provides it via useStaticKit hook', () => {
   });
 
   expect(container.querySelector('#client').textContent).toBe('client for xxx');
+});
+
+it('throws an error if site prop is not provided', () => {
+  // Mock error console to suppress noise in output
+  console.error = jest.fn();
+
+  act(() => {
+    ReactDOM.render(
+      <ErrorBoundary>
+        <StaticKit></StaticKit>
+      </ErrorBoundary>,
+      container
+    );
+  });
+
+  const error = container.querySelector('#error');
+  expect(error.textContent).toBe('site prop is required');
 });

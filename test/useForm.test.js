@@ -1,8 +1,9 @@
 import React from 'react';
-import { useForm } from '../src';
+import { StaticKit, useForm } from '../src';
 import ReactDOM from 'react-dom';
 import ReactTestUtils from 'react-dom/test-utils';
-import StaticKit from '@statickit/core';
+import StaticKitFactory from '@statickit/core';
+import { ErrorBoundary } from './helpers';
 import { version } from '../package.json';
 
 jest.mock('@statickit/core');
@@ -14,33 +15,12 @@ const success = new Promise(resolve => {
   resolve({ body: { id: '000', data: {} }, response: { status: 200 } });
 });
 
-class ErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false, errorMessage: null };
-  }
-
-  static getDerivedStateFromError(error) {
-    // Update state so the next render will show the fallback UI.
-    return { hasError: true, errorMessage: error.message };
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return <h1>{this.state.errorMessage}</h1>;
-    }
-
-    return this.props.children;
-  }
-}
-
 function TestForm(props) {
   const [state, submit] = useForm({
     id: props.id,
     site: props.site,
     form: props.form,
-    data: props.extraData,
-    client: props.client
+    data: props.extraData
   });
 
   if (state.succeeded) {
@@ -116,15 +96,17 @@ it('fails it initialize without identifying properties', () => {
 
   act(() => {
     ReactDOM.render(
-      <ErrorBoundary>
-        <TestForm client={{}} />
-      </ErrorBoundary>,
+      <StaticKit site="xxx">
+        <ErrorBoundary>
+          <TestForm />
+        </ErrorBoundary>
+      </StaticKit>,
       container
     );
   });
 
-  const heading = container.querySelector('h1');
-  expect(heading.textContent).toBe(
+  const error = container.querySelector('#error');
+  expect(error.textContent).toBe(
     'You must set an `id` or `site` & `form` properties'
   );
 
@@ -133,7 +115,7 @@ it('fails it initialize without identifying properties', () => {
 });
 
 it('submits successfully with legacy arg structure', async () => {
-  StaticKit.mockImplementation(() => ({
+  StaticKitFactory.mockImplementation(() => ({
     submitForm: props => {
       expect(props.id).toBe('xxx');
       return success;
@@ -142,7 +124,12 @@ it('submits successfully with legacy arg structure', async () => {
   }));
 
   act(() => {
-    ReactDOM.render(<TestFormLegacyArgs id="xxx" />, container);
+    ReactDOM.render(
+      <StaticKit site="xxx">
+        <TestFormLegacyArgs id="xxx" />
+      </StaticKit>,
+      container
+    );
   });
 
   const heading = container.querySelector('h1');
@@ -168,7 +155,12 @@ it('submits a client name', async () => {
   };
 
   act(() => {
-    ReactDOM.render(<TestForm id="xxx" client={mockClient} />, container);
+    ReactDOM.render(
+      <StaticKit client={mockClient}>
+        <TestForm id="xxx" />
+      </StaticKit>,
+      container
+    );
   });
 
   const form = container.querySelector('form');
@@ -188,7 +180,12 @@ it('submits successfully with `id` property', async () => {
   };
 
   act(() => {
-    ReactDOM.render(<TestForm id="xxx" client={mockClient} />, container);
+    ReactDOM.render(
+      <StaticKit client={mockClient}>
+        <TestForm id="xxx" />
+      </StaticKit>,
+      container
+    );
   });
 
   const heading = container.querySelector('h1');
@@ -216,7 +213,9 @@ it('submits successfully with `site` + `form` properties', async () => {
 
   act(() => {
     ReactDOM.render(
-      <TestForm site="xxx" form="newsletter" client={mockClient} />,
+      <StaticKit client={mockClient}>
+        <TestForm site="xxx" form="newsletter" />
+      </StaticKit>,
       container
     );
   });
@@ -245,12 +244,9 @@ it('appends extra data to form data', async () => {
 
   act(() => {
     ReactDOM.render(
-      <TestForm
-        site="xxx"
-        form="newsletter"
-        extraData={{ extra: 'yep' }}
-        client={mockClient}
-      />,
+      <StaticKit client={mockClient}>
+        <TestForm site="xxx" form="newsletter" extraData={{ extra: 'yep' }} />
+      </StaticKit>,
       container
     );
   });
@@ -273,16 +269,17 @@ it('evaluates functions passed in data', async () => {
 
   act(() => {
     ReactDOM.render(
-      <TestForm
-        site="xxx"
-        form="newsletter"
-        extraData={{
-          extra: () => {
-            return 'yep';
-          }
-        }}
-        client={mockClient}
-      />,
+      <StaticKit client={mockClient}>
+        <TestForm
+          site="xxx"
+          form="newsletter"
+          extraData={{
+            extra: () => {
+              return 'yep';
+            }
+          }}
+        />
+      </StaticKit>,
       container
     );
   });
@@ -316,7 +313,12 @@ it('reacts to server-side validation errors', async () => {
   };
 
   act(() => {
-    ReactDOM.render(<TestForm id="xxx" client={mockClient} />, container);
+    ReactDOM.render(
+      <StaticKit client={mockClient}>
+        <TestForm id="xxx" />
+      </StaticKit>,
+      container
+    );
   });
 
   const form = container.querySelector('form');
