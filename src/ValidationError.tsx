@@ -1,6 +1,17 @@
 import React from 'react';
 
-export default function ValidationError(props) {
+interface Props {
+  prefix?: string;
+  field: string;
+  errors: Array<{
+    field: string;
+    message: string;
+    code: string | null;
+    properties: object;
+  }>;
+}
+
+export const ValidationError: React.FC<Props> = props => {
   const { prefix, field, errors, ...attrs } = props;
 
   const error = (errors || []).find(error => {
@@ -16,4 +27,4 @@ export default function ValidationError(props) {
       {prefix} {error.message}
     </div>
   );
-}
+};

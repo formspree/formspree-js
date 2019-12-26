@@ -15,16 +15,14 @@ const plugins = [
     extensions,
     browser: true
   }),
-  commonjs({
-    include: 'node_modules/**'
-  }),
+  commonjs(),
   json()
 ];
 
 export default [
   {
     external: ['react', '@statickit/core'],
-    input: './src/index.js',
+    input: './src/index.ts',
     plugins: plugins,
     output: [
       {
@@ -39,7 +37,7 @@ export default [
   },
   {
     external: ['react'],
-    input: './src/index.js',
+    input: './src/index.ts',
     plugins: plugins,
     output: {
       format: 'iife',
