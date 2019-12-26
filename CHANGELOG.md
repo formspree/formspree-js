@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.0
+
+- Migrate to Typescript
+- Add `StaticKit` context provider and `useStaticKit` hook for consuming context
+- Add `usePaymentForm` hook
+
 ## 1.2.0
 
 - Update core to fix body serialization bug.
