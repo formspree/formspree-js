@@ -3,8 +3,6 @@ import { useStaticKit } from './context';
 import { version } from '../package.json';
 import { Result } from '@statickit/core/dist/types/src/methods/submitForm';
 
-// TODO: Expose an interface for submitForm return value in core
-
 interface Props {
   id?: string;
   site?: string;
@@ -14,11 +12,13 @@ interface Props {
   data?: { [key: string]: string | (() => string) };
 }
 
+type SubmitHandler = (
+  event: React.FormEvent<HTMLFormElement>
+) => Promise<Result>;
+
 type ReturnValue = [
   { submitting: boolean; succeeded: boolean; errors: any },
-  (
-    event: React.FormEvent<HTMLFormElement>
-  ) => Promise<{ body: any; response: Response }>
+  SubmitHandler
 ];
 
 export function useForm(props: Props): ReturnValue {
