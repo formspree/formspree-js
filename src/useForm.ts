@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useStaticKit } from './context';
 import { version } from '../package.json';
+import { Result } from '@statickit/core/dist/types/src/methods/submitForm';
 
 // TODO: Expose an interface for submitForm return value in core
 
@@ -38,7 +39,7 @@ export function useForm(props: Props): ReturnValue {
 
   const handleSubmit = (
     event: React.FormEvent<HTMLFormElement>
-  ): Promise<{ body: any; response: Response }> => {
+  ): Promise<Result> => {
     event.preventDefault();
     const form = event.target as HTMLFormElement;
 
@@ -100,6 +101,7 @@ export function useForm(props: Props): ReturnValue {
       .catch((error: Error) => {
         if (debug) console.log(id, 'Unexpected error', error);
         setSucceeded(false);
+        throw error;
       })
       .finally(() => {
         setSubmitting(false);

@@ -44,7 +44,7 @@
     ]
   },
   "dependencies": {
-    "@statickit/core": "github:unstacked/statickit-core#86b0d60"
+    "@statickit/core": "github:unstacked/statickit-core#829c135"
   },
   "devDependencies": {
     "@babel/core": "^7.5.4",
