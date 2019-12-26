@@ -1,8 +1,26 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useStaticKit } from './context';
 import { version } from '../package.json';
 
-export default function useForm(props) {
+// TODO: Expose an interface for submitForm return value in core
+
+interface Props {
+  id?: string;
+  site?: string;
+  form?: string;
+  endpoint?: string;
+  debug?: boolean;
+  data?: { [key: string]: string | (() => string) };
+}
+
+type ReturnValue = [
+  { submitting: boolean; succeeded: boolean; errors: any },
+  (
+    event: React.FormEvent<HTMLFormElement>
+  ) => Promise<{ body: any; response: Response }>
+];
+
+export function useForm(props: Props): ReturnValue {
   const [submitting, setSubmitting] = useState(false);
   const [succeeded, setSucceeded] = useState(false);
   const [errors, setErrors] = useState([]);
@@ -18,10 +36,11 @@ export default function useForm(props) {
   const debug = !!props.debug;
   const extraData = props.data;
 
-  const submit = event => {
+  const handleSubmit = (
+    event: React.FormEvent<HTMLFormElement>
+  ): Promise<{ body: any; response: Response }> => {
     event.preventDefault();
-
-    const form = event.target;
+    const form = event.target as HTMLFormElement;
 
     if (form.tagName != 'FORM') {
       throw new Error('submit was triggered for a non-form element');
@@ -37,9 +56,9 @@ export default function useForm(props) {
     if (typeof extraData === 'object') {
       for (const prop in extraData) {
         if (typeof extraData[prop] === 'function') {
-          formData.append(prop, extraData[prop].call(null));
+          formData.append(prop, (extraData[prop] as (() => string)).call(null));
         } else {
-          formData.append(prop, extraData[prop]);
+          formData.append(prop, extraData[prop] as string);
         }
       }
     }
@@ -55,7 +74,7 @@ export default function useForm(props) {
         clientName: `@statickit/react@${version}`,
         data: formData
       })
-      .then(result => {
+      .then((result: { body: any; response: Response }) => {
         switch (result.response.status) {
           case 200:
             if (debug) console.log('Form submitted', result);
@@ -78,7 +97,7 @@ export default function useForm(props) {
 
         return result;
       })
-      .catch(error => {
+      .catch((error: Error) => {
         if (debug) console.log(id, 'Unexpected error', error);
         setSucceeded(false);
       })
@@ -87,5 +106,5 @@ export default function useForm(props) {
       });
   };
 
-  return [{ submitting, succeeded, errors }, submit];
+  return [{ submitting, succeeded, errors }, handleSubmit];
 }

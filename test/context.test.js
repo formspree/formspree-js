@@ -2,7 +2,7 @@ import React from 'react';
 import { StaticKit, useStaticKit } from '../src';
 import ReactDOM from 'react-dom';
 import ReactTestUtils from 'react-dom/test-utils';
-import StaticKitFactory from '@statickit/core';
+import { createClient } from '@statickit/core';
 import { ErrorBoundary } from './helpers';
 
 jest.mock('@statickit/core');
@@ -22,7 +22,7 @@ afterEach(() => {
 });
 
 it('instantiates a client and provides it via useStaticKit hook', () => {
-  StaticKitFactory.mockImplementation(({ site }) => `client for ${site}`);
+  createClient.mockImplementation(({ site }) => `client for ${site}`);
 
   const Component = () => {
     const statickit = useStaticKit();

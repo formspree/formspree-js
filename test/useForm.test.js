@@ -2,7 +2,7 @@ import React from 'react';
 import { StaticKit, useForm } from '../src';
 import ReactDOM from 'react-dom';
 import ReactTestUtils from 'react-dom/test-utils';
-import StaticKitFactory from '@statickit/core';
+import { createClient } from '@statickit/core';
 import { ErrorBoundary } from './helpers';
 import { version } from '../package.json';
 
@@ -115,7 +115,7 @@ it('fails it initialize without identifying properties', () => {
 });
 
 it('submits successfully with legacy arg structure', async () => {
-  StaticKitFactory.mockImplementation(() => ({
+  createClient.mockImplementation(() => ({
     submitForm: props => {
       expect(props.id).toBe('xxx');
       return success;
