@@ -13,9 +13,7 @@
   "license": "MIT",
   "author": "Derrick Reimer",
   "files": [
-    "dist/statickit-react.esm.js",
-    "dist/statickit-react.cjs.js",
-    "dist/statickit-react.iife.js"
+    "dist/**/*.{js,ts}"
   ],
   "main": "dist/statickit-react.cjs.js",
   "module": "dist/statickit-react.esm.js",

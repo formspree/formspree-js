@@ -2,6 +2,7 @@ import babel from 'rollup-plugin-babel';
 import commonjs from 'rollup-plugin-commonjs';
 import nodeResolve from 'rollup-plugin-node-resolve';
 import json from 'rollup-plugin-json';
+import pkg from './package.json';
 
 const plugins = [
   nodeResolve(),
@@ -17,25 +18,22 @@ const plugins = [
 export default [
   {
     external: ['react', '@statickit/core'],
-    input: 'src/index.js',
+    input: './src/index.js',
     plugins: plugins,
-    output: {
-      format: 'cjs',
-      file: __dirname + '/dist/statickit-react.cjs.js'
-    }
-  },
-  {
-    external: ['react', '@statickit/core'],
-    input: 'src/index.js',
-    plugins: plugins,
-    output: {
-      format: 'esm',
-      file: __dirname + '/dist/statickit-react.esm.js'
-    }
+    output: [
+      {
+        format: 'cjs',
+        file: pkg.main
+      },
+      {
+        format: 'esm',
+        file: pkg.module
+      }
+    ]
   },
   {
     external: ['react'],
-    input: 'src/index.js',
+    input: './src/index.js',
     plugins: plugins,
     output: {
       format: 'iife',
