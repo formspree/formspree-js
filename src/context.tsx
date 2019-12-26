@@ -1,13 +1,22 @@
 import React, { useEffect, useState, useContext } from 'react';
-import createClient from '@statickit/core';
+import { StaticKit as Client, createClient } from '@statickit/core';
 
-const StaticKitContext = React.createContext({
-  client: null
+interface Context {
+  client: undefined | Client;
+}
+
+export interface Props {
+  site?: string;
+  client?: Client;
+}
+
+const StaticKitContext = React.createContext<Context>({
+  client: undefined
 });
 
 StaticKitContext.displayName = 'StaticKit';
 
-export function StaticKit(props) {
+export const StaticKit: React.FC<Props> = props => {
   const [client, setClient] = useState(props.client);
   const [site, _] = useState(props.site);
 
@@ -30,9 +39,9 @@ export function StaticKit(props) {
       {props.children}
     </StaticKitContext.Provider>
   );
-}
+};
 
-export function useStaticKit() {
+export function useStaticKit(): Client | undefined {
   const { client } = useContext(StaticKitContext);
   return client;
 }

@@ -4,13 +4,19 @@ import nodeResolve from 'rollup-plugin-node-resolve';
 import json from 'rollup-plugin-json';
 import pkg from './package.json';
 
+const extensions = ['.js', '.ts', '.tsx'];
+
 const plugins = [
-  nodeResolve(),
+  babel({
+    extensions,
+    include: ['src/**/*']
+  }),
+  nodeResolve({
+    extensions,
+    browser: true
+  }),
   commonjs({
     include: 'node_modules/**'
-  }),
-  babel({
-    exclude: 'node_modules/**'
   }),
   json()
 ];

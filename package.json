@@ -18,10 +18,15 @@
   "main": "dist/statickit-react.cjs.js",
   "module": "dist/statickit-react.esm.js",
   "scripts": {
-    "build": "rollup -c",
+    "build": "npm run build:types && npm run build:js",
+    "build:js": "rollup -c",
+    "build:types": "tsc --emitDeclarationOnly",
+    "format": "npx prettier --write 'src/**/*.{js,ts}'",
     "prepare": "npm run build",
     "release": "np",
-    "test": "jest"
+    "test": "jest",
+    "type-check": "tsc --noEmit",
+    "type-check:watch": "npm run type-check -- --watch"
   },
   "husky": {
     "hooks": {
@@ -29,7 +34,7 @@
     }
   },
   "lint-staged": {
-    "*.{js,css,json,md}": [
+    "*.{js,ts,tsx,css,json,md}": [
       "npx prettier --write",
       "git add"
     ],
@@ -39,14 +44,17 @@
     ]
   },
   "dependencies": {
-    "@statickit/core": "unstacked/statickit-core"
+    "@statickit/core": "github:unstacked/statickit-core#86b0d60"
   },
   "devDependencies": {
     "@babel/core": "^7.5.4",
     "@babel/plugin-transform-runtime": "^7.6.2",
     "@babel/preset-env": "^7.6.3",
     "@babel/preset-react": "^7.0.0",
+    "@babel/preset-typescript": "^7.7.7",
     "@babel/runtime": "^7.6.3",
+    "@types/react": "^16.9.17",
+    "@types/react-dom": "^16.9.4",
     "babel-jest": "^24.9.0",
     "husky": "^3.0.5",
     "jest": "^24.9.0",
