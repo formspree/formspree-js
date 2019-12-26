@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import StaticKitFactory from '@statickit/core';
+import createClient from '@statickit/core';
 
 const StaticKitContext = React.createContext({
   client: null
@@ -17,7 +17,7 @@ export function StaticKit(props) {
 
   useEffect(() => {
     if (!client) {
-      setClient(StaticKitFactory({ site }));
+      setClient(createClient({ site }));
     }
 
     return () => {
