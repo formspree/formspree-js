@@ -18,7 +18,7 @@
   "main": "dist/statickit-react.cjs.js",
   "module": "dist/statickit-react.esm.js",
   "scripts": {
-    "build": "npm run build:types && npm run build:js",
+    "build": "rm -rf dist && npm run build:types && npm run build:js",
     "build:js": "rollup -c",
     "build:types": "tsc --emitDeclarationOnly",
     "format": "npx prettier --write 'src/**/*.{js,ts}'",
@@ -44,7 +44,7 @@
     ]
   },
   "dependencies": {
-    "@statickit/core": "github:unstacked/statickit-core#829c135"
+    "@statickit/core": "^2.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.5.4",

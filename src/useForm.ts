@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import { useStaticKit } from './context';
 import { version } from '../package.json';
-import { Result } from '@statickit/core/dist/types/src/methods/submitForm';
+import { SubmissionResponse } from '@statickit/core/forms';
 
-interface Props {
-  id?: string;
-  site?: string;
-  form?: string;
+interface Args {
+  form: string;
   endpoint?: string;
   debug?: boolean;
   data?: { [key: string]: string | (() => string) };
@@ -14,32 +12,27 @@ interface Props {
 
 type SubmitHandler = (
   event: React.FormEvent<HTMLFormElement>
-) => Promise<Result>;
+) => Promise<SubmissionResponse>;
 
 type ReturnValue = [
   { submitting: boolean; succeeded: boolean; errors: any },
   SubmitHandler
 ];
 
-export function useForm(props: Props): ReturnValue {
+export function useForm(args: Args): ReturnValue {
   const [submitting, setSubmitting] = useState(false);
   const [succeeded, setSucceeded] = useState(false);
   const [errors, setErrors] = useState([]);
   const client = useStaticKit();
 
-  const id = typeof props === 'object' ? props.id : props;
-
-  if (!id && !(props.site && props.form)) {
-    throw new Error('You must set an `id` or `site` & `form` properties');
+  if (!args.form) {
+    throw new Error('You must provide a `form` key');
   }
 
-  const endpoint = props.endpoint || 'https://api.statickit.com';
-  const debug = !!props.debug;
-  const extraData = props.data;
+  const debug = !!args.debug;
+  const extraData = args.data;
 
-  const handleSubmit = (
-    event: React.FormEvent<HTMLFormElement>
-  ): Promise<Result> => {
+  const handleSubmit: SubmitHandler = event => {
     event.preventDefault();
     const form = event.target as HTMLFormElement;
 
@@ -67,13 +60,9 @@ export function useForm(props: Props): ReturnValue {
     setSubmitting(true);
 
     return client
-      .submitForm({
-        id: id,
-        site: props.site,
-        form: props.form,
-        endpoint: endpoint,
-        clientName: `@statickit/react@${version}`,
-        data: formData
+      .submitForm(args.form, formData, {
+        endpoint: args.endpoint,
+        clientName: `@statickit/react@${version}`
       })
       .then((result: { body: any; response: Response }) => {
         switch (result.response.status) {
@@ -99,7 +88,7 @@ export function useForm(props: Props): ReturnValue {
         return result;
       })
       .catch((error: Error) => {
-        if (debug) console.log(id, 'Unexpected error', error);
+        if (debug) console.log('Unexpected error', error);
         setSucceeded(false);
         throw error;
       })

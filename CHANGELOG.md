@@ -4,7 +4,6 @@
 
 - Migrate to TypeScript
 - Add `StaticKit` context provider and `useStaticKit` hook for consuming context
-- Add `usePaymentForm` hook
 
 ## 1.2.0
 

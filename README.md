@@ -2,7 +2,7 @@
 
 The React component library for [StaticKit](https://statickit.com).
 
-## Getting Started
+## Installation
 
 Run the following to install via npm:
 
@@ -10,21 +10,35 @@ Run the following to install via npm:
 npm install @statickit/react
 ```
 
-This package assumes that you already have React available as a dependency.
+This package assumes that you already have React available as a dependency. Since we use [React Hooks](https://reactjs.org/docs/hooks-intro.html), you must be on React >= 16.8.0.
 
-Since we use [React Hooks](https://reactjs.org/docs/hooks-intro.html), you must be on React >= 16.8.0.
+## Usage
 
-### Simple example
+Place the `StaticKit` provider in your main `App` or layout component. This will provide an instance of the StaticKit client to child components:
+
+_app.jsx_:
+
+```jsx
+import { StaticKit } from '@statickit/react';
+
+export default function App(props) {
+  return <StaticKit site="XXXXXXXXX">{props.children}</StaticKit>;
+}
+```
+
+### Forms
 
 Here's a simple example of a StaticKit-powered form:
+
+_ContactForm.jsx_
 
 ```jsx
 import { useForm } from '@statickit/react';
 
-function MyForm() {
+export default function ContactForm() {
   // Call the `useForm` hook in your function component
   const [state, submit] = useForm({
-    id: 'XXXXXXXXX'
+    form: 'myForm'
   });
 
   // Display success message in place of the form
@@ -42,58 +56,4 @@ function MyForm() {
 }
 ```
 
-At a minimum, all you have to do is use a `<form>` element and pass `submit` as the `onSubmit` handler.
-
-The `state` object contains the following:
-
-| Key          | Description                                                   |
-| :----------- | :------------------------------------------------------------ |
-| `submitting` | A Boolean indicating whether the form is currently submitting |
-| `succeeded`  | A Boolean indicating whether the form successfully submitted  |
-| `errors`     | An Array of server-side validation errors                     |
-
-The `errors` objects include the following:
-
-| Key       | Description                                        |
-| :-------- | :------------------------------------------------- |
-| `field`   | The name of the field                              |
-| `message` | The error message (e.g. "is required")             |
-| `code`    | The error code (e.g. "REQUIRED" or "EMAIL_FORMAT") |
-
-### Rendering validation errors
-
-Here's a more advanced example that displays validation errors for the `email` field:
-
-```jsx
-import { ValidationError, useForm } from '@statickit/react';
-
-function MyForm() {
-  const [state, submit] = useForm({
-    id: 'XXXXXXXXX'
-  });
-
-  if (state.succeeded) {
-    return <div>Thank you for signing up!</div>;
-  }
-
-  // Render email validation errors and disable the submit button when submitting
-  return (
-    <form onSubmit={submit}>
-      <label htmlFor="email">Email</label>
-      <input type="email" name="email" required />
-      <ValidationError field="email" prefix="Email" errors={state.errors} />
-      <button type="submit" disabled={state.submitting}>
-        Sign up
-      </button>
-    </form>
-  );
-}
-```
-
-The `ValidationError` component accepts the following special properties:
-
-- `field` - the name of the field for which to display errors (required)
-- `errors` - the object containing validation errors (required)
-- `prefix` - the human-friendly name of the field (optional, defaults to `This field`)
-
-The rest of the props (such as `className`) are passed along to the `<div>` wrapper.
+[**&rarr; Read the docs**](https://statickit.com/docs/react)
