@@ -2,12 +2,11 @@ import React, { useEffect, useState, useContext } from 'react';
 import { StaticKit as Client, createClient } from '@statickit/core';
 
 interface Context {
-  client: undefined | Client;
+  client: Client;
 }
 
 export interface Props {
-  site?: string;
-  client?: Client;
+  site: string;
 }
 
 const StaticKitContext = React.createContext<Context>({
@@ -17,22 +16,19 @@ const StaticKitContext = React.createContext<Context>({
 StaticKitContext.displayName = 'StaticKit';
 
 export const StaticKit: React.FC<Props> = props => {
-  const [client, setClient] = useState(props.client);
-  const [site, _] = useState(props.site);
-
-  if (!props.client && !props.site) {
-    throw new Error('site prop is required');
+  if (!props.site) {
+    throw new Error('site is required');
   }
 
+  const [client, _setClient] = useState(createClient({ site: props.site }));
+
   useEffect(() => {
-    if (!client) {
-      setClient(createClient({ site }));
-    }
+    client.startBrowserSession();
 
     return () => {
-      if (client) client.teardown();
+      client.teardown();
     };
-  }, [site]);
+  }, []);
 
   return (
     <StaticKitContext.Provider value={{ client }}>
@@ -41,7 +37,7 @@ export const StaticKit: React.FC<Props> = props => {
   );
 };
 
-export function useStaticKit(): Client | undefined {
+export function useStaticKit(): Client {
   const { client } = useContext(StaticKitContext);
   return client;
 }

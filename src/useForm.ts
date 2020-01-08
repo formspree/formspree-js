@@ -3,23 +3,28 @@ import { useStaticKit } from './context';
 import { version } from '../package.json';
 import { SubmissionResponse } from '@statickit/core/forms';
 
-interface Args {
-  form: string;
-  endpoint?: string;
-  debug?: boolean;
-  data?: { [key: string]: string | (() => string) };
-}
-
 type SubmitHandler = (
   event: React.FormEvent<HTMLFormElement>
 ) => Promise<SubmissionResponse>;
 
-type ReturnValue = [
-  { submitting: boolean; succeeded: boolean; errors: any },
+export function useForm(args: {
+  form: string;
+  data?: { [key: string]: string | (() => string) };
+  endpoint?: string;
+  debug?: boolean;
+}): [
+  {
+    submitting: boolean;
+    succeeded: boolean;
+    errors: {
+      field: string;
+      message: string;
+      code: string | null;
+      properties: object;
+    }[];
+  },
   SubmitHandler
-];
-
-export function useForm(args: Args): ReturnValue {
+] {
   const [submitting, setSubmitting] = useState(false);
   const [succeeded, setSucceeded] = useState(false);
   const [errors, setErrors] = useState([]);
