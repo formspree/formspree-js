@@ -17,6 +17,7 @@
   ],
   "main": "dist/statickit-react.cjs.js",
   "module": "dist/statickit-react.esm.js",
+  "types": "dist/types/src/index.d.ts",
   "scripts": {
     "build": "rm -rf dist && npm run build:types && npm run build:js",
     "build:js": "rollup -c",
