@@ -21,9 +21,11 @@ _app.jsx_:
 ```jsx
 import { StaticKit } from '@statickit/react';
 
-export default function App(props) {
+function App(props) {
   return <StaticKit site="XXXXXXXXX">{props.children}</StaticKit>;
 }
+
+export default App;
 ```
 
 ### Forms
@@ -35,7 +37,7 @@ _ContactForm.jsx_
 ```jsx
 import { useForm } from '@statickit/react';
 
-export default function ContactForm() {
+function ContactForm() {
   // Call the `useForm` hook in your function component
   const [state, submit] = useForm({
     form: 'myForm'
@@ -54,6 +56,8 @@ export default function ContactForm() {
     </form>
   );
 }
+
+export default ContactForm;
 ```
 
 [**&rarr; Read the docs**](https://statickit.com/docs/react)
