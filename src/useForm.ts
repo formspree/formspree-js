@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useStaticKit } from './context';
 import { version } from '../package.json';
+import { StaticKit as Client } from '@statickit/core';
 import { SubmissionResponse } from '@statickit/core/forms';
 
 type SubmitHandler = (
@@ -9,6 +10,7 @@ type SubmitHandler = (
 
 export function useForm(args: {
   form: string;
+  client?: Client;
   data?: { [key: string]: string | (() => string) };
   endpoint?: string;
   debug?: boolean;
@@ -28,7 +30,12 @@ export function useForm(args: {
   const [submitting, setSubmitting] = useState(false);
   const [succeeded, setSucceeded] = useState(false);
   const [errors, setErrors] = useState([]);
-  const client = useStaticKit();
+  const globalClient = useStaticKit();
+  const client = args.client || globalClient;
+
+  if (!client) {
+    throw new Error('You must provide a StaticKit client');
+  }
 
   if (!args.form) {
     throw new Error('You must provide a `form` key');

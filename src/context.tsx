@@ -20,7 +20,9 @@ export const StaticKit: React.FC<Props> = props => {
     throw new Error('site is required');
   }
 
-  const [client, _setClient] = useState(createClient({ site: props.site }));
+  const [client] = useState(() => {
+    return createClient({ site: props.site });
+  });
 
   useEffect(() => {
     client.startBrowserSession();

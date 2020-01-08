@@ -22,11 +22,14 @@ afterEach(() => {
 });
 
 it('instantiates a client and provides it via useStaticKit hook', () => {
-  createClient.mockImplementation(({ site }) => `client for ${site}`);
+  createClient.mockImplementation(() => ({
+    startBrowserSession: () => {},
+    name: 'Client'
+  }));
 
   const Component = () => {
-    const statickit = useStaticKit();
-    return <div id="client">{statickit}</div>;
+    const client = useStaticKit();
+    return <div id="client">{client.name}</div>;
   };
 
   const Page = ({ site }) => {
@@ -41,7 +44,7 @@ it('instantiates a client and provides it via useStaticKit hook', () => {
     ReactDOM.render(<Page site="xxx" />, container);
   });
 
-  expect(container.querySelector('#client').textContent).toBe('client for xxx');
+  expect(container.querySelector('#client').textContent).toBe('Client');
 });
 
 it('throws an error if site prop is not provided', () => {
@@ -58,5 +61,5 @@ it('throws an error if site prop is not provided', () => {
   });
 
   const error = container.querySelector('#error');
-  expect(error.textContent).toBe('site prop is required');
+  expect(error.textContent).toBe('site is required');
 });

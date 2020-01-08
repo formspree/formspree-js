@@ -6,6 +6,8 @@ import { ErrorBoundary } from './helpers';
 import { version } from '../package.json';
 
 jest.mock('@statickit/core');
+import { createClient } from '@statickit/core';
+const core = jest.requireActual('@statickit/core');
 
 const { act } = ReactTestUtils;
 
@@ -14,10 +16,13 @@ const success = new Promise(resolve => {
   resolve({ body: { id: '000', data: {} }, response: { status: 200 } });
 });
 
+const submitSpy = jest.fn();
+
 function TestForm(props) {
   const [state, submit] = useForm({
     form: props.form,
-    data: props.extraData
+    data: props.extraData,
+    client: props.client
   });
 
   if (state.succeeded) {
@@ -51,6 +56,7 @@ let container;
 beforeEach(() => {
   container = document.createElement('div');
   document.body.appendChild(container);
+  submitSpy.mockClear();
 });
 
 afterEach(() => {
@@ -59,6 +65,8 @@ afterEach(() => {
 });
 
 it('fails it initialize without identifying properties', () => {
+  createClient.mockImplementation(core.createClient);
+
   // Mock error console to suppress noise in output
   console.error = jest.fn();
 
@@ -80,10 +88,11 @@ it('fails it initialize without identifying properties', () => {
   expect(console.error).toHaveBeenCalled();
 });
 
-it('submits a client name', async () => {
+it('accepts a client directly', async () => {
   const mockClient = {
+    startBrowserSession: () => {},
     submitForm: (_form, _data, opts) => {
-      expect(opts.clientName).toBe(`@statickit/react@${version}`);
+      submitSpy();
       return success;
     },
     teardown: () => {}
@@ -91,7 +100,33 @@ it('submits a client name', async () => {
 
   act(() => {
     ReactDOM.render(
-      <StaticKit client={mockClient}>
+      <TestForm form="newsletter" client={mockClient} />,
+      container
+    );
+  });
+
+  const form = container.querySelector('form');
+
+  await act(async () => {
+    ReactTestUtils.Simulate.submit(form);
+  });
+
+  expect(submitSpy).toHaveBeenCalled();
+});
+
+it('submits a client name', async () => {
+  createClient.mockImplementation(() => ({
+    startBrowserSession: () => {},
+    submitForm: (_form, _data, opts) => {
+      expect(opts.clientName).toBe(`@statickit/react@${version}`);
+      return success;
+    },
+    teardown: () => {}
+  }));
+
+  act(() => {
+    ReactDOM.render(
+      <StaticKit site="xxx">
         <TestForm form="newsletter" />
       </StaticKit>,
       container
@@ -106,17 +141,18 @@ it('submits a client name', async () => {
 });
 
 it('submits successfully form key', async () => {
-  const mockClient = {
+  createClient.mockImplementation(() => ({
+    startBrowserSession: () => {},
     submitForm: (form, _data, _opts) => {
       expect(form).toBe('newsletter');
       return success;
     },
     teardown: () => {}
-  };
+  }));
 
   act(() => {
     ReactDOM.render(
-      <StaticKit client={mockClient}>
+      <StaticKit site="xxx">
         <TestForm form="newsletter" />
       </StaticKit>,
       container
@@ -137,17 +173,18 @@ it('submits successfully form key', async () => {
 });
 
 it('appends extra data to form data', async () => {
-  const mockClient = {
+  createClient.mockImplementation(() => ({
+    startBrowserSession: () => {},
     submitForm: (_form, data, _opts) => {
       expect(data.get('extra')).toBe('yep');
       return success;
     },
     teardown: () => {}
-  };
+  }));
 
   act(() => {
     ReactDOM.render(
-      <StaticKit client={mockClient}>
+      <StaticKit site="xxx">
         <TestForm form="newsletter" extraData={{ extra: 'yep' }} />
       </StaticKit>,
       container
@@ -162,17 +199,18 @@ it('appends extra data to form data', async () => {
 });
 
 it('evaluates functions passed in data', async () => {
-  const mockClient = {
+  createClient.mockImplementation(() => ({
+    startBrowserSession: () => {},
     submitForm: (_form, data, _opts) => {
       expect(data.get('extra')).toBe('yep');
       return success;
     },
     teardown: () => {}
-  };
+  }));
 
   act(() => {
     ReactDOM.render(
-      <StaticKit client={mockClient}>
+      <StaticKit site="xxx">
         <TestForm
           form="newsletter"
           extraData={{
@@ -194,7 +232,8 @@ it('evaluates functions passed in data', async () => {
 });
 
 it('reacts to server-side validation errors', async () => {
-  const mockClient = {
+  createClient.mockImplementation(() => ({
+    startBrowserSession: () => {},
     submitForm: (_form, _data, _opts) => {
       return new Promise(resolve => {
         resolve({
@@ -212,11 +251,11 @@ it('reacts to server-side validation errors', async () => {
       });
     },
     teardown: () => {}
-  };
+  }));
 
   act(() => {
     ReactDOM.render(
-      <StaticKit client={mockClient}>
+      <StaticKit site="xxx">
         <TestForm form="newsletter" />
       </StaticKit>,
       container
