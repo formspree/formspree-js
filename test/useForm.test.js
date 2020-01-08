@@ -105,38 +105,7 @@ it('submits a client name', async () => {
   });
 });
 
-it('submits successfully with `id` property', async () => {
-  const mockClient = {
-    submitForm: (form, _data, _opts) => {
-      expect(form).toBe('newsletter');
-      return success;
-    },
-    teardown: () => {}
-  };
-
-  act(() => {
-    ReactDOM.render(
-      <StaticKit client={mockClient}>
-        <TestForm form="newsletter" />
-      </StaticKit>,
-      container
-    );
-  });
-
-  const heading = container.querySelector('h1');
-  const form = container.querySelector('form');
-
-  expect(heading.textContent).toBe('Form');
-
-  await act(async () => {
-    ReactTestUtils.Simulate.submit(form);
-  });
-
-  const message = container.querySelector('#message');
-  expect(message.textContent).toBe('Thanks!');
-});
-
-it('submits successfully with `site` + `form` properties', async () => {
+it('submits successfully form key', async () => {
   const mockClient = {
     submitForm: (form, _data, _opts) => {
       expect(form).toBe('newsletter');
