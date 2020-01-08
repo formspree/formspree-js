@@ -2,7 +2,6 @@ import React from 'react';
 import { StaticKit, useForm } from '../src';
 import ReactDOM from 'react-dom';
 import ReactTestUtils from 'react-dom/test-utils';
-import { createClient } from '@statickit/core';
 import { ErrorBoundary } from './helpers';
 import { version } from '../package.json';
 
