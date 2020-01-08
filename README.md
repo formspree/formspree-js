@@ -32,7 +32,7 @@ export default App;
 
 Here's a simple example of a StaticKit-powered form:
 
-_ContactForm.jsx_
+_ContactForm.jsx_:
 
 ```jsx
 import { useForm } from '@statickit/react';
