@@ -52,10 +52,6 @@ export function useForm(args: {
       throw new Error('submit was triggered for a non-form element');
     }
 
-    if (!client) {
-      throw new Error('The StaticKit client must be instantiated');
-    }
-
     const formData = new FormData(form);
 
     // Append extra data from config
