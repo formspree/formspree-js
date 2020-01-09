@@ -22,7 +22,7 @@ _app.jsx_:
 import { StaticKit } from '@statickit/react';
 
 function App(props) {
-  return <StaticKit site="XXXXXXXXX">{props.children}</StaticKit>;
+  return <StaticKit site="REPLACE WITH SITE ID">{props.children}</StaticKit>;
 }
 
 export default App;
@@ -39,9 +39,7 @@ import { useForm } from '@statickit/react';
 
 function ContactForm() {
   // Call the `useForm` hook in your function component
-  const [state, submit] = useForm({
-    form: 'myForm'
-  });
+  const [state, submit] = useForm('myForm');
 
   // Display success message in place of the form
   if (state.succeeded) {
