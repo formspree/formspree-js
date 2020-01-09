@@ -8,13 +8,15 @@ type SubmitHandler = (
   event: React.FormEvent<HTMLFormElement>
 ) => Promise<SubmissionResponse>;
 
-export function useForm(args: {
-  form: string;
-  client?: Client;
-  data?: { [key: string]: string | (() => string) };
-  endpoint?: string;
-  debug?: boolean;
-}): [
+export function useForm(
+  formKey: string,
+  args: {
+    client?: Client;
+    data?: { [key: string]: string | (() => string) };
+    endpoint?: string;
+    debug?: boolean;
+  }
+): [
   {
     submitting: boolean;
     succeeded: boolean;
@@ -37,8 +39,8 @@ export function useForm(args: {
     throw new Error('You must provide a StaticKit client');
   }
 
-  if (!args.form) {
-    throw new Error('You must provide a `form` key');
+  if (!formKey) {
+    throw new Error('You must provide a form key (e.g. useForm("myForm")');
   }
 
   const debug = !!args.debug;
@@ -68,7 +70,7 @@ export function useForm(args: {
     setSubmitting(true);
 
     return client
-      .submitForm(args.form, formData, {
+      .submitForm(formKey, formData, {
         endpoint: args.endpoint,
         clientName: `@statickit/react@${version}`
       })

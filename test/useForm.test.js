@@ -19,8 +19,7 @@ const success = new Promise(resolve => {
 const submitSpy = jest.fn();
 
 function TestForm(props) {
-  const [state, submit] = useForm({
-    form: props.form,
+  const [state, submit] = useForm(props.form, {
     data: props.extraData,
     client: props.client
   });
@@ -82,7 +81,9 @@ it('fails it initialize without identifying properties', () => {
   });
 
   const error = container.querySelector('#error');
-  expect(error.textContent).toBe('You must provide a `form` key');
+  expect(error.textContent).toBe(
+    'You must provide a form key (e.g. useForm("myForm")'
+  );
 
   // React's error logging
   expect(console.error).toHaveBeenCalled();
