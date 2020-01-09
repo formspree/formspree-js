@@ -4,6 +4,17 @@
 
 - Migrate to TypeScript
 - Add `StaticKit` context provider and `useStaticKit` hook for consuming context
+- **Breaking change**: New argument structure for the `useForm` hook:
+
+```js
+// You only have to supply a `client` if you aren't using the `<StaticKit>` context
+const [state, handleSubmit] = useForm(formKey, {
+  client,
+  data,
+  endpoint,
+  debug
+});
+```
 
 ## 1.2.0
 
