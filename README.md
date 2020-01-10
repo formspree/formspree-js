@@ -19,10 +19,14 @@ Place the `StaticKit` provider in your main `App` or layout component. This will
 _app.jsx_:
 
 ```jsx
-import { StaticKit } from '@statickit/react';
+import { StaticKitProvider } from '@statickit/react';
 
 function App(props) {
-  return <StaticKit site="REPLACE WITH SITE ID">{props.children}</StaticKit>;
+  return (
+    <StaticKitProvider site="REPLACE WITH SITE ID">
+      {props.children}
+    </StaticKit>
+  );
 }
 
 export default App;

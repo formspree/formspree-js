@@ -1,5 +1,5 @@
 import React from 'react';
-import { StaticKit, useForm } from '../src';
+import { StaticKitProvider, useForm } from '../src';
 import ReactDOM from 'react-dom';
 import ReactTestUtils from 'react-dom/test-utils';
 import { ErrorBoundary } from './helpers';
@@ -72,11 +72,11 @@ it('fails it initialize without identifying properties', () => {
 
   act(() => {
     ReactDOM.render(
-      <StaticKit site="xxx">
+      <StaticKitProvider site="xxx">
         <ErrorBoundary>
           <TestForm />
         </ErrorBoundary>
-      </StaticKit>,
+      </StaticKitProvider>,
       container
     );
   });
@@ -128,9 +128,9 @@ it('submits a client name', async () => {
 
   act(() => {
     ReactDOM.render(
-      <StaticKit site="xxx">
+      <StaticKitProvider site="xxx">
         <TestForm form="newsletter" />
-      </StaticKit>,
+      </StaticKitProvider>,
       container
     );
   });
@@ -154,9 +154,9 @@ it('submits successfully form key', async () => {
 
   act(() => {
     ReactDOM.render(
-      <StaticKit site="xxx">
+      <StaticKitProvider site="xxx">
         <TestForm form="newsletter" />
-      </StaticKit>,
+      </StaticKitProvider>,
       container
     );
   });
@@ -186,9 +186,9 @@ it('appends extra data to form data', async () => {
 
   act(() => {
     ReactDOM.render(
-      <StaticKit site="xxx">
+      <StaticKitProvider site="xxx">
         <TestForm form="newsletter" extraData={{ extra: 'yep' }} />
-      </StaticKit>,
+      </StaticKitProvider>,
       container
     );
   });
@@ -212,7 +212,7 @@ it('evaluates functions passed in data', async () => {
 
   act(() => {
     ReactDOM.render(
-      <StaticKit site="xxx">
+      <StaticKitProvider site="xxx">
         <TestForm
           form="newsletter"
           extraData={{
@@ -221,7 +221,7 @@ it('evaluates functions passed in data', async () => {
             }
           }}
         />
-      </StaticKit>,
+      </StaticKitProvider>,
       container
     );
   });
@@ -259,9 +259,9 @@ it('reacts to server-side validation errors', async () => {
 
   act(() => {
     ReactDOM.render(
-      <StaticKit site="xxx">
+      <StaticKitProvider site="xxx">
         <TestForm form="newsletter" />
-      </StaticKit>,
+      </StaticKitProvider>,
       container
     );
   });

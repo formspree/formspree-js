@@ -1,5 +1,5 @@
 import React from 'react';
-import { StaticKit, useStaticKit } from '../src';
+import { StaticKitProvider, useStaticKit } from '../src';
 import ReactDOM from 'react-dom';
 import ReactTestUtils from 'react-dom/test-utils';
 import { createClient } from '@statickit/core';
@@ -34,9 +34,9 @@ it('instantiates a client and provides it via useStaticKit hook', () => {
 
   const Page = ({ site }) => {
     return (
-      <StaticKit site={site}>
+      <StaticKitProvider site={site}>
         <Component />
-      </StaticKit>
+      </StaticKitProvider>
     );
   };
 
@@ -54,7 +54,7 @@ it('throws an error if site prop is not provided', () => {
   act(() => {
     ReactDOM.render(
       <ErrorBoundary>
-        <StaticKit></StaticKit>
+        <StaticKitProvider></StaticKitProvider>
       </ErrorBoundary>,
       container
     );

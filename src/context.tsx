@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { StaticKit as Client, createClient } from '@statickit/core';
+import { StaticKit, createClient } from '@statickit/core';
 
 interface Context {
-  client: Client;
+  client: StaticKit;
 }
 
 export interface Props {
@@ -15,7 +15,7 @@ const StaticKitContext = React.createContext<Context>({
 
 StaticKitContext.displayName = 'StaticKit';
 
-export const StaticKit: React.FC<Props> = props => {
+export const StaticKitProvider: React.FC<Props> = props => {
   if (!props.site) {
     throw new Error('site is required');
   }
@@ -39,7 +39,7 @@ export const StaticKit: React.FC<Props> = props => {
   );
 };
 
-export function useStaticKit(): Client {
+export function useStaticKit(): StaticKit {
   const { client } = useContext(StaticKitContext);
   return client;
 }

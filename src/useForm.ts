@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useStaticKit } from './context';
 import { version } from '../package.json';
-import { StaticKit as Client } from '@statickit/core';
+import { StaticKit } from '@statickit/core';
 import { SubmissionResponse } from '@statickit/core/forms';
 
 type SubmitHandler = (
@@ -11,7 +11,7 @@ type SubmitHandler = (
 export function useForm(
   formKey: string,
   args: {
-    client?: Client;
+    client?: StaticKit;
     data?: { [key: string]: string | (() => string) };
     endpoint?: string;
     debug?: boolean;
