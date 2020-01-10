@@ -25,7 +25,7 @@ function App(props) {
   return (
     <StaticKitProvider site="REPLACE WITH SITE ID">
       {props.children}
-    </StaticKit>
+    </StaticKitProvider>
   );
 }
 
