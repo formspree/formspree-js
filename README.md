@@ -14,7 +14,7 @@ This package assumes that you already have React available as a dependency. Sinc
 
 ## Usage
 
-Place the `StaticKit` provider in your main `App` or layout component. This will provide an instance of the StaticKit client to child components:
+Place the `StaticKitProvider` in your main `App` or layout component. This will provide an instance of the StaticKit client to child components:
 
 _app.jsx_:
 
