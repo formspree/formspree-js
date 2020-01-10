@@ -9,6 +9,7 @@ interface Props {
     code: string | null;
     properties: object;
   }>;
+  [x: string]: any;
 }
 
 export const ValidationError: React.FC<Props> = props => {

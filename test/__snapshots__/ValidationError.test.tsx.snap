@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`does not render anything if the field does not have an error 1`] = `<div />`;
+
+exports[`renders an error if one exists 1`] = `
+<div>
+  <div
+    class="error"
+  >
+    Email
+     
+    is required
+  </div>
+</div>
+`;
