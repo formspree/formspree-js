@@ -8,6 +8,15 @@ type SubmitHandler = (
   event: React.FormEvent<HTMLFormElement>
 ) => Promise<SubmissionResponse>;
 
+interface ErrorResponse {
+  errors: Array<{
+    field: string;
+    message: string;
+    code: string | null;
+    properties: object;
+  }>;
+}
+
 export function useForm(
   formKey: string,
   args: {
@@ -74,7 +83,7 @@ export function useForm(
         endpoint: args.endpoint,
         clientName: `@statickit/react@${version}`
       })
-      .then((result: { body: any; response: Response }) => {
+      .then((result: SubmissionResponse) => {
         switch (result.response.status) {
           case 200:
             if (debug) console.log('Form submitted', result);
@@ -83,7 +92,8 @@ export function useForm(
             break;
 
           case 422:
-            const errors = result.body.errors;
+            let body = result.body as ErrorResponse;
+            let errors = body.errors;
             if (debug) console.log('Validation error', result);
             setSucceeded(false);
             setErrors(errors);
