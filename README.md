@@ -42,10 +42,8 @@ _ContactForm.jsx_:
 import { useForm } from '@statickit/react';
 
 function ContactForm() {
-  // Call the `useForm` hook in your function component
   const [state, submit] = useForm('myForm');
 
-  // Display success message in place of the form
   if (state.succeeded) {
     return <div>Thank you for signing up!</div>;
   }
