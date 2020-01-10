@@ -7,13 +7,7 @@
 - **Breaking change**: New argument structure for the `useForm` hook:
 
 ```js
-// You only have to supply a `client` if you aren't using the `<StaticKitProvider>`
-const [state, handleSubmit] = useForm(formKey, {
-  client,
-  data,
-  endpoint,
-  debug
-});
+const [state, handleSubmit] = useForm(formKey, opts);
 ```
 
 ## 1.2.0
