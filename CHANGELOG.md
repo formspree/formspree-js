@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.1
+
+- Bug fix: add indexer to ValidationError props type. This will allow any additional props to pass-through without TypeScript having an issue with it.
+
 ## 2.0.0
 
 - Migrate to TypeScript
