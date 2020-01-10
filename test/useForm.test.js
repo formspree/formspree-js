@@ -7,6 +7,7 @@ import { version } from '../package.json';
 
 jest.mock('@statickit/core');
 import { createClient } from '@statickit/core';
+const mockedCreateClient = createClient;
 const core = jest.requireActual('@statickit/core');
 
 const { act } = ReactTestUtils;
@@ -64,7 +65,7 @@ afterEach(() => {
 });
 
 it('fails it initialize without identifying properties', () => {
-  createClient.mockImplementation(core.createClient);
+  mockedCreateClient.mockImplementation(core.createClient);
 
   // Mock error console to suppress noise in output
   console.error = jest.fn();
@@ -116,7 +117,7 @@ it('accepts a client directly', async () => {
 });
 
 it('submits a client name', async () => {
-  createClient.mockImplementation(() => ({
+  mockedCreateClient.mockImplementation(() => ({
     startBrowserSession: () => {},
     submitForm: (_form, _data, opts) => {
       expect(opts.clientName).toBe(`@statickit/react@${version}`);
@@ -142,7 +143,7 @@ it('submits a client name', async () => {
 });
 
 it('submits successfully form key', async () => {
-  createClient.mockImplementation(() => ({
+  mockedCreateClient.mockImplementation(() => ({
     startBrowserSession: () => {},
     submitForm: (form, _data, _opts) => {
       expect(form).toBe('newsletter');
@@ -174,7 +175,7 @@ it('submits successfully form key', async () => {
 });
 
 it('appends extra data to form data', async () => {
-  createClient.mockImplementation(() => ({
+  mockedCreateClient.mockImplementation(() => ({
     startBrowserSession: () => {},
     submitForm: (_form, data, _opts) => {
       expect(data.get('extra')).toBe('yep');
@@ -200,7 +201,7 @@ it('appends extra data to form data', async () => {
 });
 
 it('evaluates functions passed in data', async () => {
-  createClient.mockImplementation(() => ({
+  mockedCreateClient.mockImplementation(() => ({
     startBrowserSession: () => {},
     submitForm: (_form, data, _opts) => {
       expect(data.get('extra')).toBe('yep');
@@ -233,7 +234,9 @@ it('evaluates functions passed in data', async () => {
 });
 
 it('reacts to server-side validation errors', async () => {
-  createClient.mockImplementation(() => ({
+  mockedCreateClient.mockImplementation(() => ({
+    site: 'xxx',
+    invokeFunction: () => {},
     startBrowserSession: () => {},
     submitForm: (_form, _data, _opts) => {
       return new Promise(resolve => {

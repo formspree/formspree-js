@@ -15,7 +15,7 @@ export function useForm(
     data?: { [key: string]: string | (() => string) };
     endpoint?: string;
     debug?: boolean;
-  }
+  } = {}
 ): [
   {
     submitting: boolean;
