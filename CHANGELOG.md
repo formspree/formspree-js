@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.1.1
+
+- Update dependencies for security.
+
 ## 2.1.0
 
 - Update core library.
