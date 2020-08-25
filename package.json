@@ -44,7 +44,7 @@
     ]
   },
   "dependencies": {
-    "@formspree/core": "github:formspree/formspree-core#07ddbe3"
+    "@formspree/core": "github:formspree/formspree-core#6d6547b"
   },
   "devDependencies": {
     "@babel/core": "^7.5.4",
