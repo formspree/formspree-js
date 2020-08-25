@@ -1,22 +1,21 @@
 {
-  "name": "@statickit/react",
+  "name": "@formspree/react",
   "version": "2.1.1",
-  "description": "The React component library for StaticKit",
-  "homepage": "https://statickit.com/docs/react",
+  "description": "The React component library for Formspree",
   "bugs": {
-    "url": "https://github.com/unstacked/statickit-react/issues"
+    "url": "https://github.com/formspree/formspree-react/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/unstacked/statickit-react.git"
+    "url": "https://github.com/formspree/formspree-react.git"
   },
   "license": "MIT",
   "author": "Derrick Reimer",
   "files": [
     "dist/**/*.{js,ts}"
   ],
-  "main": "dist/statickit-react.cjs.js",
-  "module": "dist/statickit-react.esm.js",
+  "main": "dist/formspree-react.cjs.js",
+  "module": "dist/formspree-react.esm.js",
   "types": "dist/types/src/index.d.ts",
   "scripts": {
     "build": "rm -rf dist && npm run build:types && npm run build:js",
@@ -45,7 +44,7 @@
     ]
   },
   "dependencies": {
-    "@statickit/core": "^2.5.1"
+    "@formspree/core": "github:formspree/formspree-core#07ddbe3"
   },
   "devDependencies": {
     "@babel/core": "^7.5.4",

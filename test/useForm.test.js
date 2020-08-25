@@ -1,14 +1,14 @@
 import React from 'react';
-import { StaticKitProvider, useForm } from '../src';
+import { FormspreeProvider, useForm } from '../src';
 import ReactDOM from 'react-dom';
 import ReactTestUtils from 'react-dom/test-utils';
 import { ErrorBoundary } from './helpers';
 import { version } from '../package.json';
 
-jest.mock('@statickit/core');
-import { createClient } from '@statickit/core';
+jest.mock('@formspree/core');
+import { createClient } from '@formspree/core';
 const mockedCreateClient = createClient;
-const core = jest.requireActual('@statickit/core');
+const core = jest.requireActual('@formspree/core');
 
 const { act } = ReactTestUtils;
 
@@ -72,11 +72,11 @@ it('fails it initialize without identifying properties', () => {
 
   act(() => {
     ReactDOM.render(
-      <StaticKitProvider site="xxx">
+      <FormspreeProvider projectKey="xxx">
         <ErrorBoundary>
           <TestForm />
         </ErrorBoundary>
-      </StaticKitProvider>,
+      </FormspreeProvider>,
       container
     );
   });
@@ -120,7 +120,7 @@ it('submits a client name', async () => {
   mockedCreateClient.mockImplementation(() => ({
     startBrowserSession: () => {},
     submitForm: (_form, _data, opts) => {
-      expect(opts.clientName).toBe(`@statickit/react@${version}`);
+      expect(opts.clientName).toBe(`@formspree/react@${version}`);
       return success;
     },
     teardown: () => {}
@@ -128,9 +128,9 @@ it('submits a client name', async () => {
 
   act(() => {
     ReactDOM.render(
-      <StaticKitProvider site="xxx">
+      <FormspreeProvider projectKey="xxx">
         <TestForm form="newsletter" />
-      </StaticKitProvider>,
+      </FormspreeProvider>,
       container
     );
   });
@@ -154,9 +154,9 @@ it('submits successfully form key', async () => {
 
   act(() => {
     ReactDOM.render(
-      <StaticKitProvider site="xxx">
+      <FormspreeProvider projectKey="xxx">
         <TestForm form="newsletter" />
-      </StaticKitProvider>,
+      </FormspreeProvider>,
       container
     );
   });
@@ -186,9 +186,9 @@ it('appends extra data to form data', async () => {
 
   act(() => {
     ReactDOM.render(
-      <StaticKitProvider site="xxx">
+      <FormspreeProvider projectKey="xxx">
         <TestForm form="newsletter" extraData={{ extra: 'yep' }} />
-      </StaticKitProvider>,
+      </FormspreeProvider>,
       container
     );
   });
@@ -212,7 +212,7 @@ it('evaluates functions passed in data', async () => {
 
   act(() => {
     ReactDOM.render(
-      <StaticKitProvider site="xxx">
+      <FormspreeProvider projectKey="xxx">
         <TestForm
           form="newsletter"
           extraData={{
@@ -221,7 +221,7 @@ it('evaluates functions passed in data', async () => {
             }
           }}
         />
-      </StaticKitProvider>,
+      </FormspreeProvider>,
       container
     );
   });
@@ -235,7 +235,7 @@ it('evaluates functions passed in data', async () => {
 
 it('reacts to server-side validation errors', async () => {
   mockedCreateClient.mockImplementation(() => ({
-    site: 'xxx',
+    projectKey: 'xxx',
     invokeFunction: () => {},
     startBrowserSession: () => {},
     submitForm: (_form, _data, _opts) => {
@@ -259,9 +259,9 @@ it('reacts to server-side validation errors', async () => {
 
   act(() => {
     ReactDOM.render(
-      <StaticKitProvider site="xxx">
+      <FormspreeProvider projectKey="xxx">
         <TestForm form="newsletter" />
-      </StaticKitProvider>,
+      </FormspreeProvider>,
       container
     );
   });

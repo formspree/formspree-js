@@ -1,5 +1,11 @@
-# StaticKit React [![CircleCI](https://circleci.com/gh/unstacked/statickit-react.svg?style=svg)](https://circleci.com/gh/unstacked/statickit-react)
+# Formspree React
 
-The React component library for [StaticKit](https://statickit.com).
+The React component library for [Formspree](https://formspree.io).
 
-[**Read the docs &rarr;**](https://statickit.com/docs/react)
+## Releasing
+
+Run the following to publish a new version:
+
+```
+npm run release
+```

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { useStaticKit } from './context';
+import { useFormspree } from './context';
 import { version } from '../package.json';
-import { StaticKit } from '@statickit/core';
-import { SubmissionResponse } from '@statickit/core/forms';
+import { Client } from '@formspree/core';
+import { SubmissionResponse } from '@formspree/core/forms';
 
 type SubmitHandler = (
   event: React.FormEvent<HTMLFormElement>
@@ -20,7 +20,7 @@ interface ErrorResponse {
 export function useForm(
   formKey: string,
   args: {
-    client?: StaticKit;
+    client?: Client;
     data?: { [key: string]: string | (() => string) };
     endpoint?: string;
     debug?: boolean;
@@ -41,11 +41,11 @@ export function useForm(
   const [submitting, setSubmitting] = useState(false);
   const [succeeded, setSucceeded] = useState(false);
   const [errors, setErrors] = useState([]);
-  const globalClient = useStaticKit();
+  const globalClient = useFormspree();
   const client = args.client || globalClient;
 
   if (!client) {
-    throw new Error('You must provide a StaticKit client');
+    throw new Error('You must provide a Formspree client');
   }
 
   if (!formKey) {
@@ -81,7 +81,7 @@ export function useForm(
     return client
       .submitForm(formKey, formData, {
         endpoint: args.endpoint,
-        clientName: `@statickit/react@${version}`
+        clientName: `@formspree/react@${version}`
       })
       .then((result: SubmissionResponse) => {
         switch (result.response.status) {

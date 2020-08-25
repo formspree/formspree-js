@@ -1,11 +1,11 @@
 import React from 'react';
-import { StaticKitProvider, useStaticKit } from '../src';
+import { FormspreeProvider, useFormspree } from '../src';
 import ReactDOM from 'react-dom';
 import ReactTestUtils from 'react-dom/test-utils';
-import { createClient } from '@statickit/core';
+import { createClient } from '@formspree/core';
 import { ErrorBoundary } from './helpers';
 
-jest.mock('@statickit/core');
+jest.mock('@formspree/core');
 
 const { act } = ReactTestUtils;
 
@@ -21,45 +21,45 @@ afterEach(() => {
   container = null;
 });
 
-it('instantiates a client and provides it via useStaticKit hook', () => {
+it('instantiates a client and provides it via useFormspree hook', () => {
   createClient.mockImplementation(() => ({
     startBrowserSession: () => {},
     name: 'Client'
   }));
 
   const Component = () => {
-    const client = useStaticKit();
+    const client = useFormspree();
     return <div id="client">{client.name}</div>;
   };
 
-  const Page = ({ site }) => {
+  const Page = ({ projectKey }) => {
     return (
-      <StaticKitProvider site={site}>
+      <FormspreeProvider projectKey={projectKey}>
         <Component />
-      </StaticKitProvider>
+      </FormspreeProvider>
     );
   };
 
   act(() => {
-    ReactDOM.render(<Page site="xxx" />, container);
+    ReactDOM.render(<Page projectKey="xxx" />, container);
   });
 
   expect(container.querySelector('#client').textContent).toBe('Client');
 });
 
-it('throws an error if site prop is not provided', () => {
+it('throws an error if projectKey prop is not provided', () => {
   // Mock error console to suppress noise in output
   console.error = jest.fn();
 
   act(() => {
     ReactDOM.render(
       <ErrorBoundary>
-        <StaticKitProvider></StaticKitProvider>
+        <FormspreeProvider></FormspreeProvider>
       </ErrorBoundary>,
       container
     );
   });
 
   const error = container.querySelector('#error');
-  expect(error.textContent).toBe('site is required');
+  expect(error.textContent).toBe('projectKey is required');
 });

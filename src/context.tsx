@@ -1,27 +1,27 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { StaticKit, createClient } from '@statickit/core';
+import { Client, createClient } from '@formspree/core';
 
 interface Context {
-  client: StaticKit;
+  client: Client;
 }
 
 export interface Props {
-  site: string;
+  projectKey: string;
 }
 
-const StaticKitContext = React.createContext<Context>({
+const FormspreeContext = React.createContext<Context>({
   client: undefined
 });
 
-StaticKitContext.displayName = 'StaticKit';
+FormspreeContext.displayName = 'Formspree';
 
-export const StaticKitProvider: React.FC<Props> = props => {
-  if (!props.site) {
-    throw new Error('site is required');
+export const FormspreeProvider: React.FC<Props> = props => {
+  if (!props.projectKey) {
+    throw new Error('projectKey is required');
   }
 
   const [client] = useState(() => {
-    return createClient({ site: props.site });
+    return createClient({ projectKey: props.projectKey });
   });
 
   useEffect(() => {
@@ -33,13 +33,13 @@ export const StaticKitProvider: React.FC<Props> = props => {
   }, []);
 
   return (
-    <StaticKitContext.Provider value={{ client }}>
+    <FormspreeContext.Provider value={{ client }}>
       {props.children}
-    </StaticKitContext.Provider>
+    </FormspreeContext.Provider>
   );
 };
 
-export function useStaticKit(): StaticKit {
-  const { client } = useContext(StaticKitContext);
+export function useFormspree(): Client {
+  const { client } = useContext(FormspreeContext);
   return client;
 }

@@ -21,7 +21,7 @@ const plugins = [
 
 export default [
   {
-    external: ['react', '@statickit/core'],
+    external: ['react', '@formspree/core'],
     input: './src/index.ts',
     plugins: plugins,
     output: [
@@ -41,8 +41,8 @@ export default [
     plugins: plugins,
     output: {
       format: 'iife',
-      file: __dirname + '/dist/statickit-react.iife.js',
-      name: 'StaticKitReact',
+      file: __dirname + '/dist/formspree-react.iife.js',
+      name: 'FormspreeReact',
       globals: {
         react: 'React'
       }
