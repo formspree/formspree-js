@@ -9,11 +9,11 @@ type SubmitHandler = (
 ) => Promise<SubmissionResponse>;
 
 interface ErrorResponse {
-  errors: Array<{
+  error: string;
+  validationErrors?: Array<{
     field: string;
-    message: string;
     code: string | null;
-    properties: object;
+    message: string;
   }>;
 }
 
@@ -31,9 +31,8 @@ export function useForm(
     succeeded: boolean;
     errors: {
       field: string;
-      message: string;
       code: string | null;
-      properties: object;
+      message: string;
     }[];
   },
   SubmitHandler
@@ -93,7 +92,7 @@ export function useForm(
 
           case 422:
             let body = result.body as ErrorResponse;
-            let errors = body.errors;
+            let errors = body.validationErrors || [];
             if (debug) console.log('Validation error', result);
             setSucceeded(false);
             setErrors(errors);
