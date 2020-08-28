@@ -76,25 +76,21 @@ export function useForm(
         clientName: `@formspree/react@${version}`
       })
       .then((result: SubmissionResponse) => {
-        switch (result.response.status) {
-          case 200:
-            if (debug) console.log('Form submitted', result);
-            setSucceeded(true);
-            setErrors([]);
-            break;
+        let status = result.response.status;
+        let body;
 
-          case 422:
-            let body = result.body as { errors: ErrorPayload[] };
-            let errors = body.errors || [];
-            if (debug) console.log('Validation error', result);
-            setSucceeded(false);
-            setErrors(errors);
-            break;
-
-          default:
-            if (debug) console.log('Unexpected error', result);
-            setSucceeded(false);
-            break;
+        if (status === 200) {
+          if (debug) console.log('Form submitted', result);
+          setSucceeded(true);
+          setErrors([]);
+        } else if (status >= 400 && status < 500) {
+          body = result.body as { errors: ErrorPayload[] };
+          if (body.errors) setErrors(body.errors);
+          if (debug) console.log('Validation error', result);
+          setSucceeded(false);
+        } else {
+          if (debug) console.log('Unexpected error', result);
+          setSucceeded(false);
         }
 
         return result;

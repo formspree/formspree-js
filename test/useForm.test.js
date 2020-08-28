@@ -236,7 +236,6 @@ it('evaluates functions passed in data', async () => {
 it('reacts to server-side validation errors', async () => {
   mockedCreateClient.mockImplementation(() => ({
     projectKey: 'xxx',
-    invokeFunction: () => {},
     startBrowserSession: () => {},
     submitForm: (_form, _data, _opts) => {
       return new Promise(resolve => {
@@ -275,5 +274,48 @@ it('reacts to server-side validation errors', async () => {
   const errors = container.querySelector('#errors');
   expect(errors.textContent).toBe(
     `[{"field":"email","code":"EMAIL_FORMAT","message":"must be an email"}]`
+  );
+});
+
+it('reacts to form disabled errors', async () => {
+  mockedCreateClient.mockImplementation(() => ({
+    projectKey: 'xxx',
+    startBrowserSession: () => {},
+    submitForm: (_form, _data, _opts) => {
+      return new Promise(resolve => {
+        resolve({
+          body: {
+            errors: [
+              {
+                code: 'DEACTIVATED',
+                message: 'Form not active'
+              }
+            ]
+          },
+          response: { status: 403 }
+        });
+      });
+    },
+    teardown: () => {}
+  }));
+
+  act(() => {
+    ReactDOM.render(
+      <FormspreeProvider projectKey="xxx">
+        <TestForm form="newsletter" />
+      </FormspreeProvider>,
+      container
+    );
+  });
+
+  const form = container.querySelector('form');
+
+  await act(async () => {
+    ReactTestUtils.Simulate.submit(form);
+  });
+
+  const errors = container.querySelector('#errors');
+  expect(errors.textContent).toBe(
+    `[{"code":"DEACTIVATED","message":"Form not active"}]`
   );
 });
