@@ -3,7 +3,12 @@ import { useFormspree } from './context';
 import { version } from '../package.json';
 import { Client } from '@formspree/core';
 import { SubmissionResponse } from '@formspree/core/forms';
-import { ErrorPayload } from './types';
+
+interface ErrorPayload {
+  field?: string;
+  code: string | null;
+  message: string;
+}
 
 type SubmitHandler = (
   event: React.FormEvent<HTMLFormElement>

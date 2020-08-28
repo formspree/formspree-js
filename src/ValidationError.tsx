@@ -1,10 +1,10 @@
 import React from 'react';
-import { Error } from './types';
+import { ErrorPayload } from './types';
 
 interface Props {
   prefix?: string;
   field?: string;
-  errors: Error[];
+  errors: ErrorPayload[];
   [x: string]: any;
 }
 
