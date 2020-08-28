@@ -17,7 +17,7 @@ afterEach(() => {
   container = null;
 });
 
-it('renders an error if one exists', () => {
+it('renders a field error if one exists', () => {
   act(() => {
     ReactDOM.render(
       <ValidationError
@@ -28,8 +28,26 @@ it('renders an error if one exists', () => {
           {
             field: 'email',
             message: 'is required',
-            code: 'REQUIRED',
-            properties: {}
+            code: 'REQUIRED'
+          }
+        ]}
+      />,
+      container
+    );
+  });
+
+  expect(container).toMatchSnapshot();
+});
+
+it('renders field-less errors', () => {
+  act(() => {
+    ReactDOM.render(
+      <ValidationError
+        className="error"
+        errors={[
+          {
+            message: 'Form is disabled',
+            code: 'FORM_DISABLED'
           }
         ]}
       />,
@@ -50,8 +68,7 @@ it('does not render anything if the field does not have an error', () => {
           {
             field: 'name',
             message: 'is required',
-            code: 'REQUIRED',
-            properties: {}
+            code: 'REQUIRED'
           }
         ]}
       />,

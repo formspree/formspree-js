@@ -2,7 +2,7 @@
 
 exports[`does not render anything if the field does not have an error 1`] = `<div />`;
 
-exports[`renders an error if one exists 1`] = `
+exports[`renders a field error if one exists 1`] = `
 <div>
   <div
     class="error"
@@ -10,6 +10,17 @@ exports[`renders an error if one exists 1`] = `
     Email
      
     is required
+  </div>
+</div>
+`;
+
+exports[`renders field-less errors 1`] = `
+<div>
+  <div
+    class="error"
+  >
+     
+    Form is disabled
   </div>
 </div>
 `;

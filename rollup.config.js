@@ -4,7 +4,7 @@ import nodeResolve from 'rollup-plugin-node-resolve';
 import json from 'rollup-plugin-json';
 import pkg from './package.json';
 
-const extensions = ['.js', '.ts', '.tsx'];
+const extensions = ['.js', '.ts', '.tsx', '.d.ts'];
 
 const plugins = [
   babel({

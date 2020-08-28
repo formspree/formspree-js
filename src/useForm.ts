@@ -3,19 +3,11 @@ import { useFormspree } from './context';
 import { version } from '../package.json';
 import { Client } from '@formspree/core';
 import { SubmissionResponse } from '@formspree/core/forms';
+import { ErrorPayload } from './types';
 
 type SubmitHandler = (
   event: React.FormEvent<HTMLFormElement>
 ) => Promise<SubmissionResponse>;
-
-interface ErrorResponse {
-  error: string;
-  validationErrors?: Array<{
-    field: string;
-    code: string | null;
-    message: string;
-  }>;
-}
 
 export function useForm(
   formKey: string,
@@ -29,11 +21,7 @@ export function useForm(
   {
     submitting: boolean;
     succeeded: boolean;
-    errors: {
-      field: string;
-      code: string | null;
-      message: string;
-    }[];
+    errors: ErrorPayload[];
   },
   SubmitHandler
 ] {
@@ -91,8 +79,8 @@ export function useForm(
             break;
 
           case 422:
-            let body = result.body as ErrorResponse;
-            let errors = body.validationErrors || [];
+            let body = result.body as { errors: ErrorPayload[] };
+            let errors = body.errors || [];
             if (debug) console.log('Validation error', result);
             setSucceeded(false);
             setErrors(errors);

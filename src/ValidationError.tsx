@@ -1,14 +1,10 @@
 import React from 'react';
+import { Error } from './types';
 
 interface Props {
   prefix?: string;
-  field: string;
-  errors: Array<{
-    field: string;
-    message: string;
-    code: string | null;
-    properties: object;
-  }>;
+  field?: string;
+  errors: Error[];
   [x: string]: any;
 }
 
