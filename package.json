@@ -78,7 +78,7 @@
     "react": ">= 16.8.0"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "restricted"
   },
   "np": {
     "yarn": false
