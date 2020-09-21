@@ -41,5 +41,5 @@ export const FormspreeProvider: React.FC<Props> = props => {
 
 export function useFormspree(): Client {
   const { client } = useContext(FormspreeContext);
-  return client;
+  return client || createClient();
 }

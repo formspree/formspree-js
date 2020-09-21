@@ -22,14 +22,14 @@ afterEach(() => {
 });
 
 it('instantiates a client and provides it via useFormspree hook', () => {
-  createClient.mockImplementation(() => ({
+  createClient.mockImplementation(config => ({
     startBrowserSession: () => {},
-    name: 'Client'
+    key: config.projectKey
   }));
 
   const Component = () => {
     const client = useFormspree();
-    return <div id="client">{client.name}</div>;
+    return <div id="client">projectKey: {client.key}</div>;
   };
 
   const Page = ({ projectKey }) => {
@@ -44,7 +44,9 @@ it('instantiates a client and provides it via useFormspree hook', () => {
     ReactDOM.render(<Page projectKey="xxx" />, container);
   });
 
-  expect(container.querySelector('#client').textContent).toBe('Client');
+  expect(container.querySelector('#client').textContent).toBe(
+    'projectKey: xxx'
+  );
 });
 
 it('throws an error if projectKey prop is not provided', () => {

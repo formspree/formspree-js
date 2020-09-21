@@ -83,7 +83,8 @@ it('fails it initialize without identifying properties', () => {
 
   const error = container.querySelector('#error');
   expect(error.textContent).toBe(
-    'You must provide a form key (e.g. useForm("myForm")'
+    'You must provide a form key or hashid ' +
+      '(e.g. useForm("myForm") or useForm("123xyz")'
   );
 
   // React's error logging
@@ -133,6 +134,28 @@ it('submits a client name', async () => {
       </FormspreeProvider>,
       container
     );
+  });
+
+  const form = container.querySelector('form');
+
+  await act(async () => {
+    ReactTestUtils.Simulate.submit(form);
+  });
+});
+
+it('creates the default client if none exists in the context', async () => {
+  mockedCreateClient.mockImplementation(config => ({
+    startBrowserSession: () => {},
+    submitForm: (form, _data, _opts) => {
+      expect(config).toBe(undefined);
+      expect(form).toBe('123abc');
+      return success;
+    },
+    teardown: () => {}
+  }));
+
+  act(() => {
+    ReactDOM.render(<TestForm form="123abc" />, container);
   });
 
   const form = container.querySelector('form');
