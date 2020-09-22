@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Client, createClient } from '@formspree/core';
+import { Client, createClient, getDefaultClient } from '@formspree/core';
 
 interface Context {
   client: Client;
@@ -41,5 +41,5 @@ export const FormspreeProvider: React.FC<Props> = props => {
 
 export function useFormspree(): Client {
   const { client } = useContext(FormspreeContext);
-  return client || createClient();
+  return client || getDefaultClient();
 }

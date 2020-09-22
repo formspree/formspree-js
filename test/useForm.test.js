@@ -6,9 +6,10 @@ import { ErrorBoundary } from './helpers';
 import { version } from '../package.json';
 
 jest.mock('@formspree/core');
-import { createClient } from '@formspree/core';
-const mockedCreateClient = createClient;
+import { createClient, getDefaultClient } from '@formspree/core';
 const core = jest.requireActual('@formspree/core');
+const mockedCreateClient = createClient;
+const mockedGetDefaultClient = getDefaultClient;
 
 const { act } = ReactTestUtils;
 
@@ -144,10 +145,9 @@ it('submits a client name', async () => {
 });
 
 it('creates the default client if none exists in the context', async () => {
-  mockedCreateClient.mockImplementation(config => ({
+  mockedGetDefaultClient.mockImplementation(() => ({
     startBrowserSession: () => {},
     submitForm: (form, _data, _opts) => {
-      expect(config).toBe(undefined);
       expect(form).toBe('123abc');
       return success;
     },
