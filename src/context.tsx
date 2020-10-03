@@ -6,7 +6,7 @@ interface Context {
 }
 
 export interface Props {
-  projectKey: string;
+  project: string;
 }
 
 const FormspreeContext = React.createContext<Context>({
@@ -16,12 +16,12 @@ const FormspreeContext = React.createContext<Context>({
 FormspreeContext.displayName = 'Formspree';
 
 export const FormspreeProvider: React.FC<Props> = props => {
-  if (!props.projectKey) {
-    throw new Error('projectKey is required');
+  if (!props.project) {
+    throw new Error('project is required');
   }
 
   const [client] = useState(() => {
-    return createClient({ projectKey: props.projectKey });
+    return createClient({ project: props.project });
   });
 
   useEffect(() => {

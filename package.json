@@ -1,6 +1,6 @@
 {
   "name": "@formspree/react",
-  "version": "2.1.2",
+  "version": "2.2.0",
   "description": "The React component library for Formspree",
   "bugs": {
     "url": "https://github.com/formspree/formspree-react/issues"
@@ -44,7 +44,7 @@
     ]
   },
   "dependencies": {
-    "@formspree/core": "^2.5.2"
+    "@formspree/core": "^2.6.1"
   },
   "devDependencies": {
     "@babel/core": "^7.5.4",
