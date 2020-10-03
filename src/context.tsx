@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Client, createClient } from '@formspree/core';
+import { Client, createClient, getDefaultClient } from '@formspree/core';
 
 interface Context {
   client: Client;
 }
 
 export interface Props {
-  projectKey: string;
+  project: string;
 }
 
 const FormspreeContext = React.createContext<Context>({
@@ -16,12 +16,12 @@ const FormspreeContext = React.createContext<Context>({
 FormspreeContext.displayName = 'Formspree';
 
 export const FormspreeProvider: React.FC<Props> = props => {
-  if (!props.projectKey) {
-    throw new Error('projectKey is required');
+  if (!props.project) {
+    throw new Error('project is required');
   }
 
   const [client] = useState(() => {
-    return createClient({ projectKey: props.projectKey });
+    return createClient({ project: props.project });
   });
 
   useEffect(() => {
@@ -41,5 +41,5 @@ export const FormspreeProvider: React.FC<Props> = props => {
 
 export function useFormspree(): Client {
   const { client } = useContext(FormspreeContext);
-  return client;
+  return client || getDefaultClient();
 }

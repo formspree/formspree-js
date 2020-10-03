@@ -22,32 +22,32 @@ afterEach(() => {
 });
 
 it('instantiates a client and provides it via useFormspree hook', () => {
-  createClient.mockImplementation(() => ({
+  createClient.mockImplementation(config => ({
     startBrowserSession: () => {},
-    name: 'Client'
+    key: config.project
   }));
 
   const Component = () => {
     const client = useFormspree();
-    return <div id="client">{client.name}</div>;
+    return <div id="client">project: {client.key}</div>;
   };
 
-  const Page = ({ projectKey }) => {
+  const Page = ({ project }) => {
     return (
-      <FormspreeProvider projectKey={projectKey}>
+      <FormspreeProvider project={project}>
         <Component />
       </FormspreeProvider>
     );
   };
 
   act(() => {
-    ReactDOM.render(<Page projectKey="xxx" />, container);
+    ReactDOM.render(<Page project="xxx" />, container);
   });
 
-  expect(container.querySelector('#client').textContent).toBe('Client');
+  expect(container.querySelector('#client').textContent).toBe('project: xxx');
 });
 
-it('throws an error if projectKey prop is not provided', () => {
+it('throws an error if project prop is not provided', () => {
   // Mock error console to suppress noise in output
   console.error = jest.fn();
 
@@ -61,5 +61,5 @@ it('throws an error if projectKey prop is not provided', () => {
   });
 
   const error = container.querySelector('#error');
-  expect(error.textContent).toBe('projectKey is required');
+  expect(error.textContent).toBe('project is required');
 });

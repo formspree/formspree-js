@@ -6,9 +6,10 @@ import { ErrorBoundary } from './helpers';
 import { version } from '../package.json';
 
 jest.mock('@formspree/core');
-import { createClient } from '@formspree/core';
-const mockedCreateClient = createClient;
+import { createClient, getDefaultClient } from '@formspree/core';
 const core = jest.requireActual('@formspree/core');
+const mockedCreateClient = createClient;
+const mockedGetDefaultClient = getDefaultClient;
 
 const { act } = ReactTestUtils;
 
@@ -72,7 +73,7 @@ it('fails it initialize without identifying properties', () => {
 
   act(() => {
     ReactDOM.render(
-      <FormspreeProvider projectKey="xxx">
+      <FormspreeProvider project="xxx">
         <ErrorBoundary>
           <TestForm />
         </ErrorBoundary>
@@ -83,7 +84,8 @@ it('fails it initialize without identifying properties', () => {
 
   const error = container.querySelector('#error');
   expect(error.textContent).toBe(
-    'You must provide a form key (e.g. useForm("myForm")'
+    'You must provide a form key or hashid ' +
+      '(e.g. useForm("myForm") or useForm("123xyz")'
   );
 
   // React's error logging
@@ -128,11 +130,32 @@ it('submits a client name', async () => {
 
   act(() => {
     ReactDOM.render(
-      <FormspreeProvider projectKey="xxx">
+      <FormspreeProvider project="xxx">
         <TestForm form="newsletter" />
       </FormspreeProvider>,
       container
     );
+  });
+
+  const form = container.querySelector('form');
+
+  await act(async () => {
+    ReactTestUtils.Simulate.submit(form);
+  });
+});
+
+it('creates the default client if none exists in the context', async () => {
+  mockedGetDefaultClient.mockImplementation(() => ({
+    startBrowserSession: () => {},
+    submitForm: (form, _data, _opts) => {
+      expect(form).toBe('123abc');
+      return success;
+    },
+    teardown: () => {}
+  }));
+
+  act(() => {
+    ReactDOM.render(<TestForm form="123abc" />, container);
   });
 
   const form = container.querySelector('form');
@@ -154,7 +177,7 @@ it('submits successfully form key', async () => {
 
   act(() => {
     ReactDOM.render(
-      <FormspreeProvider projectKey="xxx">
+      <FormspreeProvider project="xxx">
         <TestForm form="newsletter" />
       </FormspreeProvider>,
       container
@@ -186,7 +209,7 @@ it('appends extra data to form data', async () => {
 
   act(() => {
     ReactDOM.render(
-      <FormspreeProvider projectKey="xxx">
+      <FormspreeProvider project="xxx">
         <TestForm form="newsletter" extraData={{ extra: 'yep' }} />
       </FormspreeProvider>,
       container
@@ -212,7 +235,7 @@ it('evaluates functions passed in data', async () => {
 
   act(() => {
     ReactDOM.render(
-      <FormspreeProvider projectKey="xxx">
+      <FormspreeProvider project="xxx">
         <TestForm
           form="newsletter"
           extraData={{
@@ -235,7 +258,7 @@ it('evaluates functions passed in data', async () => {
 
 it('reacts to server-side validation errors', async () => {
   mockedCreateClient.mockImplementation(() => ({
-    projectKey: 'xxx',
+    project: 'xxx',
     startBrowserSession: () => {},
     submitForm: (_form, _data, _opts) => {
       return new Promise(resolve => {
@@ -258,7 +281,7 @@ it('reacts to server-side validation errors', async () => {
 
   act(() => {
     ReactDOM.render(
-      <FormspreeProvider projectKey="xxx">
+      <FormspreeProvider project="xxx">
         <TestForm form="newsletter" />
       </FormspreeProvider>,
       container
@@ -279,7 +302,7 @@ it('reacts to server-side validation errors', async () => {
 
 it('reacts to form disabled errors', async () => {
   mockedCreateClient.mockImplementation(() => ({
-    projectKey: 'xxx',
+    project: 'xxx',
     startBrowserSession: () => {},
     submitForm: (_form, _data, _opts) => {
       return new Promise(resolve => {
@@ -301,7 +324,7 @@ it('reacts to form disabled errors', async () => {
 
   act(() => {
     ReactDOM.render(
-      <FormspreeProvider projectKey="xxx">
+      <FormspreeProvider project="xxx">
         <TestForm form="newsletter" />
       </FormspreeProvider>,
       container

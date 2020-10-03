@@ -41,7 +41,10 @@ export function useForm(
   }
 
   if (!formKey) {
-    throw new Error('You must provide a form key (e.g. useForm("myForm")');
+    throw new Error(
+      'You must provide a form key or hashid ' +
+        '(e.g. useForm("myForm") or useForm("123xyz")'
+    );
   }
 
   const debug = !!args.debug;
