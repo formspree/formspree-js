@@ -73,7 +73,7 @@ it('fails it initialize without identifying properties', () => {
 
   act(() => {
     ReactDOM.render(
-      <FormspreeProvider project="xxx">
+      <FormspreeProvider projectKey="xxx">
         <ErrorBoundary>
           <TestForm />
         </ErrorBoundary>
@@ -130,7 +130,7 @@ it('submits a client name', async () => {
 
   act(() => {
     ReactDOM.render(
-      <FormspreeProvider project="xxx">
+      <FormspreeProvider projectKey="xxx">
         <TestForm form="newsletter" />
       </FormspreeProvider>,
       container
@@ -177,7 +177,7 @@ it('submits successfully form key', async () => {
 
   act(() => {
     ReactDOM.render(
-      <FormspreeProvider project="xxx">
+      <FormspreeProvider projectKey="xxx">
         <TestForm form="newsletter" />
       </FormspreeProvider>,
       container
@@ -209,7 +209,7 @@ it('appends extra data to form data', async () => {
 
   act(() => {
     ReactDOM.render(
-      <FormspreeProvider project="xxx">
+      <FormspreeProvider projectKey="xxx">
         <TestForm form="newsletter" extraData={{ extra: 'yep' }} />
       </FormspreeProvider>,
       container
@@ -235,7 +235,7 @@ it('evaluates functions passed in data', async () => {
 
   act(() => {
     ReactDOM.render(
-      <FormspreeProvider project="xxx">
+      <FormspreeProvider projectKey="xxx">
         <TestForm
           form="newsletter"
           extraData={{
@@ -258,7 +258,7 @@ it('evaluates functions passed in data', async () => {
 
 it('reacts to server-side validation errors', async () => {
   mockedCreateClient.mockImplementation(() => ({
-    project: 'xxx',
+    projectKey: 'xxx',
     startBrowserSession: () => {},
     submitForm: (_form, _data, _opts) => {
       return new Promise(resolve => {
@@ -281,7 +281,7 @@ it('reacts to server-side validation errors', async () => {
 
   act(() => {
     ReactDOM.render(
-      <FormspreeProvider project="xxx">
+      <FormspreeProvider projectKey="xxx">
         <TestForm form="newsletter" />
       </FormspreeProvider>,
       container
@@ -302,7 +302,7 @@ it('reacts to server-side validation errors', async () => {
 
 it('reacts to form disabled errors', async () => {
   mockedCreateClient.mockImplementation(() => ({
-    project: 'xxx',
+    projectKey: 'xxx',
     startBrowserSession: () => {},
     submitForm: (_form, _data, _opts) => {
       return new Promise(resolve => {
@@ -324,7 +324,7 @@ it('reacts to form disabled errors', async () => {
 
   act(() => {
     ReactDOM.render(
-      <FormspreeProvider project="xxx">
+      <FormspreeProvider projectKey="xxx">
         <TestForm form="newsletter" />
       </FormspreeProvider>,
       container
