@@ -2,10 +2,6 @@
 
 The React component library for [Formspree](https://formspree.io).
 
-## Releasing
+## Help and Support
 
-Run the following to publish a new version:
-
-```
-npm run release
-```
+For help and support please see [the Formspree React docs](https://help.formspree.io/hc/en-us/articles/360055613373).
