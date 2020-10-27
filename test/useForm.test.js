@@ -342,3 +342,40 @@ it('reacts to form disabled errors', async () => {
     `[{"code":"DEACTIVATED","message":"Form not active"}]`
   );
 });
+
+it('allows submit handler to be called with data directly', async () => {
+  mockedGetDefaultClient.mockImplementation(() => ({
+    startBrowserSession: () => {},
+    submitForm: (form, data, _opts) => {
+      expect(form).toBe('123abc');
+      expect(data.email).toBe('email@email.com');
+      expect(data.extra).toBe(true);
+      return success;
+    },
+    teardown: () => {}
+  }));
+
+  function DirectSubmitForm() {
+    const [state, submit] = useForm('123abc', { data: { extra: true } });
+    const doSubmit = () => {
+      submit({ email: 'email@email.com' });
+    };
+    return (
+      <div>
+        <form onSubmit={doSubmit}>
+          <button type="submit">Sign up</button>
+        </form>
+      </div>
+    );
+  }
+
+  act(() => {
+    ReactDOM.render(<DirectSubmitForm />, container);
+  });
+
+  const form = container.querySelector('form');
+
+  await act(async () => {
+    ReactTestUtils.Simulate.submit(form);
+  });
+});

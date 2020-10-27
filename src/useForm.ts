@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useFormspree } from './context';
 import { version } from '../package.json';
 import { Client } from '@formspree/core';
-import { SubmissionResponse } from '@formspree/core/forms';
+import { SubmissionResponse, SubmissionData } from '@formspree/core/forms';
 
 interface ErrorPayload {
   field?: string;
@@ -10,15 +10,23 @@ interface ErrorPayload {
   message: string;
 }
 
+type FormEvent = React.FormEvent<HTMLFormElement>;
+
+type ExtraData = { [key: string]: string | (() => string) };
+
 type SubmitHandler = (
-  event: React.FormEvent<HTMLFormElement>
+  submissionData: FormEvent | SubmissionData
 ) => Promise<SubmissionResponse>;
+
+function isEvent(data: FormEvent | SubmissionData): data is FormEvent {
+  return (data as FormEvent).preventDefault !== undefined;
+}
 
 export function useForm(
   formKey: string,
   args: {
     client?: Client;
-    data?: { [key: string]: string | (() => string) };
+    data?: ExtraData;
     endpoint?: string;
     debug?: boolean;
   } = {}
@@ -50,23 +58,35 @@ export function useForm(
   const debug = !!args.debug;
   const extraData = args.data;
 
-  const handleSubmit: SubmitHandler = event => {
-    event.preventDefault();
-    const form = event.target as HTMLFormElement;
+  const handleSubmit: SubmitHandler = submissionData => {
+    const getFormData = (event: FormEvent) => {
+      event.preventDefault();
+      const form = event.target as HTMLFormElement;
+      if (form.tagName != 'FORM') {
+        throw new Error('submit was triggered for a non-form element');
+      }
+      return new FormData(form);
+    };
 
-    if (form.tagName != 'FORM') {
-      throw new Error('submit was triggered for a non-form element');
-    }
+    let formData = isEvent(submissionData)
+      ? getFormData(submissionData)
+      : submissionData;
 
-    const formData = new FormData(form);
+    const appendExtraData = (prop: string, value: string) => {
+      if (formData instanceof FormData) {
+        formData.append(prop, value);
+      } else {
+        formData = Object.assign(formData, { [prop]: value });
+      }
+    };
 
     // Append extra data from config
     if (typeof extraData === 'object') {
       for (const prop in extraData) {
         if (typeof extraData[prop] === 'function') {
-          formData.append(prop, (extraData[prop] as (() => string)).call(null));
+          appendExtraData(prop, (extraData[prop] as (() => string)).call(null));
         } else {
-          formData.append(prop, extraData[prop] as string);
+          appendExtraData(prop, extraData[prop] as string);
         }
       }
     }
