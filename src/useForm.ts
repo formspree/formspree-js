@@ -57,6 +57,12 @@ export function useForm(
 
   const debug = !!args.debug;
   const extraData = args.data;
+  
+  const reset: () => {
+    setSubmitting(false);
+    setSucceeded(false);
+    setErrors([]);
+  }
 
   const handleSubmit: SubmitHandler = submissionData => {
     const getFormData = (event: FormEvent) => {
