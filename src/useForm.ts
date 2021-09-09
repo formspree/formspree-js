@@ -134,5 +134,5 @@ export function useForm(
       });
   };
 
-  return [{ submitting, succeeded, errors }, handleSubmit];
+  return [{ submitting, succeeded, errors }, handleSubmit, reset];
 }
