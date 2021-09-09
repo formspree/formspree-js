@@ -18,6 +18,8 @@ type SubmitHandler = (
   submissionData: FormEvent | SubmissionData
 ) => Promise<SubmissionResponse>;
 
+type ResetFunction = () => void;
+
 function isEvent(data: FormEvent | SubmissionData): data is FormEvent {
   return (data as FormEvent).preventDefault !== undefined;
 }
@@ -36,7 +38,8 @@ export function useForm(
     succeeded: boolean;
     errors: ErrorPayload[];
   },
-  SubmitHandler
+  SubmitHandler,
+  ResetFunction
 ] {
   const [submitting, setSubmitting] = useState(false);
   const [succeeded, setSucceeded] = useState(false);
@@ -57,12 +60,12 @@ export function useForm(
 
   const debug = !!args.debug;
   const extraData = args.data;
-  
-  const reset: () => {
+
+  const reset: ResetFunction = () => {
     setSubmitting(false);
     setSucceeded(false);
     setErrors([]);
-  }
+  };
 
   const handleSubmit: SubmitHandler = submissionData => {
     const getFormData = (event: FormEvent) => {

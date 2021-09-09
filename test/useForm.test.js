@@ -21,13 +21,20 @@ const success = new Promise(resolve => {
 const submitSpy = jest.fn();
 
 function TestForm(props) {
-  const [state, submit] = useForm(props.form, {
+  const [state, submit, reset] = useForm(props.form, {
     data: props.extraData,
     client: props.client
   });
 
   if (state.succeeded) {
-    return <div id="message">Thanks!</div>;
+    return (
+      <div>
+        <div id="message">Thanks!</div>;
+        <button id="reset" onClick={reset}>
+          Reset
+        </button>
+      </div>
+    );
   }
 
   if (state.errors.length > 0) {
@@ -37,7 +44,6 @@ function TestForm(props) {
   return (
     <div>
       <h1>Form</h1>
-      <div id="succeeded">{state.succeeded}</div>
       <form onSubmit={submit}>
         <label htmlFor="email">Email</label>
         <input
@@ -195,6 +201,47 @@ it('submits successfully form key', async () => {
 
   const message = container.querySelector('#message');
   expect(message.textContent).toBe('Thanks!');
+});
+
+it('resets successfully', async () => {
+  mockedCreateClient.mockImplementation(() => ({
+    startBrowserSession: () => {},
+    submitForm: (form, _data, _opts) => {
+      expect(form).toBe('newsletter');
+      return success;
+    },
+    teardown: () => {}
+  }));
+
+  act(() => {
+    ReactDOM.render(
+      <FormspreeProvider project="xxx">
+        <TestForm form="newsletter" />
+      </FormspreeProvider>,
+      container
+    );
+  });
+
+  const heading = container.querySelector('h1');
+  const form = container.querySelector('form');
+
+  expect(heading.textContent).toBe('Form');
+
+  await act(async () => {
+    ReactTestUtils.Simulate.submit(form);
+  });
+
+  const message = container.querySelector('#message');
+  expect(message.textContent).toBe('Thanks!');
+
+  const resetButton = container.querySelector('#reset');
+
+  await act(async () => {
+    ReactTestUtils.Simulate.click(resetButton);
+  });
+
+  expect(container.querySelector('form')).toBeTruthy();
+  expect(container.querySelector('#errors')).toBeFalsy();
 });
 
 it('appends extra data to form data', async () => {
