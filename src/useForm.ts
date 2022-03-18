@@ -2,17 +2,20 @@ import React, { useState } from 'react';
 import { useFormspree } from './context';
 import { version } from '../package.json';
 import { Client } from '@formspree/core';
-import { SubmissionResponse, SubmissionData } from '@formspree/core/forms';
-
-interface ErrorPayload {
-  field?: string;
-  code: string | null;
-  message: string;
-}
+import {
+  SubmissionResponse,
+  SubmissionData,
+  ErrorBody,
+  FormError
+} from '@formspree/core/forms';
 
 type FormEvent = React.FormEvent<HTMLFormElement>;
 
-type ExtraData = { [key: string]: string | (() => string) };
+type DataObject = {
+  [key: string]: string | (() => string) | (() => Promise<string>);
+};
+
+type ExtraData = DataObject | (() => DataObject) | (() => Promise<DataObject>);
 
 type SubmitHandler = (
   submissionData: FormEvent | SubmissionData
@@ -36,7 +39,7 @@ export function useForm(
   {
     submitting: boolean;
     succeeded: boolean;
-    errors: ErrorPayload[];
+    errors: FormError[];
   },
   SubmitHandler,
   ResetFunction
@@ -59,7 +62,7 @@ export function useForm(
   }
 
   const debug = !!args.debug;
-  const extraData = args.data;
+  let extraData = args.data;
 
   const reset: ResetFunction = () => {
     setSubmitting(false);
@@ -67,7 +70,7 @@ export function useForm(
     setErrors([]);
   };
 
-  const handleSubmit: SubmitHandler = submissionData => {
+  const handleSubmit: SubmitHandler = async submissionData => {
     const getFormData = (event: FormEvent) => {
       event.preventDefault();
       const form = event.target as HTMLFormElement;
@@ -90,10 +93,25 @@ export function useForm(
     };
 
     // Append extra data from config
+    if (typeof extraData === 'function') {
+      extraData = (extraData as (() => DataObject | Promise<DataObject>)).call(
+        null
+      );
+      if (extraData instanceof Promise) {
+        extraData = await extraData;
+      }
+    }
+
     if (typeof extraData === 'object') {
       for (const prop in extraData) {
         if (typeof extraData[prop] === 'function') {
-          appendExtraData(prop, (extraData[prop] as (() => string)).call(null));
+          let extraDataValue = (extraData[prop] as (() =>
+            | string
+            | Promise<string>)).call(null);
+          if (extraDataValue instanceof Promise) {
+            extraDataValue = await extraDataValue;
+          }
+          appendExtraData(prop, extraDataValue);
         } else {
           appendExtraData(prop, extraData[prop] as string);
         }
@@ -116,7 +134,7 @@ export function useForm(
           setSucceeded(true);
           setErrors([]);
         } else if (status >= 400 && status < 500) {
-          body = result.body as { errors: ErrorPayload[] };
+          body = result.body as ErrorBody;
           if (body.errors) setErrors(body.errors);
           if (debug) console.log('Validation error', result);
           setSucceeded(false);
