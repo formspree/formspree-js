@@ -1,12 +1,28 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { Client, createClient, getDefaultClient } from '@formspree/core';
+import React, { useEffect, useState, useContext, lazy, Suspense } from 'react';
+import {
+  Client,
+  Config,
+  createClient,
+  getDefaultClient
+} from '@formspree/core';
+import { loadStripe, Stripe } from '@stripe/stripe-js';
+
+const Elements = lazy(() =>
+  import('@stripe/react-stripe-js').then(module => {
+    return { default: module.Elements };
+  })
+);
+
+type CustomClient = Client;
 
 interface Context {
-  client: Client;
+  client: CustomClient;
 }
 
 export interface Props {
-  project: string;
+  project?: string;
+  children: React.ReactNode;
+  stripePK?: string;
 }
 
 const FormspreeContext = React.createContext<Context>({
@@ -15,14 +31,37 @@ const FormspreeContext = React.createContext<Context>({
 
 FormspreeContext.displayName = 'Formspree';
 
-export const FormspreeProvider: React.FC<Props> = props => {
-  if (!props.project) {
-    throw new Error('project is required');
+let stripePromise: Promise<Stripe>;
+
+const getStripe = (stripeKey: string) => {
+  if (!stripePromise) {
+    stripePromise = loadStripe(stripeKey);
+  }
+  return stripePromise;
+};
+
+const handleCreateClient = (promise?: Stripe, project?: string) => {
+  let config: Config = {};
+
+  if (promise) {
+    // @Note: this will be handled within formspree-core
+    config.stripePromise = promise as any;
   }
 
-  const [client] = useState(() => {
-    return createClient({ project: props.project });
-  });
+  if (project) {
+    config.project = project;
+  }
+
+  return createClient(config);
+};
+
+export const FormspreeProvider = (props: Props) => {
+  const [stateStripePromise, setStateStripePromise] = useState<
+    Stripe | undefined
+  >(undefined);
+  const [client] = useState<CustomClient>(
+    handleCreateClient(stateStripePromise, props.project)
+  );
 
   useEffect(() => {
     client.startBrowserSession();
@@ -32,14 +71,38 @@ export const FormspreeProvider: React.FC<Props> = props => {
     };
   }, []);
 
+  useEffect(() => {
+    const getStripePromise = async () => {
+      const promiseStripe = await getStripe(props.stripePK);
+      setStateStripePromise(promiseStripe);
+    };
+
+    if (props.stripePK) {
+      getStripePromise();
+    }
+  }, [props.stripePK]);
+
   return (
     <FormspreeContext.Provider value={{ client }}>
-      {props.children}
+      {props.stripePK && stateStripePromise ? (
+        <Suspense fallback={<p>....</p>}>
+          <Elements stripe={stateStripePromise}>
+            <>{props.children}</>
+          </Elements>
+        </Suspense>
+      ) : (
+        <p>....</p>
+      )}
     </FormspreeContext.Provider>
   );
 };
 
-export function useFormspree(): Client {
-  const { client } = useContext(FormspreeContext);
-  return client || getDefaultClient();
+export function useFormspree() {
+  const context = useContext(FormspreeContext);
+
+  return context.client
+    ? context
+    : {
+        client: getDefaultClient()
+      };
 }

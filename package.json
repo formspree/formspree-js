@@ -44,7 +44,9 @@
     ]
   },
   "dependencies": {
-    "@formspree/core": "^2.6.1"
+    "@formspree/core": "^2.6.1",
+    "@stripe/react-stripe-js": "^1.7.1",
+    "@stripe/stripe-js": "^1.27.0"
   },
   "devDependencies": {
     "@babel/core": "^7.5.4",
@@ -65,7 +67,7 @@
     "react": "^16.10.2",
     "react-dom": "^16.10.2",
     "react-test-renderer": "^16.10.2",
-    "rollup": "^1.17.0",
+    "rollup": "^2.70.2",
     "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-json": "^4.0.0",
