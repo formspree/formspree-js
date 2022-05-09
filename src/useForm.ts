@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useFormspree } from './context';
-import { ExtraData } from './types';
+import { ExtraData, ExtraDataValue } from './types';
 import { version } from '../package.json';
 import { Client } from '@formspree/core';
 import {
@@ -91,9 +91,10 @@ export function useForm(
     if (typeof extraData === 'object') {
       for (const prop in extraData) {
         if (typeof extraData[prop] === 'function') {
-          let extraDataValue = (extraData[prop] as (() =>
-            | string
-            | Promise<string>)).call(null);
+          let extraDataValue = (extraData[prop] as Exclude<
+            ExtraDataValue,
+            string
+          >).call(null);
           if (extraDataValue instanceof Promise) {
             extraDataValue = await extraDataValue;
           }

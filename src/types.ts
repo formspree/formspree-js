@@ -10,7 +10,7 @@ export type FieldError = Forms.FieldError;
  * promise that resolves to a string. Errors should be handled internally.
  * Functions can return undefined to skip this ExtraData value.
  */
-type ExtraDataValue =
+export type ExtraDataValue =
   | string
   | (() => string)
   | (() => Promise<string>)
