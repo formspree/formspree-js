@@ -1,10 +1,10 @@
 import React from 'react';
-import { ErrorPayload } from './types';
+import { FormError } from '@formspree/core/forms';
 
 interface Props {
   prefix?: string;
   field?: string;
-  errors: ErrorPayload[];
+  errors: FormError[];
   [x: string]: any;
 }
 

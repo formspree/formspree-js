@@ -274,7 +274,8 @@ it('evaluates functions passed in data', async () => {
   mockedCreateClient.mockImplementation(() => ({
     startBrowserSession: () => {},
     submitForm: (_form, data, _opts) => {
-      expect(data.get('extra')).toBe('yep');
+      expect(data.get('extraFn')).toBe('yep');
+      expect(data.get('extraPromiseFn')).toBe('yep');
       return success;
     },
     teardown: () => {}
@@ -286,8 +287,58 @@ it('evaluates functions passed in data', async () => {
         <TestForm
           form="newsletter"
           extraData={{
-            extra: () => {
+            extraFn: () => {
               return 'yep';
+            },
+            extraPromiseFn: () => {
+              return new Promise(resolve => {
+                resolve('yep');
+              });
+            }
+          }}
+        />
+      </FormspreeProvider>,
+      container
+    );
+  });
+
+  const form = container.querySelector('form');
+
+  await act(async () => {
+    ReactTestUtils.Simulate.submit(form);
+  });
+});
+
+it('handles errors in functions passed in data', async () => {
+  mockedCreateClient.mockImplementation(() => ({
+    startBrowserSession: () => {},
+    submitForm: (_form, data, _opts) => {
+      expect(Object.keys(data).includes('extraFn')).toBe(false);
+      expect(Object.keys(data).includes('extraPromiseFn')).toBe(false);
+      return success;
+    },
+    teardown: () => {}
+  }));
+
+  act(() => {
+    ReactDOM.render(
+      <FormspreeProvider project="xxx">
+        <TestForm
+          form="newsletter"
+          extraData={{
+            extraFn: () => {
+              try {
+                throw 'doh!';
+              } catch {
+                // oops, handle error
+              }
+            },
+            extraPromiseFn: async () => {
+              return new Promise((_, reject) => {
+                reject();
+              }).catch(() => {
+                // oops, handle error
+              });
             }
           }}
         />
