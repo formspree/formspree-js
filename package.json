@@ -10,7 +10,10 @@
     "url": "https://github.com/formspree/formspree-react.git"
   },
   "license": "MIT",
-  "author": "Derrick Reimer",
+  "contributors": [
+    "Derrick Reimer",
+    "Cole Krumbholz"
+  ],
   "files": [
     "dist/**/*.{js,ts}"
   ],

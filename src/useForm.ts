@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useFormspree } from './context';
+import { ExtraData } from './types';
 import { version } from '../package.json';
 import { Client } from '@formspree/core';
 import {
@@ -10,12 +11,6 @@ import {
 } from '@formspree/core/forms';
 
 type FormEvent = React.FormEvent<HTMLFormElement>;
-
-type DataObject = {
-  [key: string]: string | (() => string) | (() => Promise<string>);
-};
-
-type ExtraData = DataObject | (() => DataObject) | (() => Promise<DataObject>);
 
 type SubmitHandler = (
   submissionData: FormEvent | SubmissionData
@@ -93,15 +88,6 @@ export function useForm(
     };
 
     // Append extra data from config
-    if (typeof extraData === 'function') {
-      extraData = (extraData as (() => DataObject | Promise<DataObject>)).call(
-        null
-      );
-      if (extraData instanceof Promise) {
-        extraData = await extraData;
-      }
-    }
-
     if (typeof extraData === 'object') {
       for (const prop in extraData) {
         if (typeof extraData[prop] === 'function') {
@@ -111,7 +97,9 @@ export function useForm(
           if (extraDataValue instanceof Promise) {
             extraDataValue = await extraDataValue;
           }
-          appendExtraData(prop, extraDataValue);
+          if (extraDataValue !== undefined) {
+            appendExtraData(prop, extraDataValue);
+          }
         } else {
           appendExtraData(prop, extraData[prop] as string);
         }
