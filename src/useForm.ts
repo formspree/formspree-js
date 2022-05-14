@@ -62,7 +62,7 @@ const useForm = (
     );
   }
 
-  if (args.client && args.client.stripePromise) {
+  if (formspreeContext.client && formspreeContext.client.stripePromise) {
     stripe = useStripe();
     elements = useElements();
   }
@@ -131,7 +131,9 @@ const useForm = (
         endpoint: args.endpoint,
         clientName: `@formspree/react@${version}`,
         handlePayment:
-          args.client && args.client.stripePromise ? handlePayment : undefined
+          formspreeContext.client && formspreeContext.client.stripePromise
+            ? handlePayment
+            : undefined
       })
       .then((result: SubmissionResponse) => {
         let status = result.response.status;

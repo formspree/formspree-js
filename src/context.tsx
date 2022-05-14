@@ -44,8 +44,7 @@ const handleCreateClient = (promise?: Stripe, project?: string) => {
   let config: Config = {};
 
   if (promise) {
-    // @Note: this will be handled within formspree-core
-    config.stripePromise = promise as any;
+    config.stripePromise = promise;
   }
 
   if (project) {
@@ -59,7 +58,7 @@ export const FormspreeProvider = (props: Props) => {
   const [stateStripePromise, setStateStripePromise] = useState<
     Stripe | undefined
   >(undefined);
-  const [client] = useState<CustomClient>(
+  const [client, setClient] = useState<CustomClient>(
     handleCreateClient(stateStripePromise, props.project)
   );
 
@@ -81,6 +80,12 @@ export const FormspreeProvider = (props: Props) => {
       getStripePromise();
     }
   }, [props.stripePK]);
+
+  useEffect(() => {
+    if (stateStripePromise) {
+      setClient(handleCreateClient(stateStripePromise, props.project));
+    }
+  }, [stateStripePromise]);
 
   return (
     <FormspreeContext.Provider value={{ client }}>

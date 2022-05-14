@@ -51,7 +51,7 @@ function App() {
 }
 
 ReactDOM.render(
-  <FormspreeProvider stripePK="YOUR_STRIPE_PUBLISHABLE_KEY_HERE">
+  <FormspreeProvider stripePK="pk_test_51KfrWnGDhAb1mVsH3GxChL3LPYAPpKC8ghvi7KJXmOsTLsb9A5Q1NrE3xlqflwo9zyxSrhzKEmODoIpRKFGr3XPz00M4zFQh1e">
     <App />
   </FormspreeProvider>,
   document.getElementById('root')
