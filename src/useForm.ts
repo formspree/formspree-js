@@ -2,19 +2,17 @@ import React, { useState } from 'react';
 import { Stripe, StripeElements } from '@stripe/stripe-js';
 import { useElements, CardElement, useStripe } from '@stripe/react-stripe-js';
 import { useFormspree } from './context';
+import { ExtraData, ExtraDataValue } from './types';
 import { version } from '../package.json';
 import { Client } from '@formspree/core';
-import { SubmissionResponse, SubmissionData } from '@formspree/core/forms';
-
-type ErrorPayload = {
-  field?: string;
-  code: string | null;
-  message: string;
-};
+import {
+  SubmissionResponse,
+  SubmissionData,
+  ErrorBody,
+  FormError
+} from '@formspree/core/forms';
 
 type FormEvent = React.FormEvent<HTMLFormElement>;
-
-type ExtraData = { [key: string]: string | (() => string) };
 
 type SubmitHandler = (
   submissionData: FormEvent | SubmissionData
@@ -38,7 +36,7 @@ const useForm = (
   {
     submitting: boolean;
     succeeded: boolean;
-    errors: ErrorPayload[];
+    errors: FormError[];
   },
   SubmitHandler,
   ResetFunction
@@ -68,7 +66,7 @@ const useForm = (
   }
 
   const debug = !!args.debug;
-  const extraData = args.data;
+  let extraData = args.data;
 
   const reset: ResetFunction = () => {
     setSubmitting(false);
@@ -103,7 +101,16 @@ const useForm = (
     if (typeof extraData === 'object') {
       for (const prop in extraData) {
         if (typeof extraData[prop] === 'function') {
-          appendExtraData(prop, (extraData[prop] as () => string).call(null));
+          let extraDataValue = (extraData[prop] as Exclude<
+            ExtraDataValue,
+            string
+          >).call(null);
+          if (extraDataValue instanceof Promise) {
+            extraDataValue = await extraDataValue;
+          }
+          if (extraDataValue !== undefined) {
+            appendExtraData(prop, extraDataValue);
+          }
         } else {
           appendExtraData(prop, extraData[prop] as string);
         }
@@ -144,7 +151,7 @@ const useForm = (
           setSucceeded(true);
           setErrors([]);
         } else if (status >= 400 && status < 500) {
-          body = result.body as { errors: ErrorPayload[] };
+          body = result.body as ErrorBody;
           if (body.errors) setErrors(body.errors);
           if (debug) console.log('Validation error', result);
           setSucceeded(false);

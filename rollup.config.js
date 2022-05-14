@@ -1,21 +1,22 @@
-import babel from 'rollup-plugin-babel';
-import commonjs from 'rollup-plugin-commonjs';
-import nodeResolve from 'rollup-plugin-node-resolve';
-import json from 'rollup-plugin-json';
+import babel from '@rollup/plugin-babel';
+import commonjs from '@rollup/plugin-commonjs';
+import nodeResolve from '@rollup/plugin-node-resolve';
+import json from '@rollup/plugin-json';
 import pkg from './package.json';
 
 const extensions = ['.js', '.ts', '.tsx', '.d.ts'];
 
 const plugins = [
-  babel({
-    extensions,
-    include: ['src/**/*']
-  }),
   nodeResolve({
     extensions,
     browser: true
   }),
   commonjs(),
+  babel({
+    extensions,
+    include: ['src/**/*'],
+    babelHelpers: 'runtime'
+  }),
   json()
 ];
 
@@ -25,7 +26,8 @@ export default [
       'react',
       '@formspree/core',
       '@stripe/stripe-js',
-      '@stripe/react-stripe-js'
+      '@stripe/react-stripe-js',
+      /@babel\/runtime/
     ],
     input: './src/index.ts',
     plugins: plugins,
