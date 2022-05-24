@@ -76,3 +76,8 @@ input:focus,
 .block {
   max-width: 300px;
 }
+
+.error {
+  color: #e12626;
+  display: block;
+}

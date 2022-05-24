@@ -152,6 +152,7 @@ const useForm = (
           setErrors([]);
         } else if (status >= 400 && status < 500) {
           body = result.body as ErrorBody;
+
           if (body.errors) setErrors(body.errors);
           if (debug) console.log('Validation error', result);
           setSucceeded(false);

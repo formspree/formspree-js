@@ -13,13 +13,13 @@ const useOptions = () => {
           letterSpacing: '0.025em',
           fontFamily: 'Source Code Pro, monospace',
           '::placeholder': {
-            color: '#aab7c4'
-          }
+            color: '#aab7c4',
+          },
         },
         invalid: {
-          color: '#9e2146'
-        }
-      }
+          color: '#9e2146',
+        },
+      },
     }),
     []
   );
@@ -29,7 +29,11 @@ const useOptions = () => {
 
 function App() {
   const options = useOptions();
-  const [state, handleSubmit] = useForm('YUR_FORMSPREE_FORM_ID_HERE');
+  const [state, handleSubmit] = useForm('YOUR_FORMSPREE_FORM_ID_HERE');
+
+  const paymentErrorMessage =
+    state.errors &&
+    state.errors.find((item) => item.field === 'paymentMethod')?.message;
 
   return (
     <div
@@ -37,7 +41,7 @@ function App() {
         maxWidth: 960,
         margin: '0 auto',
         fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif',
-        padding: '4rem 0'
+        padding: '4rem 0',
       }}
     >
       {state && state.succeeded ? (
@@ -51,6 +55,9 @@ function App() {
           <div className="block">
             <label htmlFor="email">Card details</label>
             <CardElement options={options} />
+            {paymentErrorMessage && (
+              <span className="error">{paymentErrorMessage}</span>
+            )}
           </div>
           <button type="submit" disabled={state.submitting}>
             {state.submitting ? 'Handling payment...' : 'Pay'}
