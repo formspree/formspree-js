@@ -1,3 +1,10 @@
+# Formspree X Stripe demo
+
+Quickly add Stripe payment without backend
+
+## Example
+
+```jsx
 import 'react-app-polyfill/ie11';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
@@ -77,3 +84,4 @@ ReactDOM.render(
   </FormspreeProvider>,
   document.getElementById('root')
 );
+```
