@@ -13,10 +13,8 @@ const Elements = lazy(() =>
   })
 );
 
-type CustomClient = Client;
-
 interface Context {
-  client: CustomClient;
+  client: Client;
 }
 
 export interface Props {
@@ -58,7 +56,7 @@ export const FormspreeProvider = (props: Props) => {
   const [stateStripePromise, setStateStripePromise] = useState<
     Stripe | undefined
   >(undefined);
-  const [client, setClient] = useState<CustomClient>(
+  const [client, setClient] = useState<Client>(
     handleCreateClient(stateStripePromise, props.project)
   );
 
@@ -96,7 +94,7 @@ export const FormspreeProvider = (props: Props) => {
           </Elements>
         </Suspense>
       ) : (
-        <p>....</p>
+        <>{props.children}</>
       )}
     </FormspreeContext.Provider>
   );

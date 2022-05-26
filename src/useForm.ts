@@ -120,12 +120,24 @@ const useForm = (
     const handlePayment = async () => {
       const payload = await stripe.createPaymentMethod({
         type: 'card',
-        card: elements.getElement(CardElement)
-        // @TODO: Think whether to pass billing details or not
-        // billing_details: {
-        //   name: formData.name,
-        //   email: formData.email,
-        // }
+        card: elements.getElement(CardElement),
+        billing_details: {
+          ...(formData.name && { name: formData.name }),
+          ...(formData.email && { email: formData.email }),
+          ...(formData.phone && { phone: formData.phone }),
+          ...(formData.address && {
+            address: {
+              ...(formData.city && { city: formData.city }),
+              ...(formData.country && { country: formData.country }),
+              ...(formData.line1 && { line1: formData.line1 }),
+              ...(formData.line2 && { line2: formData.line2 }),
+              ...(formData.postal_code && {
+                postal_code: formData.postal_code
+              }),
+              ...(formData.state && { state: formData.state })
+            }
+          })
+        }
       });
 
       return payload;
