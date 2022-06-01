@@ -15,7 +15,9 @@ const FormspreeContext = React.createContext<Context>({
 
 FormspreeContext.displayName = 'Formspree';
 
-export const FormspreeProvider: React.FC<Props> = props => {
+export const FormspreeProvider: React.FC<
+  React.PropsWithChildren<Props>
+> = props => {
   if (!props.project) {
     throw new Error('project is required');
   }
