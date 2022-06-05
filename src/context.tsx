@@ -87,12 +87,16 @@ export const FormspreeProvider = (props: Props) => {
 
   return (
     <FormspreeContext.Provider value={{ client }}>
-      {props.stripePK && stateStripePromise ? (
-        <Suspense fallback={<p>....</p>}>
-          <Elements stripe={stateStripePromise}>
-            <>{props.children}</>
-          </Elements>
-        </Suspense>
+      {props.stripePK ? (
+        <>
+          {stateStripePromise && (
+            <Suspense fallback={<p>....</p>}>
+              <Elements stripe={stateStripePromise}>
+                <>{props.children}</>
+              </Elements>
+            </Suspense>
+          )}
+        </>
       ) : (
         <>{props.children}</>
       )}

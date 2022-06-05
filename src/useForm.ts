@@ -117,7 +117,28 @@ const useForm = (
       }
     }
 
-    const handlePayment = async () => {
+    const createPaymentMethod = async () => {
+      const address = {
+        ...(formData.address_line1 && {
+          line1: formData.address_line1
+        }),
+        ...(formData.address_line2 && {
+          line2: formData.address_line2
+        }),
+        ...(formData.address_city && {
+          city: formData.address_city
+        }),
+        ...(formData.address_country && {
+          country: formData.address_country
+        }),
+        ...(formData.address_state && {
+          state: formData.address_state
+        }),
+        ...(formData.address_postal_code && {
+          postal_code: formData.address_postal_code
+        })
+      };
+
       const payload = await stripe.createPaymentMethod({
         type: 'card',
         card: elements.getElement(CardElement),
@@ -125,17 +146,8 @@ const useForm = (
           ...(formData.name && { name: formData.name }),
           ...(formData.email && { email: formData.email }),
           ...(formData.phone && { phone: formData.phone }),
-          ...(formData.address && {
-            address: {
-              ...(formData.city && { city: formData.city }),
-              ...(formData.country && { country: formData.country }),
-              ...(formData.line1 && { line1: formData.line1 }),
-              ...(formData.line2 && { line2: formData.line2 }),
-              ...(formData.postal_code && {
-                postal_code: formData.postal_code
-              }),
-              ...(formData.state && { state: formData.state })
-            }
+          ...(address && {
+            address
           })
         }
       });
@@ -149,9 +161,9 @@ const useForm = (
       .submitForm(formKey, formData, {
         endpoint: args.endpoint,
         clientName: `@formspree/react@${version}`,
-        handlePayment:
+        createPaymentMethod:
           formspreeContext.client && formspreeContext.client.stripePromise
-            ? handlePayment
+            ? createPaymentMethod
             : undefined
       })
       .then((result: SubmissionResponse) => {
