@@ -34,7 +34,7 @@ const useOptions = () => {
 
 function App() {
   const options = useOptions();
-  const [state, handleSubmit] = useForm('YOUR_FORMSPREE_FORM_ID_HERE');
+  const [state, handleSubmit] = useForm(import.meta.env.VITE_FORM_ID as string);
 
   return (
     <div
@@ -72,7 +72,7 @@ function App() {
 }
 
 ReactDOM.render(
-  <FormspreeProvider stripePK="YOUR_STRIPE_PUBLISHABLE_KEY_HERE">
+  <FormspreeProvider stripePK={import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY}>
     <App />
   </FormspreeProvider>,
   document.getElementById('root')
