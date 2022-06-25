@@ -1,6 +1,6 @@
 # Formspree X Stripe demo
 
-Quickly add Stripe payment without backend
+Quickly add Stripe payment without setting up your own backend
 
 ## Example
 
