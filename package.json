@@ -21,15 +21,15 @@
     "dist/**/*.{js,ts}"
   ],
   "scripts": {
-    "build": "rm -rf dist && npm run build:types && npm run build:js",
+    "build": "rm -rf dist && yarn run build:types && yarn run build:js",
     "build:js": "rollup -c",
     "build:types": "tsc --emitDeclarationOnly",
     "format": "npx prettier --write 'src/**/*.{js,ts}'",
-    "prepare": "npm run build",
+    "prepare": "yarn run build",
     "release": "np",
     "test": "jest",
     "type-check": "tsc --noEmit",
-    "type-check:watch": "npm run type-check -- --watch"
+    "type-check:watch": "yarn run type-check -- --watch"
   },
   "husky": {
     "hooks": {
@@ -87,7 +87,8 @@
     "react": ">= 17.0.2"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "np": {
     "yarn": false
