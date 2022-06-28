@@ -14,12 +14,12 @@
     "Derrick Reimer",
     "Cole Krumbholz"
   ],
-  "files": [
-    "dist/**/*.{js,ts}"
-  ],
   "main": "dist/formspree-react.cjs.js",
   "module": "dist/formspree-react.esm.js",
   "types": "dist/types/src/index.d.ts",
+  "files": [
+    "dist/**/*.{js,ts}"
+  ],
   "scripts": {
     "build": "rm -rf dist && npm run build:types && npm run build:js",
     "build:js": "rollup -c",
@@ -47,7 +47,7 @@
     ]
   },
   "dependencies": {
-    "@formspree/core": "^2.6.3",
+    "@formspree/core": "^2.7.0",
     "@stripe/react-stripe-js": "^1.7.1",
     "@stripe/stripe-js": "^1.27.0"
   },
@@ -81,7 +81,7 @@
     "rollup-plugin-node-resolve": "^5.2.0",
     "sort-package-json": "^1.22.1",
     "tslib": "^1.10.0",
-    "typescript": "^3.7.4"
+    "typescript": "^4.7.4"
   },
   "peerDependencies": {
     "react": ">= 17.0.2"

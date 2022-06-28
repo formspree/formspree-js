@@ -35,6 +35,7 @@ button:hover {
   box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
 }
 
+textarea,
 input,
 .StripeElement {
   display: block;
@@ -80,4 +81,39 @@ input:focus,
 .error {
   color: #e12626;
   display: block;
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  padding: 4rem 0;
+}
+
+.tabs {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 4rem;
+}
+
+.tabs .tab {
+  background-color: #fafafa;
+  color: #6772e5;
+  transition: 0.5s all ease;
+}
+
+.tabs .tab:hover {
+  background-color: #6772e5;
+  color: #fff;
+  transition: 0.5s all ease;
+}
+
+.tabs .tab.active {
+  background-color: #6772e5;
+  color: #fff;
+}
+
+.tabs .tab:first-of-type {
+  margin-right: 1rem;
 }

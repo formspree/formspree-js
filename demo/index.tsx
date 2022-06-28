@@ -2,78 +2,44 @@ import 'react-app-polyfill/ie11';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import './styles.css';
-import {
-  useForm,
-  CardElement,
-  FormspreeProvider,
-  ValidationError,
-} from '@formspree/react';
+import { FormspreeProvider } from '@formspree/react';
+import PaymentForm from './PaymentForm';
+import SimpleForm from './SimpleForm';
 
-const useOptions = () => {
-  const options = React.useMemo(
-    () => ({
-      style: {
-        base: {
-          color: '#424770',
-          letterSpacing: '0.025em',
-          fontFamily: 'Source Code Pro, monospace',
-          '::placeholder': {
-            color: '#aab7c4',
-          },
-        },
-        invalid: {
-          color: '#9e2146',
-        },
-      },
-    }),
-    []
-  );
-
-  return options;
-};
-
-function App() {
-  const options = useOptions();
-  const [state, handleSubmit] = useForm(import.meta.env.VITE_FORM_ID as string);
+const App = () => {
+  const [isStripe, setStripe] = React.useState(true);
 
   return (
-    <div
-      style={{
-        maxWidth: 960,
-        margin: '0 auto',
-        fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif',
-        padding: '4rem 0',
-      }}
-    >
-      {state && state.succeeded ? (
-        <h2>Payment has been handled successfully!</h2>
-      ) : (
-        <form onSubmit={handleSubmit}>
-          <div className="block">
-            <label htmlFor="email">Email</label>
-            <input id="email" type="email" name="email" />
-          </div>
-          <div className="block">
-            <label htmlFor="email">Card details</label>
-            <CardElement options={options} />
-            <ValidationError
-              className="error"
-              field="paymentMethod"
-              errors={state.errors}
-            />
-          </div>
-          <button type="submit" disabled={state.submitting}>
-            {state.submitting ? 'Handling payment...' : 'Pay'}
+    <div className="container">
+      <>
+        <div className="tabs">
+          <button
+            type="button"
+            className={`tab ${!isStripe && 'active'}`}
+            onClick={() => setStripe(false)}
+          >
+            Simple form
           </button>
-        </form>
-      )}
+          <button
+            type="button"
+            className={`tab ${isStripe && 'active'}`}
+            onClick={() => setStripe(true)}
+          >
+            Stripe form
+          </button>
+        </div>
+        {isStripe ? (
+          <FormspreeProvider
+            stripePK={import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY}
+          >
+            <PaymentForm />
+          </FormspreeProvider>
+        ) : (
+          <SimpleForm />
+        )}
+      </>
     </div>
   );
-}
+};
 
-ReactDOM.render(
-  <FormspreeProvider stripePK={import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY}>
-    <App />
-  </FormspreeProvider>,
-  document.getElementById('root')
-);
+ReactDOM.render(<App />, document.getElementById('root'));

@@ -1,87 +1,24 @@
-# Formspree X Stripe demo
+# Formspree demo
 
-Quickly add Stripe payment without setting up your own backend
+Quick simple demo with both a simple form and a payment form powered by Stripe
 
-## Example
+## Getting started
 
-```jsx
-import 'react-app-polyfill/ie11';
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import './styles.css';
-import {
-  useForm,
-  CardElement,
-  FormspreeProvider,
-  ValidationError,
-} from '@formspree/react';
+1. Create a Formspree account
+2. Create 2 forms
+3. Enable Stripe plugin on one of the forms
+4. Run `cp .env.template .env`
+5. Place your forms IDs and your Stripe publishable key that you can get from your Stripe plugin on Formspree plugins dashboard
+6. Install dependencies
+  
+  ```bash
+  yarn
+  ```
 
-const useOptions = () => {
-  const options = React.useMemo(
-    () => ({
-      style: {
-        base: {
-          color: '#424770',
-          letterSpacing: '0.025em',
-          fontFamily: 'Source Code Pro, monospace',
-          '::placeholder': {
-            color: '#aab7c4',
-          },
-        },
-        invalid: {
-          color: '#9e2146',
-        },
-      },
-    }),
-    []
-  );
+7. Start the Vite project
 
-  return options;
-};
+  ```bash
+  yarn start
+  ```
 
-function App() {
-  const options = useOptions();
-  const [state, handleSubmit] = useForm('YOUR_FORMSPREE_FORM_ID_HERE');
-
-  return (
-    <div
-      style={{
-        maxWidth: 960,
-        margin: '0 auto',
-        fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif',
-        padding: '4rem 0',
-      }}
-    >
-      {state && state.succeeded ? (
-        <h2>Payment has been handled successfully!</h2>
-      ) : (
-        <form onSubmit={handleSubmit}>
-          <div className="block">
-            <label htmlFor="email">Email</label>
-            <input id="email" type="email" name="email" />
-          </div>
-          <div className="block">
-            <label htmlFor="email">Card details</label>
-            <CardElement options={options} />
-            <ValidationError
-              className="error"
-              field="paymentMethod"
-              errors={state.errors}
-            />
-          </div>
-          <button type="submit" disabled={state.submitting}>
-            {state.submitting ? 'Handling payment...' : 'Pay'}
-          </button>
-        </form>
-      )}
-    </div>
-  );
-}
-
-ReactDOM.render(
-  <FormspreeProvider stripePK="YOUR_STRIPE_PUBLISHABLE_KEY_HERE">
-    <App />
-  </FormspreeProvider>,
-  document.getElementById('root')
-);
-```
+Happy coding!
