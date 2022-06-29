@@ -98,32 +98,6 @@ it('fails it initialize without identifying properties', () => {
   expect(console.error).toHaveBeenCalled();
 });
 
-it('accepts a client directly', async () => {
-  const mockClient = {
-    startBrowserSession: () => {},
-    submitForm: (_form, _data, opts) => {
-      submitSpy();
-      return success;
-    },
-    teardown: () => {}
-  };
-
-  act(() => {
-    ReactDOM.render(
-      <TestForm form="newsletter" client={mockClient} />,
-      container
-    );
-  });
-
-  const form = container.querySelector('form');
-
-  await act(async () => {
-    ReactTestUtils.Simulate.submit(form);
-  });
-
-  expect(submitSpy).toHaveBeenCalled();
-});
-
 it('submits a client name', async () => {
   mockedCreateClient.mockImplementation(() => ({
     startBrowserSession: () => {},
