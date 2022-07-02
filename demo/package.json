@@ -10,8 +10,10 @@
     "start": "vite"
   },
   "dependencies": {
-    "@formspree/react": "^2.2.4",
-    "react-app-polyfill": "^1.0.0"
+    "@formspree/react": "^2.3.0",
+    "react": "^18.2.0",
+    "react-app-polyfill": "^1.0.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@types/react": "^16.9.11",
@@ -19,10 +21,5 @@
     "typescript": "^4.7.4",
     "vite": "latest",
     "vite-preset-react": "latest"
-  },
-  "alias": {
-    "react": "../node_modules/react",
-    "react-dom": "../node_modules/react-dom/profiling",
-    "scheduler/tracing": "../node_modules/scheduler/tracing-profiling"
   }
 }
