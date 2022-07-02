@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { Stripe, StripeElements } from '@stripe/stripe-js';
+import { useElements, CardElement, useStripe } from '@stripe/react-stripe-js';
 import { useFormspree } from './context';
 import { ExtraData, ExtraDataValue } from './types';
 import { version } from '../package.json';
@@ -18,11 +20,11 @@ type SubmitHandler = (
 
 type ResetFunction = () => void;
 
-function isEvent(data: FormEvent | SubmissionData): data is FormEvent {
+const isEvent = (data: FormEvent | SubmissionData): data is FormEvent => {
   return (data as FormEvent).preventDefault !== undefined;
-}
+};
 
-export function useForm(
+const useForm = (
   formKey: string,
   args: {
     client?: Client;
@@ -38,12 +40,14 @@ export function useForm(
   },
   SubmitHandler,
   ResetFunction
-] {
+] => {
   const [submitting, setSubmitting] = useState(false);
   const [succeeded, setSucceeded] = useState(false);
   const [errors, setErrors] = useState([]);
-  const globalClient = useFormspree();
-  const client = args.client || globalClient;
+  const formspreeContext = useFormspree();
+  const client = args.client || formspreeContext;
+  let stripe: Stripe;
+  let elements: StripeElements;
 
   if (!client) {
     throw new Error('You must provide a Formspree client');
@@ -56,6 +60,11 @@ export function useForm(
     );
   }
 
+  if (formspreeContext.client && formspreeContext.client.stripePromise) {
+    stripe = useStripe();
+    elements = useElements();
+  }
+
   const debug = !!args.debug;
   let extraData = args.data;
 
@@ -66,8 +75,9 @@ export function useForm(
   };
 
   const handleSubmit: SubmitHandler = async submissionData => {
-    const getFormData = (event: FormEvent) => {
+    const getFormData = async (event: FormEvent) => {
       event.preventDefault();
+
       const form = event.target as HTMLFormElement;
       if (form.tagName != 'FORM') {
         throw new Error('submit was triggered for a non-form element');
@@ -76,7 +86,7 @@ export function useForm(
     };
 
     let formData = isEvent(submissionData)
-      ? getFormData(submissionData)
+      ? await getFormData(submissionData)
       : submissionData;
 
     const appendExtraData = (prop: string, value: string) => {
@@ -107,12 +117,54 @@ export function useForm(
       }
     }
 
+    const createPaymentMethod = async () => {
+      const address = {
+        ...(formData.address_line1 && {
+          line1: formData.address_line1
+        }),
+        ...(formData.address_line2 && {
+          line2: formData.address_line2
+        }),
+        ...(formData.address_city && {
+          city: formData.address_city
+        }),
+        ...(formData.address_country && {
+          country: formData.address_country
+        }),
+        ...(formData.address_state && {
+          state: formData.address_state
+        }),
+        ...(formData.address_postal_code && {
+          postal_code: formData.address_postal_code
+        })
+      };
+
+      const payload = await stripe.createPaymentMethod({
+        type: 'card',
+        card: elements.getElement(CardElement),
+        billing_details: {
+          ...(formData.name && { name: formData.name }),
+          ...(formData.email && { email: formData.email }),
+          ...(formData.phone && { phone: formData.phone }),
+          ...(address && {
+            address
+          })
+        }
+      });
+
+      return payload;
+    };
+
     setSubmitting(true);
 
-    return client
+    return formspreeContext.client
       .submitForm(formKey, formData, {
         endpoint: args.endpoint,
-        clientName: `@formspree/react@${version}`
+        clientName: `@formspree/react@${version}`,
+        createPaymentMethod:
+          formspreeContext.client && formspreeContext.client.stripePromise
+            ? createPaymentMethod
+            : undefined
       })
       .then((result: SubmissionResponse) => {
         let status = result.response.status;
@@ -124,6 +176,7 @@ export function useForm(
           setErrors([]);
         } else if (status >= 400 && status < 500) {
           body = result.body as ErrorBody;
+
           if (body.errors) setErrors(body.errors);
           if (debug) console.log('Validation error', result);
           setSucceeded(false);
@@ -145,4 +198,6 @@ export function useForm(
   };
 
   return [{ submitting, succeeded, errors }, handleSubmit, reset];
-}
+};
+
+export { CardElement, useForm };

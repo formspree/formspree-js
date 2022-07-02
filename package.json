@@ -14,22 +14,22 @@
     "Derrick Reimer",
     "Cole Krumbholz"
   ],
-  "files": [
-    "dist/**/*.{js,ts}"
-  ],
   "main": "dist/formspree-react.cjs.js",
   "module": "dist/formspree-react.esm.js",
   "types": "dist/types/src/index.d.ts",
+  "files": [
+    "dist/**/*.{js,ts}"
+  ],
   "scripts": {
-    "build": "rm -rf dist && npm run build:types && npm run build:js",
+    "build": "rm -rf dist && yarn run build:types && yarn run build:js",
     "build:js": "rollup -c",
     "build:types": "tsc --emitDeclarationOnly",
     "format": "npx prettier --write 'src/**/*.{js,ts}'",
-    "prepare": "npm run build",
+    "prepare": "yarn run build",
     "release": "np",
     "test": "jest",
     "type-check": "tsc --noEmit",
-    "type-check:watch": "npm run type-check -- --watch"
+    "type-check:watch": "yarn run type-check -- --watch"
   },
   "husky": {
     "hooks": {
@@ -47,7 +47,9 @@
     ]
   },
   "dependencies": {
-    "@formspree/core": "^2.6.3"
+    "@formspree/core": "^2.7.0",
+    "@stripe/react-stripe-js": "^1.7.1",
+    "@stripe/stripe-js": "^1.27.0"
   },
   "devDependencies": {
     "@babel/core": "^7.5.4",
@@ -72,16 +74,21 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-test-renderer": "^17.0.2",
-    "rollup": "^2.70.1",
+    "rollup": "^2.70.2",
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-json": "^4.0.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
     "sort-package-json": "^1.22.1",
     "tslib": "^1.10.0",
-    "typescript": "^3.7.4"
+    "typescript": "^4.7.4"
   },
   "peerDependencies": {
     "react": ">= 17.0.2"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "np": {
     "yarn": false

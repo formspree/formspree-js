@@ -3,7 +3,6 @@ import { FormspreeProvider, useFormspree } from '../src';
 import ReactDOM from 'react-dom';
 import ReactTestUtils from 'react-dom/test-utils';
 import { createClient } from '@formspree/core';
-import { ErrorBoundary } from './helpers';
 
 jest.mock('@formspree/core');
 
@@ -21,7 +20,7 @@ afterEach(() => {
   container = null;
 });
 
-it('instantiates a client and provides it via useFormspree hook', () => {
+it('instantiates a client and provides it via useFormspree hook', async () => {
   createClient.mockImplementation(config => ({
     startBrowserSession: () => {},
     key: config.project
@@ -29,7 +28,8 @@ it('instantiates a client and provides it via useFormspree hook', () => {
 
   const Component = () => {
     const client = useFormspree();
-    return <div id="client">project: {client.key}</div>;
+
+    return <div id="client">project: {client.client.key}</div>;
   };
 
   const Page = ({ project }) => {
@@ -45,21 +45,4 @@ it('instantiates a client and provides it via useFormspree hook', () => {
   });
 
   expect(container.querySelector('#client').textContent).toBe('project: xxx');
-});
-
-it('throws an error if project prop is not provided', () => {
-  // Mock error console to suppress noise in output
-  console.error = jest.fn();
-
-  act(() => {
-    ReactDOM.render(
-      <ErrorBoundary>
-        <FormspreeProvider></FormspreeProvider>
-      </ErrorBoundary>,
-      container
-    );
-  });
-
-  const error = container.querySelector('#error');
-  expect(error.textContent).toBe('project is required');
 });

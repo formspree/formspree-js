@@ -22,7 +22,13 @@ const plugins = [
 
 export default [
   {
-    external: ['react', '@formspree/core', /@babel\/runtime/],
+    external: [
+      'react',
+      '@formspree/core',
+      '@stripe/stripe-js',
+      '@stripe/react-stripe-js',
+      /@babel\/runtime/
+    ],
     input: './src/index.ts',
     plugins: plugins,
     output: [
@@ -37,7 +43,7 @@ export default [
     ]
   },
   {
-    external: ['react'],
+    external: ['react', '@stripe/stripe-js', '@stripe/react-stripe-js'],
     input: './src/index.ts',
     plugins: plugins,
     output: {
