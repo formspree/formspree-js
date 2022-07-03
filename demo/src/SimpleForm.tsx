@@ -1,11 +1,10 @@
-import * as React from 'react'
 import {
   useForm,
   ValidationError,
 } from '@formspree/react';
 
 const SimpleForm = () => {
-  const [state, handleSubmit] = useForm(import.meta.env.VITE_SIMPLE_FORM_ID as string);
+  const [state, handleSubmit] = useForm(process.env.REACT_APP_SIMPLE_FORM_ID as string);
 
   return (
     <div>
