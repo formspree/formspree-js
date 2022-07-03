@@ -1,13 +1,10 @@
-import 'react-app-polyfill/ie11';
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
+import { useState } from 'react';
 import { FormspreeProvider } from '@formspree/react';
-import './styles.css';
 import PaymentForm from './PaymentForm';
 import SimpleForm from './SimpleForm';
 
 const App = () => {
-  const [isStripe, setStripe] = React.useState(true);
+  const [isStripe, setStripe] = useState(true);
 
   return (
     <div className="container">
@@ -30,7 +27,7 @@ const App = () => {
         </div>
         {isStripe ? (
           <FormspreeProvider
-            stripePK={import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY}
+            stripePK={process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY}
           >
             <PaymentForm />
           </FormspreeProvider>
@@ -42,4 +39,4 @@ const App = () => {
   );
 };
 
-ReactDOM.render(<App />, document.getElementById('root'));
+export default App

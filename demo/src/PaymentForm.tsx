@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useMemo } from 'react'
 import {
   useForm,
   CardElement,
@@ -6,7 +6,7 @@ import {
 } from '@formspree/react';
 
 const useOptions = () => {
-  const options = React.useMemo(
+  const options = useMemo(
     () => ({
       style: {
         base: {
@@ -30,7 +30,7 @@ const useOptions = () => {
 
 const PaymentForm = () => {
   const options = useOptions();
-  const [state, handleSubmit] = useForm(import.meta.env.VITE_PAYMENT_FORM_ID as string);
+  const [state, handleSubmit] = useForm(process.env.REACT_APP_PAYMENT_FORM_ID as string);
 
   return (
     <div
