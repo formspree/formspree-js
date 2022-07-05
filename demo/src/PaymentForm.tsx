@@ -1,9 +1,6 @@
-import { useMemo } from 'react'
-import {
-  useForm,
-  CardElement,
-  ValidationError,
-} from '@formspree/react';
+import { useMemo } from 'react';
+import { useForm, CardElement, ValidationError } from '@formspree/react';
+import CardExample from './CardExample';
 
 const useOptions = () => {
   const options = useMemo(
@@ -30,7 +27,9 @@ const useOptions = () => {
 
 const PaymentForm = () => {
   const options = useOptions();
-  const [state, handleSubmit] = useForm(process.env.REACT_APP_PAYMENT_FORM_ID as string);
+  const [state, handleSubmit] = useForm(
+    process.env.REACT_APP_PAYMENT_FORM_ID as string
+  );
 
   return (
     <div
@@ -61,10 +60,38 @@ const PaymentForm = () => {
           <button type="submit" disabled={state.submitting}>
             {state.submitting ? 'Handling payment...' : 'Pay'}
           </button>
+
+          <div className="block info">
+            <p>You can use the following cards for testing:</p>
+            <ul>
+              <CardExample
+                title="Successful charge: 4242 4242 4242 4242"
+                cardNumber="4242424242424242"
+              />
+              <CardExample
+                title="Declined payment: 4000 0000 0000 0002"
+                cardNumber="4000000000000002"
+              />
+              <CardExample
+                title="3D secure: 4000 0027 6000 3184"
+                cardNumber="4000002760003184"
+              />
+            </ul>
+            <span>
+              Use any 3 digits for CVC and any future date for the date
+            </span>
+            <a
+              href="https://stripe.com/docs/testing"
+              target="_blank"
+              rel="noreferrer"
+            >
+              See more on Stripe
+            </a>
+          </div>
         </form>
       )}
     </div>
   );
-}
+};
 
-export default PaymentForm
+export default PaymentForm;

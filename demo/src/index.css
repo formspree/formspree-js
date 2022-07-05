@@ -1,3 +1,52 @@
+html {
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  box-sizing: content-box;
+  width: 100%;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+#root {
+  height: 100%;
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 4rem 0;
+}
+
+.tabs {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 4rem;
+}
+
+.tabs .tab {
+  background-color: #fafafa;
+  color: #6772e5;
+  transition: 0.5s all ease;
+}
+
+.tabs .tab:hover {
+  background-color: #6772e5;
+  color: #fff;
+  transition: 0.5s all ease;
+}
+
+.tabs .tab.active {
+  background-color: #6772e5;
+  color: #fff;
+}
+
+.tabs .tab:first-of-type {
+  margin-right: 1rem;
+}
+
 label {
   color: #6b7c93;
   font-weight: 300;
@@ -41,6 +90,7 @@ input,
   display: block;
   margin: 10px 0 20px 0;
   max-width: 500px;
+  width: 100%;
   padding: 10px 14px;
   font-size: 1em;
   font-family: 'Source Code Pro', monospace;
@@ -75,7 +125,13 @@ input:focus,
 }
 
 .block {
-  max-width: 300px;
+  max-width: 500px;
+}
+
+@media screen and (max-width: 600px) {
+  .block {
+    max-width: 350px;
+  }
 }
 
 .error {
@@ -83,37 +139,38 @@ input:focus,
   display: block;
 }
 
-.container {
-  max-width: 960px;
-  margin: 0 auto;
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  padding: 4rem 0;
+.info {
+  margin-top: 2rem;
+  color: #6b7c93;
 }
 
-.tabs {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 4rem;
+.info li {
+  position: relative;
+  margin-bottom: 0.5rem;
 }
 
-.tabs .tab {
-  background-color: #fafafa;
-  color: #6772e5;
-  transition: 0.5s all ease;
+.info svg {
+  margin-left: 0.4rem;
+  fill: #6b7c93;
+  cursor: pointer;
 }
 
-.tabs .tab:hover {
-  background-color: #6772e5;
+.info svg:hover {
+  fill: #6772e5;
+}
+
+.info span {
+  display: block;
+  font-style: italic;
+  margin-top: 1rem;
+}
+
+.alert {
+  position: absolute;
+  right: 0;
+  top: 0;
+  background: #5c68e3;
   color: #fff;
-  transition: 0.5s all ease;
-}
-
-.tabs .tab.active {
-  background-color: #6772e5;
-  color: #fff;
-}
-
-.tabs .tab:first-of-type {
-  margin-right: 1rem;
+  padding: 0.3rem 0.5rem;
+  border-radius: 5px;
 }
