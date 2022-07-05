@@ -4,11 +4,11 @@ import PaymentForm from './PaymentForm';
 import SimpleForm from './SimpleForm';
 
 const App = () => {
-  const [isStripe, setStripe] = useState(true);
+  const [isStripe, setStripe] = useState(false);
 
   return (
-    <div className="container">
-      <>
+    <>
+      <div className="container">
         <div className="tabs">
           <button
             type="button"
@@ -34,9 +34,17 @@ const App = () => {
         ) : (
           <SimpleForm />
         )}
-      </>
-    </div>
+      </div>
+      <footer className="container">
+        <p>
+          Powered by:{' '}
+          <a href="https://formspree.io?utm_source=formspree-react-demo">
+            Formspree
+          </a>
+        </p>
+      </footer>
+    </>
   );
 };
 
-export default App
+export default App;
