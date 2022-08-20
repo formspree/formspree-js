@@ -1,0 +1,76 @@
+{
+  "name": "@formspree/react",
+  "version": "2.3.2",
+  "description": "The React component library for Formspree",
+  "private": false,
+  "bugs": {
+    "url": "https://github.com/formspree/formspree-react/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/formspree/formspree-react.git"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Derrick Reimer",
+    "Cole Krumbholz",
+    "Ismail Ghallou"
+  ],
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --external react --minify",
+    "dev": "tsup src/index.ts --format esm,cjs --watch --dts --external react --minify",
+    "clean": "rm -rf dist",
+    "lint": "eslint src/*.ts*",
+    "test": "jest"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,ts,tsx,css,json,md}": [
+      "npx prettier --write",
+      "git add"
+    ],
+    "package.json": [
+      "npx sort-package-json",
+      "git add"
+    ]
+  },
+  "dependencies": {
+    "@stripe/react-stripe-js": "^1.7.1"
+  },
+  "devDependencies": {
+    "@formspree/core": "*",
+    "@types/jest": "^24.0.25",
+    "@types/react": "^18.0.15",
+    "@types/react-dom": "^18.0.6",
+    "babel-jest": "^26.3.0",
+    "husky": "^3.0.5",
+    "jest": "^26.4.2",
+    "lint-staged": "^9.2.5",
+    "np": "^6.4.0",
+    "prettier": "^1.18.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-test-renderer": "^17.0.2",
+    "sort-package-json": "^1.22.1",
+    "tsup": "^6.2.2",
+    "typescript": "^4.7.4"
+  },
+  "peerDependencies": {
+    "@stripe/stripe-js": "^1.29.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "np": {
+    "yarn": false
+  }
+}

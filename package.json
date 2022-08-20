@@ -1,96 +1,24 @@
 {
-  "name": "@formspree/react",
-  "version": "2.3.3",
-  "description": "The React component library for Formspree",
-  "bugs": {
-    "url": "https://github.com/formspree/formspree-react/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/formspree/formspree-react.git"
-  },
-  "license": "MIT",
-  "contributors": [
-    "Derrick Reimer",
-    "Cole Krumbholz"
-  ],
-  "main": "dist/formspree-react.cjs.js",
-  "module": "dist/formspree-react.esm.js",
-  "types": "dist/types/src/index.d.ts",
-  "files": [
-    "dist/**/*.{js,ts}"
-  ],
-  "scripts": {
-    "build": "rm -rf dist && yarn run build:types && yarn run build:js",
-    "build:js": "rollup -c",
-    "build:types": "tsc --emitDeclarationOnly",
-    "format": "npx prettier --write 'src/**/*.{js,ts}'",
-    "prepare": "yarn run build",
-    "release": "np",
-    "test": "jest",
-    "type-check": "tsc --noEmit",
-    "type-check:watch": "yarn run type-check -- --watch"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "*.{js,ts,tsx,css,json,md}": [
-      "npx prettier --write",
-      "git add"
-    ],
-    "package.json": [
-      "npx sort-package-json",
-      "git add"
-    ]
-  },
-  "dependencies": {
-    "@babel/runtime": "^7.18.9",
-    "@formspree/core": "^2.7.0",
-    "@stripe/react-stripe-js": "^1.7.1",
-    "@stripe/stripe-js": "^1.27.0"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.5.4",
-    "@babel/plugin-transform-runtime": "^7.6.2",
-    "@babel/preset-env": "^7.6.3",
-    "@babel/preset-react": "^7.0.0",
-    "@babel/preset-typescript": "^7.7.7",
-    "@rollup/plugin-babel": "^5.3.1",
-    "@rollup/plugin-commonjs": "^21.0.2",
-    "@rollup/plugin-json": "^4.1.0",
-    "@rollup/plugin-node-resolve": "^13.1.3",
-    "@types/jest": "^24.0.25",
-    "@types/react": "^16.9.17",
-    "@types/react-dom": "^16.9.4",
-    "babel-jest": "^26.3.0",
-    "husky": "^3.0.5",
-    "jest": "^26.4.2",
-    "lint-staged": "^9.2.5",
-    "np": "^6.4.0",
-    "prettier": "^1.18.2",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-test-renderer": "^17.0.2",
-    "rollup": "^2.70.2",
-    "rollup-plugin-babel": "^4.3.3",
-    "rollup-plugin-commonjs": "^10.1.0",
-    "rollup-plugin-json": "^4.0.0",
-    "rollup-plugin-node-resolve": "^5.2.0",
-    "sort-package-json": "^1.22.1",
-    "tslib": "^1.10.0",
-    "typescript": "^4.7.4"
-  },
-  "peerDependencies": {
-    "react": ">= 17.0.2"
-  },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
-  },
-  "np": {
-    "yarn": false
-  }
+	"private": true,
+	"workspaces": [
+		"packages/*",
+		"examples/*"
+	],
+	"scripts": {
+		"build": "turbo run build",
+		"dev": "turbo run dev --no-cache --parallel --continue",
+		"lint": "turbo run lint",
+		"clean": "turbo run clean && rm -rf node_modules",
+		"format": "prettier --write \"**/*.{ts,tsx,md}\"",
+		"changeset": "changeset",
+		"version-packages": "changeset version",
+		"release": "turbo run build --filter=@formspree/cra-demo^... --filter=@formspree/vite-demo^... && changeset publish"
+	},
+	"devDependencies": {
+		"@changesets/cli": "^2.22.0",
+		"eslint": "^8.15.0",
+		"eslint-config-acme": "*",
+		"prettier": "^2.5.1",
+		"turbo": "latest"
+	}
 }
