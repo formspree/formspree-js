@@ -1,5 +1,0 @@
-#!/bin/sh
-
-# script/build: Build the distribution.
-
-npm run build
