@@ -16,6 +16,9 @@
     "Cole Krumbholz",
     "Ismail Ghallou"
   ],
+  "files": [
+    "dist/**"
+  ],
   "sideEffects": false,
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
