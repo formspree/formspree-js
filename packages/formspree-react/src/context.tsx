@@ -5,7 +5,8 @@ import {
   createClient,
   getDefaultClient
 } from '@formspree/core';
-import { loadStripe, Stripe } from '@stripe/stripe-js';
+import { loadStripe } from '@stripe/stripe-js/pure';
+import { type Stripe } from '@stripe/stripe-js';
 
 const Elements = lazy(() =>
   import('@stripe/react-stripe-js').then(module => {
