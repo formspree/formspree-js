@@ -5,7 +5,7 @@ import {
   createClient,
   getDefaultClient
 } from '@formspree/core';
-import { loadStripe } from '@stripe/stripe-js/pure';
+import { loadStripe } from '@stripe/stripe-js/pure.js';
 import { type Stripe } from '@stripe/stripe-js';
 
 const Elements = lazy(() =>
