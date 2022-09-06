@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.8.0
+
+### Minor Changes
+
+- Conversion to monorepo. Path for type imports changed. Lazy loading stripe.
+
 ## 2.5.1
 
 - Update dependencies for security.
