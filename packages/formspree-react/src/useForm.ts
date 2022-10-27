@@ -180,17 +180,17 @@ const useForm = (
           setSucceeded(true);
           setResult(result);
           setErrors([]);
-        } else if (status >= 400 && status < 500) {
+        } else if (status >= 400) {
           body = result.body as ErrorBody;
-
-          if (body.errors) setErrors(body.errors);
-          if (debug) console.log('Validation error', result);
-          setSucceeded(false);
-        } else {
-          if (debug) console.log('Unexpected error', result);
+          if (body.errors) {
+            setErrors(body.errors);
+            if (debug) console.log('Error', result);
+          } else {
+            setErrors([{ message: 'Unexpected error' }]);
+            if (debug) console.log('Unexpected error', result);
+          }
           setSucceeded(false);
         }
-
         return result;
       })
       .catch((error: Error) => {

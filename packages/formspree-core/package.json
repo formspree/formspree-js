@@ -27,7 +27,7 @@
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts --minify",
     "clean": "rm -rf dist && rm -rf node_modules",
-    "dev": "tsup src/index.ts --format esm,cjs --watch --dts --minify",
+    "dev": "tsup src/index.ts --format esm,cjs --dts --sourcemap",
     "lint": "eslint src/*.ts*",
     "test": "jest"
   },

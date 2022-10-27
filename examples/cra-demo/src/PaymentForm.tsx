@@ -37,7 +37,7 @@ const PaymentForm = () => {
     <form onSubmit={handleSubmit}>
       <div className="block">
         <label htmlFor="email">Email</label>
-        <input id="email" type="email" name="email" required />
+        <input id="email" type="email" name="email" />
         <ValidationError
           field="email"
           prefix="Email"
@@ -53,6 +53,9 @@ const PaymentForm = () => {
           field="paymentMethod"
           errors={state.errors}
         />
+      </div>
+      <div className="block">
+        <ValidationError className="error" errors={state.errors} />
       </div>
       <button type="submit" disabled={state.submitting}>
         {state.submitting ? "Handling payment..." : "Pay"}

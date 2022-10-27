@@ -25,7 +25,7 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts --external react --minify",
-    "dev": "tsup src/index.ts --format esm,cjs --watch --dts --external react --minify",
+    "dev": "tsup src/index.ts --format esm,cjs --dts --external react --sourcemap",
     "clean": "rm -rf dist && rm -rf node_modules",
     "lint": "eslint src/*.ts*",
     "test": "jest"

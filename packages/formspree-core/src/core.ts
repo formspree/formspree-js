@@ -6,7 +6,13 @@ import {
   SubmissionBody,
   SubmissionResponse
 } from './forms';
-import { appendExtraData, clientHeader, encode64, handleSCA } from './utils';
+import {
+  appendExtraData,
+  clientHeader,
+  encode64,
+  handleLegacyErrorPayload,
+  handleSCA
+} from './utils';
 import { Session } from './session';
 
 export interface Config {
@@ -134,21 +140,20 @@ export class Client {
         });
       }
 
-      return {
+      return handleLegacyErrorPayload({
         response,
         body: responseData
-      };
-    } else {
-      return fetchImpl(url, request).then(response => {
-        return response.json().then(
-          (body: SubmissionBody): SubmissionResponse => {
-            if (!hasErrors(body) && (body as any)?.error) {
-              body = { errors: [{ message: (body as any).error }] };
-            }
-            return { body, response };
-          }
-        );
       });
+    } else {
+      return fetchImpl(url, request)
+        .then(response => {
+          return response.json().then(
+            (body: SubmissionBody): SubmissionResponse => {
+              return handleLegacyErrorPayload({ body, response });
+            }
+          );
+        })
+        .catch();
     }
   }
 }
