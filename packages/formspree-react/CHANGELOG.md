@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.4.1
+
+### Patch Changes
+
+- Fixed promise detection in extradata
+
 ## 2.4.0
 
 ### Minor Changes
