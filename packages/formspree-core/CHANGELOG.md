@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.8.1
+
+### Patch Changes
+
+- Catch Formspree errors using legacy format
+
 ## 2.8.0
 
 ### Minor Changes

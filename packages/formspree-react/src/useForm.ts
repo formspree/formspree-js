@@ -104,19 +104,20 @@ const useForm = (
     // Append extra data from config
     if (typeof extraData === 'object') {
       for (const prop in extraData) {
+        let extraDataValue;
         if (typeof extraData[prop] === 'function') {
-          let extraDataValue = (extraData[prop] as Exclude<
+          extraDataValue = (extraData[prop] as Exclude<
             ExtraDataValue,
             string
           >).call(null);
           if (typeof extraDataValue?.then === 'function') {
             extraDataValue = await extraDataValue;
           }
-          if (extraDataValue !== undefined) {
-            appendExtraData(prop, extraDataValue);
-          }
         } else {
-          appendExtraData(prop, extraData[prop] as string);
+          extraDataValue = extraData[prop];
+        }
+        if (extraDataValue !== undefined) {
+          appendExtraData(prop, extraDataValue as string);
         }
       }
     }

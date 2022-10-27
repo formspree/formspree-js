@@ -1,21 +1,21 @@
-import { useMemo } from 'react';
-import { useForm, CardElement, ValidationError } from '@formspree/react';
-import CardExample from './CardExample';
+import { useMemo } from "react";
+import { useForm, CardElement, ValidationError } from "@formspree/react";
+import CardExample from "./CardExample";
 
 const useOptions = () => {
   const options = useMemo(
     () => ({
       style: {
         base: {
-          color: '#424770',
-          letterSpacing: '0.025em',
-          fontFamily: 'Source Code Pro, monospace',
-          '::placeholder': {
-            color: '#aab7c4',
+          color: "#424770",
+          letterSpacing: "0.025em",
+          fontFamily: "Source Code Pro, monospace",
+          "::placeholder": {
+            color: "#aab7c4",
           },
         },
         invalid: {
-          color: '#9e2146',
+          color: "#9e2146",
         },
       },
     }),
@@ -35,9 +35,9 @@ const PaymentForm = () => {
     <div
       style={{
         maxWidth: 960,
-        margin: '0 auto',
-        fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif',
-        padding: '4rem 0',
+        margin: "0 auto",
+        fontFamily: "Helvetica Neue, Helvetica, Arial, sans-serif",
+        padding: "4rem 0",
       }}
     >
       {state && state.succeeded ? (
@@ -47,6 +47,12 @@ const PaymentForm = () => {
           <div className="block">
             <label htmlFor="email">Email</label>
             <input id="email" type="email" name="email" />
+            <ValidationError
+              field="email"
+              prefix="Email"
+              className="error"
+              errors={state.errors}
+            />
           </div>
           <div className="block">
             <label htmlFor="email">Card details</label>
@@ -58,7 +64,7 @@ const PaymentForm = () => {
             />
           </div>
           <button type="submit" disabled={state.submitting}>
-            {state.submitting ? 'Handling payment...' : 'Pay'}
+            {state.submitting ? "Handling payment..." : "Pay"}
           </button>
 
           <div className="block info">

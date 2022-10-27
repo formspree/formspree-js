@@ -1,5 +1,6 @@
 import { Stripe } from '@stripe/stripe-js';
 import {
+  hasErrors,
   SubmissionData,
   SubmissionOptions,
   SubmissionBody,
@@ -53,8 +54,7 @@ export class Client {
     opts: SubmissionOptions = {}
   ): Promise<SubmissionResponse> {
     let endpoint = opts.endpoint || 'https://formspree.io';
-    let fetchImpl =
-      opts.fetchImpl || fetch;
+    let fetchImpl = opts.fetchImpl || fetch;
     let url = this.project
       ? `${endpoint}/p/${this.project}/f/${formKey}`
       : `${endpoint}/f/${formKey}`;
@@ -142,6 +142,9 @@ export class Client {
       return fetchImpl(url, request).then(response => {
         return response.json().then(
           (body: SubmissionBody): SubmissionResponse => {
+            if (!hasErrors(body) && (body as any)?.error) {
+              body = { errors: [{ message: (body as any).error }] };
+            }
             return { body, response };
           }
         );
