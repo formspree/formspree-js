@@ -11,6 +11,7 @@ export type FieldError = Forms.FieldError;
  * Functions can return undefined to skip this ExtraData value.
  */
 export type ExtraDataValue =
+  | undefined
   | string
   | (() => string)
   | (() => Promise<string>)

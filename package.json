@@ -20,5 +20,8 @@
     "eslint-config-acme": "*",
     "prettier": "^2.5.1",
     "turbo": "latest"
+  },
+  "dependencies": {
+    "react-google-recaptcha-v3": "^1.10.0"
   }
 }

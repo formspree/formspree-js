@@ -9,7 +9,7 @@ import {
   SubmissionResponse,
   SubmissionData,
   ErrorBody,
-  FormError,
+  FormError
 } from '@formspree/core';
 
 type FormEvent = React.FormEvent<HTMLFormElement>;
@@ -78,7 +78,7 @@ const useForm = (
     setErrors([]);
   };
 
-  const handleSubmit: SubmitHandler = async (submissionData) => {
+  const handleSubmit: SubmitHandler = async submissionData => {
     const getFormData = async (event: FormEvent) => {
       event.preventDefault();
 
@@ -104,18 +104,20 @@ const useForm = (
     // Append extra data from config
     if (typeof extraData === 'object') {
       for (const prop in extraData) {
+        let extraDataValue;
         if (typeof extraData[prop] === 'function') {
-          let extraDataValue = (
-            extraData[prop] as Exclude<ExtraDataValue, string>
-          ).call(null);
-          if (extraDataValue instanceof Promise) {
+          extraDataValue = (extraData[prop] as Exclude<
+            ExtraDataValue,
+            string
+          >).call(null);
+          if (typeof extraDataValue?.then === 'function') {
             extraDataValue = await extraDataValue;
           }
-          if (extraDataValue !== undefined) {
-            appendExtraData(prop, extraDataValue);
-          }
         } else {
-          appendExtraData(prop, extraData[prop] as string);
+          extraDataValue = extraData[prop];
+        }
+        if (extraDataValue !== undefined) {
+          appendExtraData(prop, extraDataValue as string);
         }
       }
     }
@@ -123,23 +125,23 @@ const useForm = (
     const createPaymentMethod = async () => {
       const address = {
         ...(formData.address_line1 && {
-          line1: formData.address_line1,
+          line1: formData.address_line1
         }),
         ...(formData.address_line2 && {
-          line2: formData.address_line2,
+          line2: formData.address_line2
         }),
         ...(formData.address_city && {
-          city: formData.address_city,
+          city: formData.address_city
         }),
         ...(formData.address_country && {
-          country: formData.address_country,
+          country: formData.address_country
         }),
         ...(formData.address_state && {
-          state: formData.address_state,
+          state: formData.address_state
         }),
         ...(formData.address_postal_code && {
-          postal_code: formData.address_postal_code,
-        }),
+          postal_code: formData.address_postal_code
+        })
       };
 
       const payload = await stripe.createPaymentMethod({
@@ -150,9 +152,9 @@ const useForm = (
           ...(formData.email && { email: formData.email }),
           ...(formData.phone && { phone: formData.phone }),
           ...(address && {
-            address,
-          }),
-        },
+            address
+          })
+        }
       });
 
       return payload;
@@ -167,7 +169,7 @@ const useForm = (
         createPaymentMethod:
           formspreeContext.client && formspreeContext.client.stripePromise
             ? createPaymentMethod
-            : undefined,
+            : undefined
       })
       .then((result: SubmissionResponse) => {
         let status = result.response.status;
@@ -178,17 +180,17 @@ const useForm = (
           setSucceeded(true);
           setResult(result);
           setErrors([]);
-        } else if (status >= 400 && status < 500) {
+        } else if (status >= 400) {
           body = result.body as ErrorBody;
-
-          if (body.errors) setErrors(body.errors);
-          if (debug) console.log('Validation error', result);
-          setSucceeded(false);
-        } else {
-          if (debug) console.log('Unexpected error', result);
+          if (body.errors) {
+            setErrors(body.errors);
+            if (debug) console.log('Error', result);
+          } else {
+            setErrors([{ message: 'Unexpected error' }]);
+            if (debug) console.log('Unexpected error', result);
+          }
           setSucceeded(false);
         }
-
         return result;
       })
       .catch((error: Error) => {

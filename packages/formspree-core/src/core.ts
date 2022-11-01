@@ -1,11 +1,18 @@
 import { Stripe } from '@stripe/stripe-js';
 import {
+  hasErrors,
   SubmissionData,
   SubmissionOptions,
   SubmissionBody,
   SubmissionResponse
 } from './forms';
-import { appendExtraData, clientHeader, encode64, handleSCA } from './utils';
+import {
+  appendExtraData,
+  clientHeader,
+  encode64,
+  handleLegacyErrorPayload,
+  handleSCA
+} from './utils';
 import { Session } from './session';
 
 export interface Config {
@@ -53,8 +60,7 @@ export class Client {
     opts: SubmissionOptions = {}
   ): Promise<SubmissionResponse> {
     let endpoint = opts.endpoint || 'https://formspree.io';
-    let fetchImpl =
-      opts.fetchImpl || fetch;
+    let fetchImpl = opts.fetchImpl || fetch;
     let url = this.project
       ? `${endpoint}/p/${this.project}/f/${formKey}`
       : `${endpoint}/f/${formKey}`;
@@ -134,18 +140,20 @@ export class Client {
         });
       }
 
-      return {
+      return handleLegacyErrorPayload({
         response,
         body: responseData
-      };
-    } else {
-      return fetchImpl(url, request).then(response => {
-        return response.json().then(
-          (body: SubmissionBody): SubmissionResponse => {
-            return { body, response };
-          }
-        );
       });
+    } else {
+      return fetchImpl(url, request)
+        .then(response => {
+          return response.json().then(
+            (body: SubmissionBody): SubmissionResponse => {
+              return handleLegacyErrorPayload({ body, response });
+            }
+          );
+        })
+        .catch();
     }
   }
 }
