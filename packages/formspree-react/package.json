@@ -1,6 +1,6 @@
 {
   "name": "@formspree/react",
-  "version": "2.4.2",
+  "version": "2.4.1",
   "description": "The React component library for Formspree",
   "private": false,
   "bugs": {

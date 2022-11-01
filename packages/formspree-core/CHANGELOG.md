@@ -1,16 +1,11 @@
 # Changelog
 
-## 2.8.2
-
-### Patch Changes
-
-- 8e233bf: Better error handling
-
 ## 2.8.1
 
 ### Patch Changes
 
 - Catch Formspree errors using legacy format
+- Better error handling
 
 ## 2.8.0
 
