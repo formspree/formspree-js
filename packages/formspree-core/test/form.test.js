@@ -2,7 +2,8 @@ import { hasErrors, isFieldError, isKnownError } from '../src/forms';
 
 describe('handleErrors', () => {
   it('recognizes errors', () => {
-    expect(hasErrors({ errors: [{ message: 'doh!' }] })).toBe(true);
+    expect(hasErrors({ body: { errors: [{ message: 'doh!' }] } })).toBe(true);
+    expect(hasErrors({ body: {} })).toBe(false);
   });
 
   it('recognizes Field errors', () => {

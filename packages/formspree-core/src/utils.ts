@@ -1,7 +1,7 @@
 // @ts-ignore
 import { btoa } from './base64';
 import { version } from '../package.json';
-import { hasErrors, SubmissionResponse } from './forms';
+import { ErrorResponse, SubmissionResponse } from './forms';
 import { PaymentMethod, Stripe } from '@stripe/stripe-js';
 
 /**
@@ -171,12 +171,15 @@ export const handleSCA = async ({
   }
 };
 
-export function handleLegacyErrorPayload({
-  body,
-  response
-}: SubmissionResponse): SubmissionResponse {
-  if (!hasErrors(body) && (body as any)?.error) {
-    body = { errors: [{ message: (body as any).error }] };
+export function handleLegacyErrorPayload(
+  response: SubmissionResponse
+): SubmissionResponse {
+  let body = response.body as any;
+  if (body?.errors == undefined && body?.error) {
+    return {
+      ...response,
+      body: { errors: [{ message: body.error }] }
+    };
   }
-  return { body, response };
+  return response;
 }

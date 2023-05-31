@@ -1,11 +1,5 @@
 import { Stripe } from '@stripe/stripe-js';
-import {
-  hasErrors,
-  SubmissionData,
-  SubmissionOptions,
-  SubmissionBody,
-  SubmissionResponse
-} from './forms';
+import { SubmissionData, SubmissionOptions, SubmissionResponse } from './forms';
 import {
   appendExtraData,
   clientHeader,
@@ -145,15 +139,12 @@ export class Client {
         body: responseData
       });
     } else {
-      return fetchImpl(url, request)
-        .then(response => {
-          return response.json().then(
-            (body: SubmissionBody): SubmissionResponse => {
-              return handleLegacyErrorPayload({ body, response });
-            }
-          );
-        })
-        .catch();
+      // no stripe payment, just send the request
+      return fetchImpl(url, request).then(response => {
+        return response.json().then(body => {
+          return handleLegacyErrorPayload({ body, response });
+        });
+      });
     }
   }
 }

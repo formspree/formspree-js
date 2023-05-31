@@ -7,10 +7,13 @@ import { ErrorBoundary } from './helpers';
 import { version } from '../package.json';
 
 jest.mock('@formspree/core');
-import { createClient, getDefaultClient } from '@formspree/core';
+import { createClient, getDefaultClient, hasErrors } from '@formspree/core';
 const core = jest.requireActual('@formspree/core');
 const mockedCreateClient = createClient;
 const mockedGetDefaultClient = getDefaultClient;
+
+// Mock `hasErrors` to return the original implementation
+hasErrors.mockImplementation(core.hasErrors);
 
 // A fake success result for a mocked `submitForm` call.
 const success = new Promise(resolve => {

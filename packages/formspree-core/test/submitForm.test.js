@@ -99,10 +99,10 @@ it('handles errors returned from the server', () => {
         fetchImpl: mockFetch
       }
     )
-    .then(({ body, response }) => {
-      expect(response.status).toEqual(400);
-      expect(hasErrors(body)).toEqual(true);
-      expect(isKnownError(body.errors[0])).toEqual(false);
+    .then(result => {
+      expect(hasErrors(result)).toEqual(true);
+      expect(result.response.status).toEqual(400);
+      expect(isKnownError(result.body.errors[0])).toEqual(false);
     })
     .catch(e => {
       throw e;

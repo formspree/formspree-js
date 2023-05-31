@@ -8,7 +8,7 @@ import {
   Client,
   SubmissionResponse,
   SubmissionData,
-  ErrorBody,
+  hasErrors,
   FormError
 } from '@formspree/core';
 
@@ -16,7 +16,7 @@ type FormEvent = React.FormEvent<HTMLFormElement>;
 
 type SubmitHandler = (
   submissionData: FormEvent | SubmissionData
-) => Promise<SubmissionResponse>;
+) => Promise<void>;
 
 type ResetFunction = () => void;
 
@@ -172,26 +172,21 @@ const useForm = (
             : undefined
       })
       .then((result: SubmissionResponse) => {
-        let status = result.response.status;
-        let body;
-
-        if (status === 200) {
-          if (debug) console.log('Form submitted', result);
+        if (hasErrors(result)) {
+          setSucceeded(false);
+          setErrors(result.body.errors);
+          if (debug) console.log('Error', result);
+        } else if (result.response && result.response.status >= 400) {
+          // This should not happen. If it does, there's a bug in formspree-core.
+          setSucceeded(false);
+          setErrors([{ message: 'Unexpected error' }]);
+          if (debug) console.log('Unexpected error', result);
+        } else {
           setSucceeded(true);
           setResult(result);
           setErrors([]);
-        } else if (status >= 400) {
-          body = result.body as ErrorBody;
-          if (body.errors) {
-            setErrors(body.errors);
-            if (debug) console.log('Error', result);
-          } else {
-            setErrors([{ message: 'Unexpected error' }]);
-            if (debug) console.log('Unexpected error', result);
-          }
-          setSucceeded(false);
+          if (debug) console.log('Form submitted', result);
         }
-        return result;
       })
       .catch((error: Error) => {
         if (debug) console.log('Unexpected error', error);

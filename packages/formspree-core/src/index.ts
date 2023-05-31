@@ -1,3 +1,3 @@
 export { Client, type Config, createClient, getDefaultClient } from './core'
-export { isFieldError, type FormError, type SubmissionResponse, type SubmissionData, type ErrorBody, type FieldError } from './forms'
+export { hasErrors, isFieldError, type SubmissionResponse, type SuccessResponse, type ErrorResponse, type SubmissionData, type FieldError, type FormError } from './forms'
 export { type Session } from './session'

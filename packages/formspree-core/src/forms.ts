@@ -67,22 +67,23 @@ export function isKnownError(error: FormError): error is KnownError<FormError> {
   );
 }
 
-export interface SuccessBody {
-  id: string;
-  data: object;
-}
-
-export interface ErrorBody {
-  errors: FormError[];
-}
-
-export type SubmissionBody = SuccessBody | ErrorBody;
-
-export function hasErrors(body: SubmissionBody): body is ErrorBody {
-  return (body as ErrorBody).errors !== undefined;
-}
-
-export interface SubmissionResponse {
-  body: SubmissionBody;
+export interface SuccessResponse {
+  body: {
+    id: string;
+    data: object;
+  };
   response: Response | null;
+}
+
+export interface ErrorResponse {
+  body: { errors: FormError[] };
+  response: Response | null;
+}
+
+export type SubmissionResponse = SuccessResponse | ErrorResponse;
+
+export function hasErrors(
+  response: SubmissionResponse
+): response is ErrorResponse {
+  return (response as ErrorResponse).body.errors !== undefined;
 }
