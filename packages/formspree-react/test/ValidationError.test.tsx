@@ -1,9 +1,7 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import ReactTestUtils from 'react-dom/test-utils';
+import ReactDOM from 'react-dom/client';
+import { act } from '@testing-library/react';
 import { ValidationError } from '../src';
-
-const { act } = ReactTestUtils;
 
 let container: HTMLElement;
 
@@ -19,7 +17,7 @@ afterEach(() => {
 
 it('renders a field error if one exists', () => {
   act(() => {
-    ReactDOM.render(
+    ReactDOM.createRoot(container).render(
       <ValidationError
         prefix="Email"
         field="email"
@@ -31,8 +29,7 @@ it('renders a field error if one exists', () => {
             code: 'REQUIRED'
           }
         ]}
-      />,
-      container
+      />
     );
   });
 
@@ -41,7 +38,7 @@ it('renders a field error if one exists', () => {
 
 it('renders field-less errors', () => {
   act(() => {
-    ReactDOM.render(
+    ReactDOM.createRoot(container).render(
       <ValidationError
         className="error"
         errors={[
@@ -50,8 +47,7 @@ it('renders field-less errors', () => {
             code: 'FORM_DISABLED'
           }
         ]}
-      />,
-      container
+      />
     );
   });
 
@@ -60,7 +56,7 @@ it('renders field-less errors', () => {
 
 it('does not render anything if the field does not have an error', () => {
   act(() => {
-    ReactDOM.render(
+    ReactDOM.createRoot(container).render(
       <ValidationError
         prefix="Email"
         field="email"
@@ -71,8 +67,7 @@ it('does not render anything if the field does not have an error', () => {
             code: 'REQUIRED'
           }
         ]}
-      />,
-      container
+      />
     );
   });
 

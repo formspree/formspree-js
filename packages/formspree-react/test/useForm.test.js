@@ -1,7 +1,8 @@
 import React from 'react';
 import { FormspreeProvider, useForm } from '../src';
-import ReactDOM from 'react-dom';
-import ReactTestUtils from 'react-dom/test-utils';
+import ReactDOM from 'react-dom/client';
+import { act, screen, waitFor } from '@testing-library/react';
+import user from '@testing-library/user-event';
 import { ErrorBoundary } from './helpers';
 import { version } from '../package.json';
 
@@ -11,14 +12,10 @@ const core = jest.requireActual('@formspree/core');
 const mockedCreateClient = createClient;
 const mockedGetDefaultClient = getDefaultClient;
 
-const { act } = ReactTestUtils;
-
 // A fake success result for a mocked `submitForm` call.
 const success = new Promise(resolve => {
   resolve({ body: { id: '000', data: {} }, response: { status: 200 } });
 });
-
-const submitSpy = jest.fn();
 
 function TestForm(props) {
   const [state, submit, reset] = useForm(props.form, {
@@ -63,7 +60,6 @@ let container;
 beforeEach(() => {
   container = document.createElement('div');
   document.body.appendChild(container);
-  submitSpy.mockClear();
 });
 
 afterEach(() => {
@@ -78,13 +74,12 @@ it('fails it initialize without identifying properties', () => {
   console.error = jest.fn();
 
   act(() => {
-    ReactDOM.render(
+    ReactDOM.createRoot(container).render(
       <FormspreeProvider project="xxx">
         <ErrorBoundary>
           <TestForm />
         </ErrorBoundary>
-      </FormspreeProvider>,
-      container
+      </FormspreeProvider>
     );
   });
 
@@ -99,29 +94,29 @@ it('fails it initialize without identifying properties', () => {
 });
 
 it('submits a client name', async () => {
+  let submitSpy = jest.fn();
   mockedCreateClient.mockImplementation(() => ({
     startBrowserSession: () => {},
     submitForm: (_form, _data, opts) => {
       expect(opts.clientName).toBe(`@formspree/react@${version}`);
+      submitSpy();
       return success;
     },
     teardown: () => {}
   }));
 
   act(() => {
-    ReactDOM.render(
+    ReactDOM.createRoot(container).render(
       <FormspreeProvider project="xxx">
         <TestForm form="newsletter" />
-      </FormspreeProvider>,
-      container
+      </FormspreeProvider>
     );
   });
 
-  const form = container.querySelector('form');
+  const button = screen.getByRole('button', { name: /sign up/i });
+  await waitFor(() => user.click(button));
 
-  await act(async () => {
-    ReactTestUtils.Simulate.submit(form);
-  });
+  expect(submitSpy).toHaveBeenCalled();
 });
 
 it('creates the default client if none exists in the context', async () => {
@@ -135,14 +130,11 @@ it('creates the default client if none exists in the context', async () => {
   }));
 
   act(() => {
-    ReactDOM.render(<TestForm form="123abc" />, container);
+    ReactDOM.createRoot(container).render(<TestForm form="123abc" />);
   });
 
-  const form = container.querySelector('form');
-
-  await act(async () => {
-    ReactTestUtils.Simulate.submit(form);
-  });
+  const button = screen.getByRole('button', { name: /sign up/i });
+  await waitFor(() => user.click(button));
 });
 
 it('submits successfully form key', async () => {
@@ -156,22 +148,18 @@ it('submits successfully form key', async () => {
   }));
 
   act(() => {
-    ReactDOM.render(
+    ReactDOM.createRoot(container).render(
       <FormspreeProvider project="xxx">
         <TestForm form="newsletter" />
-      </FormspreeProvider>,
-      container
+      </FormspreeProvider>
     );
   });
 
   const heading = container.querySelector('h1');
-  const form = container.querySelector('form');
-
   expect(heading.textContent).toBe('Form');
 
-  await act(async () => {
-    ReactTestUtils.Simulate.submit(form);
-  });
+  const button = screen.getByRole('button', { name: /sign up/i });
+  await waitFor(() => user.click(button));
 
   const message = container.querySelector('#message');
   expect(message.textContent).toBe('Thanks!');
@@ -188,31 +176,23 @@ it('resets successfully', async () => {
   }));
 
   act(() => {
-    ReactDOM.render(
+    ReactDOM.createRoot(container).render(
       <FormspreeProvider project="xxx">
         <TestForm form="newsletter" />
-      </FormspreeProvider>,
-      container
+      </FormspreeProvider>
     );
   });
 
   const heading = container.querySelector('h1');
-  const form = container.querySelector('form');
-
   expect(heading.textContent).toBe('Form');
 
-  await act(async () => {
-    ReactTestUtils.Simulate.submit(form);
-  });
+  const button = screen.getByRole('button', { name: /sign up/i });
+  await waitFor(() => user.click(button));
 
-  const message = container.querySelector('#message');
-  expect(message.textContent).toBe('Thanks!');
+  await screen.findByText('Thanks!');
 
-  const resetButton = container.querySelector('#reset');
-
-  await act(async () => {
-    ReactTestUtils.Simulate.click(resetButton);
-  });
+  const resetButton = screen.getByRole('button', { name: /reset/i });
+  await waitFor(() => user.click(resetButton));
 
   expect(container.querySelector('form')).toBeTruthy();
   expect(container.querySelector('#errors')).toBeFalsy();
@@ -229,19 +209,15 @@ it('appends extra data to form data', async () => {
   }));
 
   act(() => {
-    ReactDOM.render(
+    ReactDOM.createRoot(container).render(
       <FormspreeProvider project="xxx">
         <TestForm form="newsletter" extraData={{ extra: 'yep' }} />
-      </FormspreeProvider>,
-      container
+      </FormspreeProvider>
     );
   });
 
-  const form = container.querySelector('form');
-
-  await act(async () => {
-    ReactTestUtils.Simulate.submit(form);
-  });
+  const button = screen.getByRole('button', { name: /sign up/i });
+  await waitFor(() => user.click(button));
 });
 
 it('evaluates functions passed in data', async () => {
@@ -256,7 +232,7 @@ it('evaluates functions passed in data', async () => {
   }));
 
   act(() => {
-    ReactDOM.render(
+    ReactDOM.createRoot(container).render(
       <FormspreeProvider project="xxx">
         <TestForm
           form="newsletter"
@@ -271,16 +247,12 @@ it('evaluates functions passed in data', async () => {
             }
           }}
         />
-      </FormspreeProvider>,
-      container
+      </FormspreeProvider>
     );
   });
 
-  const form = container.querySelector('form');
-
-  await act(async () => {
-    ReactTestUtils.Simulate.submit(form);
-  });
+  const button = screen.getByRole('button', { name: /sign up/i });
+  await waitFor(() => user.click(button));
 });
 
 it('handles errors in functions passed in data', async () => {
@@ -295,7 +267,7 @@ it('handles errors in functions passed in data', async () => {
   }));
 
   act(() => {
-    ReactDOM.render(
+    ReactDOM.createRoot(container).render(
       <FormspreeProvider project="xxx">
         <TestForm
           form="newsletter"
@@ -316,16 +288,12 @@ it('handles errors in functions passed in data', async () => {
             }
           }}
         />
-      </FormspreeProvider>,
-      container
+      </FormspreeProvider>
     );
   });
 
-  const form = container.querySelector('form');
-
-  await act(async () => {
-    ReactTestUtils.Simulate.submit(form);
-  });
+  const button = screen.getByRole('button', { name: /sign up/i });
+  await waitFor(() => user.click(button));
 });
 
 it('reacts to server-side validation errors', async () => {
@@ -352,19 +320,15 @@ it('reacts to server-side validation errors', async () => {
   }));
 
   act(() => {
-    ReactDOM.render(
+    ReactDOM.createRoot(container).render(
       <FormspreeProvider project="xxx">
         <TestForm form="newsletter" />
-      </FormspreeProvider>,
-      container
+      </FormspreeProvider>
     );
   });
 
-  const form = container.querySelector('form');
-
-  await act(async () => {
-    ReactTestUtils.Simulate.submit(form);
-  });
+  const button = screen.getByRole('button', { name: /sign up/i });
+  await waitFor(() => user.click(button));
 
   const errors = container.querySelector('#errors');
   expect(errors.textContent).toBe(
@@ -395,19 +359,15 @@ it('reacts to form disabled errors', async () => {
   }));
 
   act(() => {
-    ReactDOM.render(
+    ReactDOM.createRoot(container).render(
       <FormspreeProvider project="xxx">
         <TestForm form="newsletter" />
-      </FormspreeProvider>,
-      container
+      </FormspreeProvider>
     );
   });
 
-  const form = container.querySelector('form');
-
-  await act(async () => {
-    ReactTestUtils.Simulate.submit(form);
-  });
+  const button = screen.getByRole('button', { name: /sign up/i });
+  await waitFor(() => user.click(button));
 
   const errors = container.querySelector('#errors');
   expect(errors.textContent).toBe(
@@ -442,12 +402,9 @@ it('allows submit handler to be called with data directly', async () => {
   }
 
   act(() => {
-    ReactDOM.render(<DirectSubmitForm />, container);
+    ReactDOM.createRoot(container).render(<DirectSubmitForm />);
   });
 
-  const form = container.querySelector('form');
-
-  await act(async () => {
-    ReactTestUtils.Simulate.submit(form);
-  });
+  const button = screen.getByRole('button', { name: /sign up/i });
+  await waitFor(() => user.click(button));
 });

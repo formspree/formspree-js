@@ -1,12 +1,10 @@
 import React from 'react';
 import { FormspreeProvider, useFormspree } from '../src';
-import ReactDOM from 'react-dom';
-import ReactTestUtils from 'react-dom/test-utils';
+import ReactDOM from 'react-dom/client';
+import { act } from '@testing-library/react';
 import { createClient } from '@formspree/core';
 
 jest.mock('@formspree/core');
-
-const { act } = ReactTestUtils;
 
 let container;
 
@@ -41,7 +39,7 @@ it('instantiates a client and provides it via useFormspree hook', async () => {
   };
 
   act(() => {
-    ReactDOM.render(<Page project="xxx" />, container);
+    ReactDOM.createRoot(container).render(<Page project="xxx" />);
   });
 
   expect(container.querySelector('#client').textContent).toBe('project: xxx');
