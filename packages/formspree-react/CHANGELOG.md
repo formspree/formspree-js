@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.4.2
+
+### Patch Changes
+
+- 758b606: Upgrading react version used for development. Making react peerDependency explicit. Fixing dependency on core.
+
 ## 2.4.1
 
 ### Patch Changes
