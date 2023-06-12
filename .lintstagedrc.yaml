@@ -1,2 +1,2 @@
----
-"package.json": "yarn sort-package-json"
+package.json: yarn sort-package-json
+'./*.{json,md,yaml}': yarn prettier --write

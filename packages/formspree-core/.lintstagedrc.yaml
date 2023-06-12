@@ -1,2 +1,1 @@
----
-"package.json": "yarn sort-package-json"
+package.json: yarn sort-package-json
