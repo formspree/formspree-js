@@ -14,9 +14,9 @@ To work on the formspree-js packages, clone this repo, install dependencies, and
 
 ```
 yarn
-turbo build
-turbo test
-turbo dev
+yarn turbo build
+yarn turbo test
+yarn turbo dev
 ```
 
 ## Publishing changes 
