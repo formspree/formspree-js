@@ -31,7 +31,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@formspree/core": "^2.8.1",
+    "@formspree/core": "*",
     "@stripe/react-stripe-js": "^1.7.1",
     "@stripe/stripe-js": "^1.35.0"
   },
