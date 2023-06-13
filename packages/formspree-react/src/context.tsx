@@ -3,29 +3,29 @@ import {
   Client,
   Config,
   createClient,
-  getDefaultClient
+  getDefaultClient,
 } from '@formspree/core';
 import { loadStripe } from '@stripe/stripe-js/pure.js';
 import { type Stripe } from '@stripe/stripe-js';
 
 const Elements = lazy(() =>
-  import('@stripe/react-stripe-js').then(module => {
+  import('@stripe/react-stripe-js').then((module) => {
     return { default: module.Elements };
   })
 );
 
 export type FromspreeContextType = {
   client: Client;
-}
+};
 
 export type FormspreeProviderProps = {
   project?: string;
   children: React.ReactNode;
   stripePK?: string;
-}
+};
 
 const FormspreeContext = React.createContext<FromspreeContextType>({
-  client: undefined
+  client: undefined,
 });
 
 FormspreeContext.displayName = 'Formspree';
@@ -111,6 +111,6 @@ export function useFormspree() {
   return context.client
     ? context
     : {
-        client: getDefaultClient()
+        client: getDefaultClient(),
       };
 }

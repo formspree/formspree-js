@@ -14,10 +14,10 @@ const success = new Promise((resolve, _reject) => {
   const response = {
     status: 200,
     json: () => {
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         resolve({ id: 'xxx' });
       });
-    }
+    },
   };
   resolve(response);
 });
@@ -26,12 +26,12 @@ const failure = new Promise((resolve, _reject) => {
   const response = {
     status: 400,
     json: () => {
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         resolve({
-          errors: [{ code: 'UNKNOWN', message: 'doh!' }]
+          errors: [{ code: 'UNKNOWN', message: 'doh!' }],
         });
       });
-    }
+    },
   };
   resolve(response);
 });
@@ -49,14 +49,14 @@ it('resolves with body and response when successful', () => {
       'newsletter',
       {},
       {
-        fetchImpl: mockFetch
+        fetchImpl: mockFetch,
       }
     )
     .then(({ body, response }) => {
       expect(body.id).toEqual('xxx');
       expect(response.status).toEqual(200);
     })
-    .catch(e => {
+    .catch((e) => {
       throw e;
     });
 });
@@ -74,14 +74,14 @@ it('uses the form URL when no project key is provided', () => {
       'xxyyhashid',
       {},
       {
-        fetchImpl: mockFetch
+        fetchImpl: mockFetch,
       }
     )
     .then(({ body, response }) => {
       expect(body.id).toEqual('xxx');
       expect(response.status).toEqual(200);
     })
-    .catch(e => {
+    .catch((e) => {
       throw e;
     });
 });
@@ -96,7 +96,7 @@ it('handles errors returned from the server', () => {
       'xxyyhashid',
       {},
       {
-        fetchImpl: mockFetch
+        fetchImpl: mockFetch,
       }
     )
     .then(({ body, response }) => {
@@ -104,7 +104,7 @@ it('handles errors returned from the server', () => {
       expect(hasErrors(body)).toEqual(true);
       expect(isKnownError(body.errors[0])).toEqual(false);
     })
-    .catch(e => {
+    .catch((e) => {
       throw e;
     });
 });
@@ -122,7 +122,7 @@ it('uses a default client header if none is given', () => {
     'newsletter',
     {},
     {
-      fetchImpl: mockFetch
+      fetchImpl: mockFetch,
     }
   );
 });
@@ -141,7 +141,7 @@ it('puts given client name in the client header', () => {
     {},
     {
       clientName: 'my-client',
-      fetchImpl: mockFetch
+      fetchImpl: mockFetch,
     }
   );
 });

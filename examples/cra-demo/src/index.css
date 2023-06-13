@@ -93,7 +93,7 @@ button:hover {
 }
 
 textarea,
-input:not([type="checkbox"]),
+input:not([type='checkbox']),
 .StripeElement {
   display: block;
   margin: 10px 0 20px 0;
@@ -110,8 +110,8 @@ input:not([type="checkbox"]),
   background: white;
 }
 
-input[type="checkbox"] {
-  cursor: pointer
+input[type='checkbox'] {
+  cursor: pointer;
 }
 
 input::placeholder {

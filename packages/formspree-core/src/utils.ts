@@ -38,11 +38,8 @@ export const append = (
  * @param str - A string to convert to camel case.
  */
 export const toCamel = (str: string): string => {
-  return str.replace(/([-_][a-z])/gi, $1 => {
-    return $1
-      .toUpperCase()
-      .replace('-', '')
-      .replace('_', '');
+  return str.replace(/([-_][a-z])/gi, ($1) => {
+    return $1.toUpperCase().replace('-', '').replace('_', '');
   });
 };
 
@@ -127,7 +124,7 @@ export const handleSCA = async ({
   data,
   fetchImpl,
   request,
-  url
+  url,
 }: HandleSCAargs): Promise<SubmissionResponse> => {
   const stripeResult = await stripePromise.handleCardAction(
     responseData.stripe.paymentIntentClientSecret
@@ -142,10 +139,10 @@ export const handleSCA = async ({
           {
             code: 'STRIPE_CLIENT_ERROR',
             message: 'Stripe SCA error',
-            field: 'paymentMethod'
-          }
-        ]
-      }
+            field: 'paymentMethod',
+          },
+        ],
+      },
     };
   } else {
     if (!payload.paymentMethod.id) {
@@ -159,21 +156,21 @@ export const handleSCA = async ({
       ...request,
       body: JSON.stringify({
         paymentIntent: stripeResult.paymentIntent.id,
-        resubmitKey: responseData.resubmitKey
-      })
+        resubmitKey: responseData.resubmitKey,
+      }),
     });
     const resSubmitData = await resSubmitResponse.json();
 
     return {
       response: resSubmitResponse,
-      body: resSubmitData
+      body: resSubmitData,
     };
   }
 };
 
 export function handleLegacyErrorPayload({
   body,
-  response
+  response,
 }: SubmissionResponse): SubmissionResponse {
   if (!hasErrors(body) && (body as any)?.error) {
     body = { errors: [{ message: (body as any).error }] };

@@ -1,21 +1,21 @@
-import { useMemo } from "react";
-import { useForm, CardElement, ValidationError } from "@formspree/react";
-import CardExample from "./CardExample";
+import { useMemo } from 'react';
+import { useForm, CardElement, ValidationError } from '@formspree/react';
+import CardExample from './CardExample';
 
 const useOptions = () => {
   const options = useMemo(
     () => ({
       style: {
         base: {
-          color: "#424770",
-          letterSpacing: "0.025em",
-          fontFamily: "Source Code Pro, monospace",
-          "::placeholder": {
-            color: "#aab7c4",
+          color: '#424770',
+          letterSpacing: '0.025em',
+          fontFamily: 'Source Code Pro, monospace',
+          '::placeholder': {
+            color: '#aab7c4',
           },
         },
         invalid: {
-          color: "#9e2146",
+          color: '#9e2146',
         },
       },
     }),
@@ -58,7 +58,7 @@ const PaymentForm = () => {
         <ValidationError className="error" errors={state.errors} />
       </div>
       <button type="submit" disabled={state.submitting}>
-        {state.submitting ? "Handling payment..." : "Pay"}
+        {state.submitting ? 'Handling payment...' : 'Pay'}
       </button>
 
       <div className="block info">

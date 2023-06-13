@@ -105,7 +105,7 @@ Renamed the UMD global export from `statickit-react` to `StaticKitReact`.
 Wrap state variables up in a `state` object in the return value for `useForm`:
 
 ```javascript
-const [state, submit] = useForm("xyz");
+const [state, submit] = useForm('xyz');
 ```
 
 ## 1.0.0-beta.0
