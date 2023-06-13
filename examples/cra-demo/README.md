@@ -10,15 +10,15 @@ Quick simple demo with both a simple form and a payment form powered by Stripe
 4. Run `cp .env.local.template .env.local`
 5. Place your forms IDs and your Stripe publishable key that you can get from your Stripe plugin on Formspree plugins dashboard
 6. Install dependencies
-  
-  ```bash
-  yarn
-  ```
+
+```bash
+yarn
+```
 
 7. Start the Vite project
 
-  ```bash
-  yarn start
-  ```
+```bash
+yarn start
+```
 
 Happy coding!

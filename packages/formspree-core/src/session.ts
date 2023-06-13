@@ -31,7 +31,7 @@ export class Session {
   } {
     return {
       loadedAt: this.loadedAt,
-      webdriver: this.webdriver
+      webdriver: this.webdriver,
     };
   }
 }

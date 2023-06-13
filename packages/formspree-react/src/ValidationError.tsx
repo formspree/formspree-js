@@ -6,12 +6,12 @@ export type ValidationErrorProps = {
   field?: string;
   errors: FormError[];
   [x: string]: any;
-}
+};
 
-export const ValidationError: React.FC<ValidationErrorProps> = props => {
+export const ValidationError: React.FC<ValidationErrorProps> = (props) => {
   const { prefix, field, errors, ...attrs } = props;
 
-  const error = (errors || []).find(error => {
+  const error = (errors || []).find((error) => {
     return error.field === field;
   });
 

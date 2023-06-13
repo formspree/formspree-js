@@ -19,7 +19,7 @@ enum FormErrorCodeEnum {
   TOO_MANY_FILES = 'TOO_MANY_FILES',
   FILES_TOO_BIG = 'FILES_TOO_BIG',
   STRIPE_CLIENT_ERROR = 'STRIPE_CLIENT_ERROR',
-  STRIPE_SCA_ERROR = 'STRIPE_SCA_ERROR'
+  STRIPE_SCA_ERROR = 'STRIPE_SCA_ERROR',
 }
 
 enum FieldErrorCodeEnum {
@@ -27,7 +27,7 @@ enum FieldErrorCodeEnum {
   REQUIRED_FIELD_EMPTY = 'REQUIRED_FIELD_EMPTY',
   TYPE_EMAIL = 'TYPE_EMAIL',
   TYPE_NUMERIC = 'TYPE_NUMERIC',
-  TYPE_TEXT = 'TYPE_TEXT'
+  TYPE_TEXT = 'TYPE_TEXT',
 }
 
 export type FormErrorCode = keyof typeof FormErrorCodeEnum;

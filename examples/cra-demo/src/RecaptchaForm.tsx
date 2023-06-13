@@ -1,10 +1,10 @@
-import { useForm, ValidationError } from "@formspree/react";
-import { useState } from "react";
+import { useForm, ValidationError } from '@formspree/react';
+import { useState } from 'react';
 
 import {
   GoogleReCaptchaProvider,
   useGoogleReCaptcha,
-} from "react-google-recaptcha-v3";
+} from 'react-google-recaptcha-v3';
 
 const ReCaptchaForm = () => {
   const { executeRecaptcha } = useGoogleReCaptcha();
@@ -13,8 +13,8 @@ const ReCaptchaForm = () => {
     process.env.REACT_APP_RECAPTCHA_FORM_ID as string,
     {
       data: {
-        "g-recaptcha-response": failReCaptcha
-          ? () => new Promise<string>((resolve) => resolve("Nonsense!"))
+        'g-recaptcha-response': failReCaptcha
+          ? () => new Promise<string>((resolve) => resolve('Nonsense!'))
           : executeRecaptcha,
       },
     }
@@ -56,7 +56,7 @@ const ReCaptchaForm = () => {
             <ValidationError className="error" errors={state.errors} />
           </div>
           <button type="submit" disabled={state.submitting}>
-            {state.submitting ? "Submitting..." : "Submit"}
+            {state.submitting ? 'Submitting...' : 'Submit'}
           </button>
         </form>
       )}

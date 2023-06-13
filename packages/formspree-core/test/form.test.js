@@ -10,19 +10,19 @@ describe('handleErrors', () => {
       isFieldError({
         field: 'email',
         code: 'TYPE_EMAIL',
-        message: 'should be an email'
+        message: 'should be an email',
       })
     ).toBe(true);
     expect(
       isFieldError({
         code: 'INACTIVE',
-        message: 'form is inactive'
+        message: 'form is inactive',
       })
     ).toBe(false);
     expect(
       isFieldError({
         code: 'TYPE_EMAIL',
-        message: 'something should be an email'
+        message: 'something should be an email',
       })
     ).toBe(false);
   });
@@ -32,7 +32,7 @@ describe('handleErrors', () => {
       'INACTIVE',
       'FORM_NOT_FOUND',
       'REQUIRED_FIELD_EMPTY',
-      'TYPE_EMAIL'
+      'TYPE_EMAIL',
     ]) {
       expect(isKnownError({ code, message: 'doh!' })).toBe(true);
     }

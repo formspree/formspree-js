@@ -13,14 +13,14 @@ const mockedCreateClient = createClient;
 const mockedGetDefaultClient = getDefaultClient;
 
 // A fake success result for a mocked `submitForm` call.
-const success = new Promise(resolve => {
+const success = new Promise((resolve) => {
   resolve({ body: { id: '000', data: {} }, response: { status: 200 } });
 });
 
 function TestForm(props) {
   const [state, submit, reset] = useForm(props.form, {
     data: props.extraData,
-    client: props.client
+    client: props.client,
   });
 
   if (state.succeeded) {
@@ -102,7 +102,7 @@ it('submits a client name', async () => {
       submitSpy();
       return success;
     },
-    teardown: () => {}
+    teardown: () => {},
   }));
 
   act(() => {
@@ -126,7 +126,7 @@ it('creates the default client if none exists in the context', async () => {
       expect(form).toBe('123abc');
       return success;
     },
-    teardown: () => {}
+    teardown: () => {},
   }));
 
   act(() => {
@@ -144,7 +144,7 @@ it('submits successfully form key', async () => {
       expect(form).toBe('newsletter');
       return success;
     },
-    teardown: () => {}
+    teardown: () => {},
   }));
 
   act(() => {
@@ -172,7 +172,7 @@ it('resets successfully', async () => {
       expect(form).toBe('newsletter');
       return success;
     },
-    teardown: () => {}
+    teardown: () => {},
   }));
 
   act(() => {
@@ -205,7 +205,7 @@ it('appends extra data to form data', async () => {
       expect(data.get('extra')).toBe('yep');
       return success;
     },
-    teardown: () => {}
+    teardown: () => {},
   }));
 
   act(() => {
@@ -228,7 +228,7 @@ it('evaluates functions passed in data', async () => {
       expect(data.get('extraPromiseFn')).toBe('yep');
       return success;
     },
-    teardown: () => {}
+    teardown: () => {},
   }));
 
   act(() => {
@@ -241,10 +241,10 @@ it('evaluates functions passed in data', async () => {
               return 'yep';
             },
             extraPromiseFn: () => {
-              return new Promise(resolve => {
+              return new Promise((resolve) => {
                 resolve('yep');
               });
-            }
+            },
           }}
         />
       </FormspreeProvider>
@@ -263,7 +263,7 @@ it('handles errors in functions passed in data', async () => {
       expect(Object.keys(data).includes('extraPromiseFn')).toBe(false);
       return success;
     },
-    teardown: () => {}
+    teardown: () => {},
   }));
 
   act(() => {
@@ -285,7 +285,7 @@ it('handles errors in functions passed in data', async () => {
               }).catch(() => {
                 // oops, handle error
               });
-            }
+            },
           }}
         />
       </FormspreeProvider>
@@ -301,22 +301,22 @@ it('reacts to server-side validation errors', async () => {
     project: 'xxx',
     startBrowserSession: () => {},
     submitForm: (_form, _data, _opts) => {
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         resolve({
           body: {
             errors: [
               {
                 field: 'email',
                 code: 'EMAIL_FORMAT',
-                message: 'must be an email'
-              }
-            ]
+                message: 'must be an email',
+              },
+            ],
           },
-          response: { status: 422 }
+          response: { status: 422 },
         });
       });
     },
-    teardown: () => {}
+    teardown: () => {},
   }));
 
   act(() => {
@@ -341,21 +341,21 @@ it('reacts to form disabled errors', async () => {
     project: 'xxx',
     startBrowserSession: () => {},
     submitForm: (_form, _data, _opts) => {
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         resolve({
           body: {
             errors: [
               {
                 code: 'DEACTIVATED',
-                message: 'Form not active'
-              }
-            ]
+                message: 'Form not active',
+              },
+            ],
           },
-          response: { status: 403 }
+          response: { status: 403 },
         });
       });
     },
-    teardown: () => {}
+    teardown: () => {},
   }));
 
   act(() => {
@@ -384,7 +384,7 @@ it('allows submit handler to be called with data directly', async () => {
       expect(data.extra).toBe(true);
       return success;
     },
-    teardown: () => {}
+    teardown: () => {},
   }));
 
   function DirectSubmitForm() {
