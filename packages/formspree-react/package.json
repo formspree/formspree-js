@@ -1,8 +1,8 @@
 {
   "name": "@formspree/react",
   "version": "2.4.2",
-  "description": "The React component library for Formspree",
   "private": false,
+  "description": "The React component library for Formspree",
   "bugs": {
     "url": "https://github.com/formspree/formspree-react/issues"
   },
@@ -16,34 +16,19 @@
     "Cole Krumbholz",
     "Ismail Ghallou"
   ],
-  "files": [
-    "dist/**"
-  ],
   "sideEffects": false,
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
+  "files": [
+    "dist/**"
+  ],
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts --external react --minify",
-    "dev": "tsup src/index.ts --format esm,cjs --dts --external react --sourcemap",
     "clean": "rm -rf dist && rm -rf node_modules",
+    "dev": "tsup src/index.ts --format esm,cjs --dts --external react --sourcemap",
     "lint": "eslint src/*.ts*",
     "test": "jest"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "*.{js,ts,tsx,css,json,md}": [
-      "npx prettier --write",
-      "git add"
-    ],
-    "package.json": [
-      "npx sort-package-json",
-      "git add"
-    ]
   },
   "dependencies": {
     "@formspree/core": "^2.8.1",
@@ -60,14 +45,10 @@
     "@types/react": "^18.0.15",
     "@types/react-dom": "^18.0.6",
     "babel-jest": "^26.3.0",
-    "husky": "^3.0.5",
     "jest": "^26.4.2",
-    "lint-staged": "^9.2.5",
     "np": "^6.4.0",
-    "prettier": "^1.18.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "sort-package-json": "^1.22.1",
     "tsup": "^6.2.2",
     "typescript": "^4.7.4"
   },

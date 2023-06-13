@@ -6,18 +6,22 @@
   ],
   "scripts": {
     "build": "turbo run build",
-    "dev": "turbo run dev --no-cache --continue",
-    "lint": "turbo run lint",
-    "clean": "turbo run clean && rm -rf node_modules",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "changeset": "changeset",
-    "version-packages": "changeset version",
-    "release": "turbo run build --filter=@formspree/cra-demo^... && changeset publish"
+    "clean": "turbo run clean && rm -rf node_modules",
+    "dev": "turbo run dev --no-cache --continue",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "lint": "turbo run lint",
+    "prepare": "husky install",
+    "release": "turbo run build --filter=@formspree/cra-demo^... && changeset publish",
+    "version-packages": "changeset version"
   },
   "devDependencies": {
     "@changesets/cli": "^2.22.0",
     "eslint": "^8.15.0",
-    "prettier": "^2.5.1",
+    "husky": "^8.0.0",
+    "lint-staged": "^13.2.2",
+    "prettier": "^2.8.8",
+    "sort-package-json": "^2.4.1",
     "turbo": "latest"
   }
 }
