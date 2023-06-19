@@ -7,7 +7,7 @@
     "declarationDir": "dist/types",
     "declarationMap": true,
     "jsx": "react-jsx",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": ["ES2015", "DOM"],
     "resolveJsonModule": true
   },
   "include": ["src/**/*", "test/**/*"],
