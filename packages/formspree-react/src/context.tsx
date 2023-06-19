@@ -24,13 +24,11 @@ export type FormspreeProviderProps = {
   stripePK?: string;
 };
 
-const FormspreeContext = React.createContext<FromspreeContextType>({
-  client: undefined,
-});
+const FormspreeContext = React.createContext<FromspreeContextType | null>(null);
 
 FormspreeContext.displayName = 'Formspree';
 
-let stripePromise: Promise<Stripe>;
+let stripePromise: Promise<Stripe | null>;
 
 const getStripe = (stripeKey: string) => {
   if (!stripePromise) {
@@ -70,13 +68,15 @@ export const FormspreeProvider = (props: FormspreeProviderProps) => {
   }, []);
 
   useEffect(() => {
-    const getStripePromise = async () => {
-      const promiseStripe = await getStripe(props.stripePK);
-      setStateStripePromise(promiseStripe);
+    const getStripePromise = async (stripeKey: string) => {
+      const promiseStripe = await getStripe(stripeKey);
+      if (promiseStripe) {
+        setStateStripePromise(promiseStripe);
+      }
     };
 
     if (props.stripePK) {
-      getStripePromise();
+      getStripePromise(props.stripePK);
     }
   }, [props.stripePK]);
 
@@ -105,12 +105,6 @@ export const FormspreeProvider = (props: FormspreeProviderProps) => {
   );
 };
 
-export function useFormspree() {
-  const context = useContext(FormspreeContext);
-
-  return context.client
-    ? context
-    : {
-        client: getDefaultClient(),
-      };
+export function useFormspree(): FromspreeContextType {
+  return useContext(FormspreeContext) ?? { client: getDefaultClient() };
 }

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Stripe, StripeElements } from '@stripe/stripe-js';
 import { useElements, CardElement, useStripe } from '@stripe/react-stripe-js';
 import { useFormspree } from './context';
-import { ExtraData, ExtraDataValue } from './types';
+import { ExtraData } from './types';
 import { version } from '../package.json';
 import {
   Client,
@@ -47,11 +47,11 @@ const useForm = (
   const [result, setResult] = useState<SubmissionResponse | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [succeeded, setSucceeded] = useState(false);
-  const [errors, setErrors] = useState([]);
+  const [errors, setErrors] = useState<FormError[]>([]);
   const formspreeContext = useFormspree();
   const client = args.client || formspreeContext;
-  let stripe: Stripe;
-  let elements: StripeElements;
+  let stripe: Stripe | null;
+  let elements: StripeElements | null;
 
   if (!client) {
     throw new Error('You must provide a Formspree client');
@@ -103,20 +103,15 @@ const useForm = (
 
     // Append extra data from config
     if (typeof extraData === 'object') {
-      for (const prop in extraData) {
-        let extraDataValue;
-        if (typeof extraData[prop] === 'function') {
-          extraDataValue = (
-            extraData[prop] as Exclude<ExtraDataValue, string>
-          ).call(null);
-          if (typeof extraDataValue?.then === 'function') {
-            extraDataValue = await extraDataValue;
-          }
+      for (const [prop, value] of Object.entries(extraData)) {
+        let extraDataValue: string | undefined;
+        if (typeof value === 'function') {
+          extraDataValue = await value();
         } else {
-          extraDataValue = extraData[prop];
+          extraDataValue = value;
         }
         if (extraDataValue !== undefined) {
-          appendExtraData(prop, extraDataValue as string);
+          appendExtraData(prop, extraDataValue);
         }
       }
     }
@@ -143,8 +138,10 @@ const useForm = (
         }),
       };
 
+      // @ts-ignore: unhandled stripe is possibly null
       const payload = await stripe.createPaymentMethod({
         type: 'card',
+        // @ts-ignore: unhandled elements is possibly null and getElement can return null
         card: elements.getElement(CardElement),
         billing_details: {
           ...(formData.name && { name: formData.name }),
@@ -171,6 +168,7 @@ const useForm = (
             : undefined,
       })
       .then((result: SubmissionResponse) => {
+        // @ts-ignore: unhandled result.response is possibly null
         let status = result.response.status;
         let body;
 

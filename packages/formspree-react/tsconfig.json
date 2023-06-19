@@ -1,16 +1,14 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "@formspree/react",
+  "extends": ["../../tsconfig.json"],
   "compilerOptions": {
-    "target": "es5",
-    "module": "ESNext",
-    "lib": ["es6", "dom"],
     "declaration": true,
     "declarationDir": "dist/types",
-    "noImplicitAny": true,
-    "moduleResolution": "node",
-    "jsx": "react",
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true
+    "declarationMap": true,
+    "jsx": "react-jsx",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "resolveJsonModule": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

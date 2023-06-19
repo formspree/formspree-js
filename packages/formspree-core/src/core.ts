@@ -1,6 +1,5 @@
 import { Stripe } from '@stripe/stripe-js';
 import {
-  hasErrors,
   SubmissionData,
   SubmissionOptions,
   SubmissionBody,

@@ -1,14 +1,12 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "@formspree/core",
+  "extends": ["../../tsconfig.json"],
   "compilerOptions": {
-    "target": "ES6",
-    "module": "ESNext",
     "declaration": true,
     "declarationDir": "dist/types",
-    "strict": true,
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "isolatedModules": true
+    "declarationMap": true,
+    "resolveJsonModule": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"],
