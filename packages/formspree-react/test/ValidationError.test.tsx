@@ -1,3 +1,4 @@
+// @ts-ignore: still need to import React in Jest 26
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { act } from '@testing-library/react';
@@ -12,7 +13,6 @@ beforeEach(() => {
 
 afterEach(() => {
   document.body.removeChild(container);
-  container = null;
 });
 
 it('renders a field error if one exists', () => {
@@ -26,7 +26,7 @@ it('renders a field error if one exists', () => {
           {
             field: 'email',
             message: 'is required',
-            code: 'REQUIRED',
+            code: 'REQUIRED_FIELD_MISSING',
           },
         ]}
       />
@@ -44,7 +44,7 @@ it('renders field-less errors', () => {
         errors={[
           {
             message: 'Form is disabled',
-            code: 'FORM_DISABLED',
+            code: 'INACTIVE',
           },
         ]}
       />
@@ -64,7 +64,7 @@ it('does not render anything if the field does not have an error', () => {
           {
             field: 'name',
             message: 'is required',
-            code: 'REQUIRED',
+            code: 'REQUIRED_FIELD_MISSING',
           },
         ]}
       />
