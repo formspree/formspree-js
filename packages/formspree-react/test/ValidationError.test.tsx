@@ -26,8 +26,8 @@ it('renders a field error if one exists', () => {
           {
             field: 'email',
             message: 'is required',
-            code: 'REQUIRED'
-          }
+            code: 'REQUIRED',
+          },
         ]}
       />
     );
@@ -44,8 +44,8 @@ it('renders field-less errors', () => {
         errors={[
           {
             message: 'Form is disabled',
-            code: 'FORM_DISABLED'
-          }
+            code: 'FORM_DISABLED',
+          },
         ]}
       />
     );
@@ -64,8 +64,8 @@ it('does not render anything if the field does not have an error', () => {
           {
             field: 'name',
             message: 'is required',
-            code: 'REQUIRED'
-          }
+            code: 'REQUIRED',
+          },
         ]}
       />
     );

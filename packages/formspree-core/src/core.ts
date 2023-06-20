@@ -4,14 +4,14 @@ import {
   SubmissionData,
   SubmissionOptions,
   SubmissionBody,
-  SubmissionResponse
+  SubmissionResponse,
 } from './forms';
 import {
   appendExtraData,
   clientHeader,
   encode64,
   handleLegacyErrorPayload,
-  handleSCA
+  handleSCA,
 } from './utils';
 import { Session } from './session';
 
@@ -72,7 +72,7 @@ export class Client {
 
     let headers: { [key: string]: string } = {
       Accept: 'application/json',
-      'Formspree-Client': clientHeader(opts.clientName)
+      'Formspree-Client': clientHeader(opts.clientName),
     };
 
     if (this.session) {
@@ -87,7 +87,7 @@ export class Client {
       method: 'POST',
       mode: 'cors' as const,
       body: serializeBody(data),
-      headers
+      headers,
     };
 
     // first check if we need to add the stripe paymentMethod
@@ -104,10 +104,10 @@ export class Client {
               {
                 code: 'STRIPE_CLIENT_ERROR',
                 message: 'Error creating payment method',
-                field: 'paymentMethod'
-              }
-            ]
-          }
+                field: 'paymentMethod',
+              },
+            ],
+          },
         };
       }
 
@@ -117,7 +117,7 @@ export class Client {
       // Send a request to Formspree server to handle the payment method
       const response = await fetchImpl(url, {
         ...request,
-        body: data
+        body: data,
       });
       const responseData = await response.json();
 
@@ -136,22 +136,22 @@ export class Client {
           data,
           fetchImpl,
           request,
-          url
+          url,
         });
       }
 
       return handleLegacyErrorPayload({
         response,
-        body: responseData
+        body: responseData,
       });
     } else {
       return fetchImpl(url, request)
-        .then(response => {
-          return response.json().then(
-            (body: SubmissionBody): SubmissionResponse => {
+        .then((response) => {
+          return response
+            .json()
+            .then((body: SubmissionBody): SubmissionResponse => {
               return handleLegacyErrorPayload({ body, response });
-            }
-          );
+            });
         })
         .catch();
     }

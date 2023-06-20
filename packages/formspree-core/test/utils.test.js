@@ -19,7 +19,7 @@ describe('camelizeTopKeys', () => {
     expect(
       camelizeTopKeys({ first_name: { first_letter: 'B' } })
     ).toStrictEqual({
-      firstName: { first_letter: 'B' }
+      firstName: { first_letter: 'B' },
     });
   });
 });

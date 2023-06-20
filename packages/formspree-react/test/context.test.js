@@ -19,9 +19,9 @@ afterEach(() => {
 });
 
 it('instantiates a client and provides it via useFormspree hook', async () => {
-  createClient.mockImplementation(config => ({
+  createClient.mockImplementation((config) => ({
     startBrowserSession: () => {},
-    key: config.project
+    key: config.project,
   }));
 
   const Component = () => {

@@ -1,4 +1,4 @@
-import { useForm, ValidationError } from "@formspree/react";
+import { useForm, ValidationError } from '@formspree/react';
 
 const SimpleForm = () => {
   const [state, handleSubmit] = useForm(
@@ -33,7 +33,7 @@ const SimpleForm = () => {
             <ValidationError className="error" errors={state.errors} />
           </div>
           <button type="submit" disabled={state.submitting}>
-            {state.submitting ? "Submitting..." : "Submit"}
+            {state.submitting ? 'Submitting...' : 'Submit'}
           </button>
         </form>
       )}

@@ -19,7 +19,7 @@ turbo test
 turbo dev
 ```
 
-## Publishing changes 
+## Publishing changes
 
 When developing you should include a changeset in your PR.
 
@@ -33,12 +33,11 @@ Once approved you can convert the changeset into a changelog and bump the versio
 yarn changeset version
 ```
 
-Commit the changes, which will remove the changeset file and update the changelog in the relevant 
+Commit the changes, which will remove the changeset file and update the changelog in the relevant
 package(s). Push to the approved PR's branch. Now you can merge the PR to main.
 
-After merging, you should publish to NPM. You can do that by running the github action 
+After merging, you should publish to NPM. You can do that by running the github action
 `release`.
-
 
 ## Help and Support
 
