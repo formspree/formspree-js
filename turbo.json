@@ -6,10 +6,6 @@
       "outputs": ["build/**", "dist/**"],
       "dependsOn": ["^build"]
     },
-    "test": {
-      "outputs": ["coverage/**"],
-      "dependsOn": []
-    },
     "lint": {
       "outputs": []
     },
@@ -20,6 +16,7 @@
     "clean": {
       "cache": false
     },
+    "test": {},
     "typecheck": {}
   }
 }
