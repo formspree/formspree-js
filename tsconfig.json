@@ -7,6 +7,7 @@
     "forceConsistentCasingInFileNames": true,
     "inlineSources": false,
     "isolatedModules": true,
+    "lib": ["ES2015", "DOM"],
     "module": "ESNext",
     "moduleResolution": "node",
     "noUnusedLocals": true,

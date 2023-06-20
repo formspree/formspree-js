@@ -7,7 +7,6 @@
     "declarationDir": "dist/types",
     "declarationMap": true,
     "jsx": "react-jsx",
-    "lib": ["ES2015", "DOM"],
     "resolveJsonModule": true
   },
   "include": ["src/**/*", "test/**/*"],
