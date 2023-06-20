@@ -20,11 +20,6 @@
     "clean": {
       "cache": false
     },
-    "topo": {
-      "dependsOn": ["^topo"]
-    },
-    "typecheck": {
-      "dependsOn": ["topo"]
-    }
+    "typecheck": {}
   }
 }
