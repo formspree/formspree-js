@@ -6,7 +6,7 @@
     "declaration": true,
     "declarationDir": "dist/types",
     "declarationMap": true,
-    "jsx": "react-jsx",
+    "jsx": "react",
     "resolveJsonModule": true
   },
   "include": ["src/**/*", "test/**/*"],
