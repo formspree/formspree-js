@@ -1,6 +1,3 @@
 package.json: yarn sort-package-json
 '*.{json,md,yml}': yarn prettier --write
-'*.js': yarn prettier --write
-'*.ts':
-  - yarn typecheck
-  - yarn prettier --write
+'*.{js,ts}': yarn prettier --write

@@ -1,2 +1,3 @@
 package.json: yarn sort-package-json
 '*.{json,md,yml}': yarn prettier --write
+'*.{ts,tsx}': yarn typecheck
