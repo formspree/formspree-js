@@ -3,7 +3,12 @@
     "test": {
       "presets": [
         "@babel/preset-env",
-        "@babel/preset-react",
+        [
+          "@babel/preset-react",
+          // use the new jsx transform so we don't need to import React
+          // https://legacy.reactjs.org/blog/2020/09/22/introducing-the-new-jsx-transform.html
+          { "runtime": "automatic" }
+        ],
         "@babel/preset-typescript"
       ]
     }
