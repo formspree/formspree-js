@@ -15,4 +15,7 @@ jobs:
           cache: yarn
           cache-dependency-path: yarn.lock
       - run: yarn install --frozen-lockfile
+      # currently, we need to build first to the types declaration
+      # in @formspree/core generated.
+      - run: yarn build
       - run: yarn typecheck
