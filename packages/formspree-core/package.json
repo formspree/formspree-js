@@ -36,7 +36,6 @@
     "@stripe/stripe-js": "^1.35.0"
   },
   "devDependencies": {
-    "@babel/preset-react": "^7.22.5",
     "np": "^3.0.4",
     "tsup": "^6.2.2"
   },
