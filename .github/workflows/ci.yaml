@@ -1,0 +1,21 @@
+name: CI
+on: push
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          cache: yarn
+          cache-dependency-path: yarn.lock
+      - run: yarn install --frozen-lockfile
+      # We need to build first in order to generate the type declarations
+      # in @formspree/core.
+      - run: yarn build --filter="./packages/*"
+      - run: yarn typecheck --filter="./packages/*"
