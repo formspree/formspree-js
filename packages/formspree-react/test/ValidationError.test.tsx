@@ -1,4 +1,3 @@
-// @ts-ignore: still need to import React in Jest 26
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { act } from '@testing-library/react';
