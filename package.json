@@ -12,7 +12,8 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "turbo run lint",
     "prepare": "husky install",
-    "release": "turbo run build --filter=@formspree/cra-demo^... && changeset publish",
+    "prerelease": "turbo run build --filter=\"./packages/*\"",
+    "release": "changeset publish",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
     "version-packages": "changeset version"
