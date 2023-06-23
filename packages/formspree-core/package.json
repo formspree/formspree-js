@@ -36,7 +36,6 @@
     "@stripe/stripe-js": "^1.35.0"
   },
   "devDependencies": {
-    "jest": "^26.4.2",
     "np": "^3.0.4",
     "tsup": "^6.2.2"
   },

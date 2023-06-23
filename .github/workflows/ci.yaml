@@ -19,3 +19,4 @@ jobs:
       # in @formspree/core.
       - run: yarn build --filter="./packages/*"
       - run: yarn typecheck --filter="./packages/*"
+      - run: yarn test --filter="./packages/*"
