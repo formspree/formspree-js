@@ -52,10 +52,8 @@ _Note: non-packages (examples/\*) do not need changesets._
 
 _Note: Only core maintainers can release new versions of formpree-js packages._
 
-When we are ready to release a new version on one or more packages, follow these steps:
+When pull requests are merged to `main`, a `release` Github Actions job will automatically generate a Version Package pull request, either creating a new one or updating an existing one.
 
-1. Create a new branch off the `main` branch.
-1. Run `yarn changeset version` which will consume the changeset files and update the changelog and package.json files in the relevant packages.
-1. Create a new pull request for the generated changes.
+When we are ready to publish a new version for one or more packages, simply approve the Version Package pull request and merge it to `main`.
 
-Once the proposed release PR is approved, merging it to `main` will automatically tag and push the new versions of the affected packages and publish them to npm.
+Once the pull request is merged, the `release` GitHub Actions job will automatically tag and push the new versions of the affected packages and publish them to npm.
