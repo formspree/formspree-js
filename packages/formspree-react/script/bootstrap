@@ -1,5 +1,0 @@
-#!/bin/sh
-
-# script/bootstrap: Install dependencies and perform setup tasks.
-
-npm install
