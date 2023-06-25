@@ -27,7 +27,7 @@
     "build": "tsup src/index.ts --format esm,cjs --dts --external react --minify",
     "clean": "rm -rf dist && rm -rf node_modules",
     "dev": "tsup src/index.ts --format esm,cjs --dts --external react --sourcemap",
-    "lint": "eslint src/*.ts*",
+    "lint": "eslint ./src ./test",
     "test": "jest",
     "typecheck": "tsc --noEmit"
   },
@@ -44,6 +44,7 @@
     "@testing-library/user-event": "^14.4.3",
     "@types/react": "^18.0.15",
     "@types/react-dom": "^18.0.6",
+    "eslint-plugin-react-hooks": "^4.3.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
