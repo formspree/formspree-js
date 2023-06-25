@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
-import { Stripe, StripeElements } from '@stripe/stripe-js';
+import { useState } from 'react';
+import type React from 'react';
+import type { Stripe, StripeElements } from '@stripe/stripe-js';
 import { useElements, CardElement, useStripe } from '@stripe/react-stripe-js';
 import { useFormspree } from './context';
-import { ExtraData } from './types';
+import type { ExtraData } from './types';
 import { version } from '../package.json';
-import {
-  Client,
+import type { Client } from '@formspree/core';
+import type {
   SubmissionResponse,
   SubmissionData,
   ErrorBody,
@@ -65,12 +66,16 @@ const useForm = (
   }
 
   if (formspreeContext.client && formspreeContext.client.stripePromise) {
+    // suppress existing violation: React Hook "useStripe" is called conditionally
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     stripe = useStripe();
+    // suppress existing violation: React Hook "useElements" is called conditionally
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     elements = useElements();
   }
 
   const debug = !!args.debug;
-  let extraData = args.data;
+  const extraData = args.data;
 
   const reset: ResetFunction = () => {
     setSubmitting(false);
@@ -169,7 +174,7 @@ const useForm = (
       })
       .then((result: SubmissionResponse) => {
         // @ts-ignore: unhandled result.response is possibly null
-        let status = result.response.status;
+        const status = result.response.status;
         let body;
 
         if (status === 200) {

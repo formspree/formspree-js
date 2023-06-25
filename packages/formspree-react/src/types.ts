@@ -1,4 +1,4 @@
-import * as Forms from '@formspree/core';
+import type * as Forms from '@formspree/core';
 
 export { isFieldError } from '@formspree/core';
 

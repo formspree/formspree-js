@@ -1,5 +1,7 @@
 const b64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
 const b64re =
+  // suppress existing violation: Unnecessary escape character: \/
+  // eslint-disable-next-line no-useless-escape
   /^(?:[A-Za-z\d+\/]{4})*?(?:[A-Za-z\d+\/]{2}(?:==)?|[A-Za-z\d+\/]{3}=?)?$/;
 
 export function btoa(string) {

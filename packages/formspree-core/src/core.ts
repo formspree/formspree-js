@@ -1,5 +1,5 @@
-import { Stripe } from '@stripe/stripe-js';
-import {
+import type { Stripe } from '@stripe/stripe-js';
+import type {
   SubmissionData,
   SubmissionOptions,
   SubmissionBody,
@@ -58,9 +58,9 @@ export class Client {
     data: SubmissionData,
     opts: SubmissionOptions = {}
   ): Promise<SubmissionResponse> {
-    let endpoint = opts.endpoint || 'https://formspree.io';
-    let fetchImpl = opts.fetchImpl || fetch;
-    let url = this.project
+    const endpoint = opts.endpoint || 'https://formspree.io';
+    const fetchImpl = opts.fetchImpl || fetch;
+    const url = this.project
       ? `${endpoint}/p/${this.project}/f/${formKey}`
       : `${endpoint}/f/${formKey}`;
 
@@ -69,7 +69,7 @@ export class Client {
       return JSON.stringify(data);
     };
 
-    let headers: { [key: string]: string } = {
+    const headers: { [key: string]: string } = {
       Accept: 'application/json',
       'Formspree-Client': clientHeader(opts.clientName),
     };
@@ -82,7 +82,7 @@ export class Client {
       headers['Content-Type'] = 'application/json';
     }
 
-    let request = {
+    const request = {
       method: 'POST',
       mode: 'cors' as const,
       body: serializeBody(data),

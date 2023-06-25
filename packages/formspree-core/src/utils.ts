@@ -1,8 +1,8 @@
-// @ts-ignore
 import { btoa } from './base64';
 import { version } from '../package.json';
-import { hasErrors, SubmissionResponse } from './forms';
-import { PaymentMethod, Stripe } from '@stripe/stripe-js';
+import { hasErrors } from './forms';
+import type { SubmissionResponse } from './forms';
+import type { PaymentMethod, Stripe } from '@stripe/stripe-js';
 
 /**
  * Base-64 encodes a (JSON-castable) object.
@@ -52,9 +52,9 @@ export const toCamel = (str: string): string => {
 export const camelizeTopKeys = (obj: {
   [key: string]: any;
 }): { [key: string]: any } => {
-  let newObject: { [key: string]: any } = {};
+  const newObject: { [key: string]: any } = {};
 
-  for (let [key, value] of Object.entries(obj)) {
+  for (const [key, value] of Object.entries(obj)) {
     newObject[toCamel(key)] = value;
   }
 

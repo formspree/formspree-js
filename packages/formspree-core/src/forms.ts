@@ -1,4 +1,4 @@
-import { PaymentMethodResult } from '@stripe/stripe-js';
+import type { PaymentMethodResult } from '@stripe/stripe-js';
 
 export type SubmissionData = FormData | any;
 
