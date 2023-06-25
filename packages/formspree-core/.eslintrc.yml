@@ -3,5 +3,3 @@ extends:
   - '../../.eslintrc.yml'
 parserOptions:
   project: './tsconfig.json'
-rules:
-  '@typescript-eslint/ban-ts-comment': 0
