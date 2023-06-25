@@ -5,8 +5,8 @@ import { useElements, CardElement, useStripe } from '@stripe/react-stripe-js';
 import { useFormspree } from './context';
 import type { ExtraData } from './types';
 import { version } from '../package.json';
-import type { Client } from '@formspree/core';
 import type {
+  Client,
   SubmissionResponse,
   SubmissionData,
   ErrorBody,
