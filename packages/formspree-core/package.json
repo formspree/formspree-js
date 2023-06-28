@@ -35,15 +35,8 @@
   "dependencies": {
     "@stripe/stripe-js": "^1.35.0"
   },
-  "devDependencies": {
-    "np": "^3.0.4",
-    "tsup": "^6.2.2"
-  },
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org"
-  },
-  "np": {
-    "yarn": false
   }
 }

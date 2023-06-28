@@ -1,5 +1,0 @@
-#!/bin/sh
-
-# script/release: Publish a new release.
-
-npm publish --access public
