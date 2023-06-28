@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.8.3
+
+### Patch Changes
+
+- a359edd: Upgrade jest to v29 using centralized dependency, and run tests in CI
+
 ## 2.8.2
 
 ### Patch Changes

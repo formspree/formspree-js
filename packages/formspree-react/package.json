@@ -1,6 +1,6 @@
 {
   "name": "@formspree/react",
-  "version": "2.4.3",
+  "version": "2.4.4",
   "private": false,
   "description": "The React component library for Formspree",
   "bugs": {
@@ -26,13 +26,13 @@
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts --external react --minify",
     "clean": "rm -rf dist && rm -rf node_modules",
-    "dev": "tsup src/index.ts --format esm,cjs --dts --external react --sourcemap",
+    "dev": "tsup src/index.ts --format esm,cjs --dts --external react --sourcemap --watch",
     "lint": "eslint ./src ./test",
     "test": "jest",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@formspree/core": "^2.8.2",
+    "@formspree/core": "^2.8.3",
     "@stripe/react-stripe-js": "^1.7.1",
     "@stripe/stripe-js": "^1.35.0"
   },
