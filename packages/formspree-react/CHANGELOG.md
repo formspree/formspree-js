@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.4.4
+
+### Patch Changes
+
+- a359edd: Upgrade jest to v29 using centralized dependency, and run tests in CI
+- Updated dependencies [a359edd]
+  - @formspree/core@2.8.3
+
 ## 2.4.3
 
 ### Patch Changes
