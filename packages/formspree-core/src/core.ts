@@ -109,7 +109,7 @@ export class Client {
       // Send a request to Formspree server to handle the payment method
       const response = await fetchImpl(url, {
         ...request,
-        body: data,
+        body: serializeBody(data),
       });
       const responseData = await response.json();
 

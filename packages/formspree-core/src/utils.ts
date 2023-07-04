@@ -1,7 +1,7 @@
 import { btoa } from './base64';
 import { version } from '../package.json';
 import { hasErrors } from './forms';
-import type { SubmissionResponse } from './forms';
+import type { SubmissionData, SubmissionResponse } from './forms';
 import type { PaymentMethod, Stripe } from '@stripe/stripe-js';
 
 /**
@@ -25,7 +25,7 @@ export const clientHeader = (givenLabel: string | undefined): string => {
 };
 
 export const appendExtraData = (
-  formData: FormData | Record<string, string | Blob>,
+  formData: SubmissionData,
   prop: string,
   value: string
 ) => {
@@ -44,7 +44,7 @@ type HandleSCAargs = {
     paymentMethod: PaymentMethod;
     error?: undefined;
   };
-  data: FormData | Record<string, string | Blob>;
+  data: SubmissionData;
   fetchImpl: (
     input: RequestInfo,
     init?: RequestInit | undefined
