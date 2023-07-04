@@ -40,13 +40,6 @@ export class Client {
   }
 
   /**
-   * Teardown the client session.
-   */
-  teardown(): void {
-    if (this.session) this.session.teardown();
-  }
-
-  /**
    * Submit a form.
    *
    * @param formKey - The form key.

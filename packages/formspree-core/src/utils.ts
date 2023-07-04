@@ -14,54 +14,6 @@ export const encode64 = (obj: object): string => {
 };
 
 /**
- * Appends a key-value pair to a target.
- *
- * @param target - An object or FormData instance to mutate.
- * @param key - The key to append.
- * @param value - The value to append.
- */
-export const append = (
-  target: { [key: string]: any } | FormData,
-  key: string,
-  value: string
-): void => {
-  if (target instanceof FormData) {
-    target.append(key, value);
-  } else {
-    target[key] = value;
-  }
-};
-
-/**
- * Converts a snake case string to camel case.
- *
- * @param str - A string to convert to camel case.
- */
-export const toCamel = (str: string): string => {
-  return str.replace(/([-_][a-z])/gi, ($1) => {
-    return $1.toUpperCase().replace('-', '').replace('_', '');
-  });
-};
-
-/**
- * Converts the top-level keys of an object to camel case.
- * This function returns a new object (instead of mutating in place).
- *
- * @param obj - An object with string keys.
- */
-export const camelizeTopKeys = (obj: {
-  [key: string]: any;
-}): { [key: string]: any } => {
-  const newObject: { [key: string]: any } = {};
-
-  for (const [key, value] of Object.entries(obj)) {
-    newObject[toCamel(key)] = value;
-  }
-
-  return newObject;
-};
-
-/**
  * Generates a client header.
  *
  * @param givenLabel
@@ -72,16 +24,8 @@ export const clientHeader = (givenLabel: string | undefined): string => {
   return `${givenLabel} ${label}`;
 };
 
-/**
- * The current timestamp.
- */
-export const now = (): number => {
-  // @ts-ignore
-  return 1 * new Date();
-};
-
 export const appendExtraData = (
-  formData: FormData | object,
+  formData: FormData | Record<string, string | Blob>,
   prop: string,
   value: string
 ) => {
@@ -100,7 +44,7 @@ type HandleSCAargs = {
     paymentMethod: PaymentMethod;
     error?: undefined;
   };
-  data: FormData | object;
+  data: FormData | Record<string, string | Blob>;
   fetchImpl: (
     input: RequestInfo,
     init?: RequestInit | undefined
