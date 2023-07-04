@@ -10,7 +10,7 @@ import { version } from '../package.json';
 //     return success;
 //   };
 //
-const success = new Promise((resolve, _reject) => {
+const success = new Promise((resolve) => {
   const response = {
     status: 200,
     json: () => {
@@ -22,7 +22,7 @@ const success = new Promise((resolve, _reject) => {
   resolve(response);
 });
 
-const failure = new Promise((resolve, _reject) => {
+const failure = new Promise((resolve) => {
   const response = {
     status: 400,
     json: () => {
@@ -168,6 +168,7 @@ it('sends telemetry data if session is started', () => {
     expect(props.headers['Formspree-Session-Data']).toBeDefined();
 
     const parsedBody = JSON.parse(props.body);
+    expect(parsedBody).toEqual({});
     return success;
   };
 
