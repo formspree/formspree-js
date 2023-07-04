@@ -1,7 +1,5 @@
-import { now } from './utils';
-
-// @ts-ignore
 import { atob } from './base64';
+import { now } from './utils';
 
 const webdriver = (): boolean => {
   return (

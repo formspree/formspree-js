@@ -1,12 +1,8 @@
-import React, { useEffect, useState, useContext, lazy, Suspense } from 'react';
-import {
-  Client,
-  Config,
-  createClient,
-  getDefaultClient,
-} from '@formspree/core';
+import React, { Suspense, lazy, useContext, useEffect, useState } from 'react';
+import { createClient, getDefaultClient } from '@formspree/core';
+import type { Client, Config } from '@formspree/core';
 import { loadStripe } from '@stripe/stripe-js/pure.js';
-import { type Stripe } from '@stripe/stripe-js';
+import type { Stripe } from '@stripe/stripe-js';
 
 const Elements = lazy(() =>
   import('@stripe/react-stripe-js').then((module) => {
@@ -38,7 +34,7 @@ const getStripe = (stripeKey: string) => {
 };
 
 const handleCreateClient = (promise?: Stripe, project?: string) => {
-  let config: Config = {};
+  const config: Config = {};
 
   if (promise) {
     config.stripePromise = promise;

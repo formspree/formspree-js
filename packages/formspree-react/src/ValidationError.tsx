@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormError } from '@formspree/core';
+import type { FormError } from '@formspree/core';
 
 export type ValidationErrorProps = {
   prefix?: string;

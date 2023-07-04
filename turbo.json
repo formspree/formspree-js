@@ -13,9 +13,7 @@
       "dependsOn": ["^dev"],
       "cache": false
     },
-    "lint": {
-      "outputs": []
-    },
+    "lint": {},
     "test": {},
     "typecheck": {}
   }
