@@ -1,7 +1,7 @@
 import { atob } from './base64';
 
 /**
- * Check whether the user agent is controlled by automation.
+ * Check whether the user agent is controlled by an automation.
  */
 const webdriver = (): boolean => {
   return (
