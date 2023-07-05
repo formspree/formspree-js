@@ -84,7 +84,7 @@ const useForm = (
   };
 
   const handleSubmit: SubmitHandler = async (submissionData) => {
-    const getFormData = async (event: FormEvent) => {
+    const getFormData = (event: FormEvent) => {
       event.preventDefault();
 
       const form = event.target as HTMLFormElement;
@@ -94,15 +94,15 @@ const useForm = (
       return new FormData(form);
     };
 
-    let formData = isEvent(submissionData)
-      ? await getFormData(submissionData)
+    const formData = isEvent(submissionData)
+      ? getFormData(submissionData)
       : submissionData;
 
     const appendExtraData = (prop: string, value: string) => {
       if (formData instanceof FormData) {
         formData.append(prop, value);
       } else {
-        formData = Object.assign(formData, { [prop]: value });
+        formData[prop] = value;
       }
     };
 
@@ -122,40 +122,12 @@ const useForm = (
     }
 
     const createPaymentMethod = async () => {
-      const address = {
-        ...(formData.address_line1 && {
-          line1: formData.address_line1,
-        }),
-        ...(formData.address_line2 && {
-          line2: formData.address_line2,
-        }),
-        ...(formData.address_city && {
-          city: formData.address_city,
-        }),
-        ...(formData.address_country && {
-          country: formData.address_country,
-        }),
-        ...(formData.address_state && {
-          state: formData.address_state,
-        }),
-        ...(formData.address_postal_code && {
-          postal_code: formData.address_postal_code,
-        }),
-      };
-
       // @ts-ignore: unhandled stripe is possibly null
       const payload = await stripe.createPaymentMethod({
         type: 'card',
         // @ts-ignore: unhandled elements is possibly null and getElement can return null
         card: elements.getElement(CardElement),
-        billing_details: {
-          ...(formData.name && { name: formData.name }),
-          ...(formData.email && { email: formData.email }),
-          ...(formData.phone && { phone: formData.phone }),
-          ...(address && {
-            address,
-          }),
-        },
+        billing_details: mapBillingDetailsPayload(formData),
       });
 
       return payload;
@@ -207,5 +179,58 @@ const useForm = (
 
   return [{ result, submitting, succeeded, errors }, handleSubmit, reset];
 };
+
+type StripeBillingDetailsPayload = {
+  address: StripeAddressPayload;
+  name?: string;
+  email?: string;
+  phone?: string;
+};
+
+function mapBillingDetailsPayload(
+  data: SubmissionData
+): StripeBillingDetailsPayload {
+  const billing: StripeBillingDetailsPayload = {
+    address: mapAddressPayload(data),
+  };
+
+  for (const key of ['name', 'email', 'phone'] as const) {
+    const value = data instanceof FormData ? data.get(key) : data[key];
+    if (value && typeof value === 'string') {
+      billing[key] = value;
+    }
+  }
+
+  return billing;
+}
+
+type StripeAddressPayload = {
+  line1?: string;
+  line2?: string;
+  city?: string;
+  country?: string;
+  state?: string;
+  postal_code?: string;
+};
+
+function mapAddressPayload(data: SubmissionData): StripeAddressPayload {
+  const address: StripeAddressPayload = {};
+
+  for (const [fromKey, toKey] of [
+    ['address_line1', 'line1'],
+    ['address_line2', 'line2'],
+    ['address_city', 'city'],
+    ['address_country', 'country'],
+    ['address_state', 'state'],
+    ['address_postal_code', 'postal_code'],
+  ] as const) {
+    const value = data instanceof FormData ? data.get(fromKey) : data[fromKey];
+    if (value && typeof value === 'string') {
+      address[toKey] = value;
+    }
+  }
+
+  return address;
+}
 
 export { CardElement, useForm };
