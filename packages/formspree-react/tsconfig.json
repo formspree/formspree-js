@@ -3,7 +3,6 @@
   "display": "@formspree/react",
   "extends": ["../../tsconfig.json"],
   "compilerOptions": {
-    "target": "es5",
     "declaration": true,
     "declarationDir": "dist/types",
     "declarationMap": true,
