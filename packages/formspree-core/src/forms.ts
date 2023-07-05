@@ -1,6 +1,6 @@
 import type { PaymentMethodResult } from '@stripe/stripe-js';
 
-export type SubmissionData = FormData | Record<string, string>;
+export type SubmissionData = FormData | Record<string, string | Blob>;
 
 export interface SubmissionOptions {
   endpoint?: string;
