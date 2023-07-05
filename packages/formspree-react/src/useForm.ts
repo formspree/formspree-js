@@ -204,14 +204,14 @@ function mapBillingDetailsPayload(
   return billing;
 }
 
-type StripeAddressPayload = {
-  line1?: string;
-  line2?: string;
-  city?: string;
-  country?: string;
-  state?: string;
-  postal_code?: string;
-};
+type StripeAddressPayload = Partial<{
+  line1: string;
+  line2: string;
+  city: string;
+  country: string;
+  state: string;
+  postal_code: string;
+}>;
 
 function mapAddressPayload(data: SubmissionData): StripeAddressPayload {
   const address: StripeAddressPayload = {};
