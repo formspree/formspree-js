@@ -1,7 +1,7 @@
-import { btoa } from './base64';
-import { version } from '../package.json';
-import type { SubmissionData } from './submission';
 // import type { PaymentMethod, Stripe } from '@stripe/stripe-js';
+import { version } from '../package.json';
+import { btoa } from './base64';
+import type { SubmissionData } from './submission';
 
 /**
  * Base-64 encodes a (JSON-castable) object.
@@ -23,17 +23,17 @@ export const clientHeader = (givenLabel: string | undefined): string => {
   return `${givenLabel} ${label}`;
 };
 
-export const appendExtraData = (
+export function appendExtraData(
   formData: SubmissionData,
   prop: string,
   value: string
-) => {
+) {
   if (formData instanceof FormData) {
     formData.append(prop, value);
   } else {
     formData[prop] = value;
   }
-};
+}
 
 /*
 type HandleSCAargs = {

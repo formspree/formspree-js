@@ -46,7 +46,7 @@ export class Client {
    */
   async submitForm<T extends FieldValues>(
     formKey: string,
-    data: SubmissionData,
+    data: SubmissionData<T>,
     opts: SubmissionOptions = {}
   ): Promise<SubmissionResult<T>> {
     const endpoint = opts.endpoint || 'https://formspree.io';
@@ -54,11 +54,6 @@ export class Client {
     const url = this.project
       ? `${endpoint}/p/${this.project}/f/${formKey}`
       : `${endpoint}/f/${formKey}`;
-
-    const serializeBody = (data: SubmissionData): FormData | string => {
-      if (data instanceof FormData) return data;
-      return JSON.stringify(data);
-    };
 
     const headers: { [key: string]: string } = {
       Accept: 'application/json',
@@ -74,13 +69,13 @@ export class Client {
     }
 
     async function makeFormspreeRequest(
-      data: SubmissionData
+      data: SubmissionData<T>
     ): Promise<SubmissionResult<T>> {
       try {
         const res = await fetchImpl(url, {
           method: 'POST',
           mode: 'cors',
-          body: serializeBody(data),
+          body: data instanceof FormData ? data : JSON.stringify(data),
           headers,
         });
 
@@ -128,7 +123,8 @@ export class Client {
       //   body: serializeBody(data),
       // });
       // const responseData = await response.json();
-      const result = await makeFormspreeRequest(data);
+
+      // const result = await makeFormspreeRequest(data);
 
       // if (result.errors) {
       //   return result;
@@ -191,6 +187,12 @@ export const createClient = (config?: Config): Client => new Client(config);
 export const getDefaultClient = (): Client => {
   if (!defaultClientSingleton) {
     defaultClientSingleton = createClient();
+    // TEMPORARY: testing type
+    const data = { email: '', password: '' };
+    defaultClientSingleton.submitForm('', data).then((result) => {
+      appendExtraData(data, 'foo', 'bar');
+      console.log(result.ok ? result.next : result.getFieldError('email'));
+    });
   }
   return defaultClientSingleton;
 };

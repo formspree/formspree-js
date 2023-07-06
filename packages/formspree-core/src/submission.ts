@@ -3,12 +3,17 @@ import type { PaymentMethodResult } from '@stripe/stripe-js';
 /*
 export type SubmitForm = <T extends FieldValues>(
   formKey: string,
-  data: SubmissionData, // ...
+  data: SubmissionData<T>, // ...
   opts?: SubmissionOptions
 ) => Promise<SubmissionResult<T>>;
 */
 
-export type SubmissionData = FormData | Record<string, string | Blob>;
+export type SubmissionData<T extends FieldValues = FieldValues> = FormData | T;
+
+export type FieldValues = Record<
+  string,
+  string | number | boolean | null | undefined
+>;
 
 export type SubmissionOptions = {
   endpoint?: string;
@@ -69,6 +74,10 @@ export class SubmissionError<T extends FieldValues> {
 
   getFieldError<K extends keyof T>(field: K): FieldError | undefined {
     return this.fieldErrors.get(field);
+  }
+
+  getAllFieldErrors(): [keyof T, FieldError][] {
+    return Array.from(this.fieldErrors);
   }
 }
 
@@ -152,14 +161,6 @@ type ServerError = {
   field?: string;
   message: string;
 };
-
-/**
- * Experimenting
- */
-
-// export type FieldValues = Record<string, any>;
-export type FieldValues = Record<string, unknown>;
-// <TFieldValues extends FieldValues>
 
 type ValueOf<T> = T[keyof T];
 
