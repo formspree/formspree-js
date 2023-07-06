@@ -1,8 +1,7 @@
 import { btoa } from './base64';
 import { version } from '../package.json';
-import { hasErrors } from './forms';
-import type { SubmissionData, SubmissionResponse } from './forms';
-import type { PaymentMethod, Stripe } from '@stripe/stripe-js';
+import type { SubmissionData } from './submission';
+// import type { PaymentMethod, Stripe } from '@stripe/stripe-js';
 
 /**
  * Base-64 encodes a (JSON-castable) object.
@@ -32,10 +31,11 @@ export const appendExtraData = (
   if (formData instanceof FormData) {
     formData.append(prop, value);
   } else {
-    formData = Object.assign(formData, { [prop]: value });
+    formData[prop] = value;
   }
 };
 
+/*
 type HandleSCAargs = {
   stripePromise: Stripe;
   response: Response;
@@ -62,14 +62,14 @@ type HandleSCAargs = {
 
 export const handleSCA = async ({
   stripePromise,
-  response,
+  // response,
   responseData,
   payload,
   data,
   fetchImpl,
   request,
   url,
-}: HandleSCAargs): Promise<SubmissionResponse> => {
+}: HandleSCAargs): Promise<SubmissionResult> => {
   const stripeResult = await stripePromise.handleCardAction(
     responseData.stripe.paymentIntentClientSecret
   );
@@ -77,16 +77,13 @@ export const handleSCA = async ({
   // Handle Stripe error
   if (stripeResult.error) {
     return {
-      response,
-      body: {
-        errors: [
-          {
-            code: 'STRIPE_CLIENT_ERROR',
-            message: 'Stripe SCA error',
-            field: 'paymentMethod',
-          },
-        ],
-      },
+      errors: [
+        {
+          code: 'STRIPE_CLIENT_ERROR',
+          message: 'Stripe SCA error',
+          field: 'paymentMethod',
+        },
+      ],
     };
   } else {
     if (!payload.paymentMethod.id) {
@@ -111,13 +108,4 @@ export const handleSCA = async ({
     };
   }
 };
-
-export function handleLegacyErrorPayload({
-  body,
-  response,
-}: SubmissionResponse): SubmissionResponse {
-  if (!hasErrors(body) && (body as any)?.error) {
-    body = { errors: [{ message: (body as any).error }] };
-  }
-  return { body, response };
-}
+*/

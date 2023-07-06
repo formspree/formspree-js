@@ -1,18 +1,16 @@
 import type { Stripe } from '@stripe/stripe-js';
-import type {
-  SubmissionData,
-  SubmissionOptions,
-  SubmissionBody,
-  SubmissionResponse,
-} from './forms';
-import {
-  appendExtraData,
-  clientHeader,
-  encode64,
-  handleLegacyErrorPayload,
-  handleSCA,
-} from './utils';
 import { Session } from './session';
+import {
+  SubmissionError,
+  SubmissionSuccess,
+  isServerErrorResponse,
+  isServerSuccessResponse,
+  type FieldValues,
+  type SubmissionData,
+  type SubmissionOptions,
+  type SubmissionResult,
+} from './submission';
+import { appendExtraData, clientHeader, encode64 } from './utils';
 
 export interface Config {
   project?: string;
@@ -46,11 +44,11 @@ export class Client {
    * @param data - An object or FormData instance containing submission data.
    * @param args - An object of form submission data.
    */
-  async submitForm(
+  async submitForm<T extends FieldValues>(
     formKey: string,
     data: SubmissionData,
     opts: SubmissionOptions = {}
-  ): Promise<SubmissionResponse> {
+  ): Promise<SubmissionResult<T>> {
     const endpoint = opts.endpoint || 'https://formspree.io';
     const fetchImpl = opts.fetchImpl || fetch;
     const url = this.project
@@ -75,78 +73,110 @@ export class Client {
       headers['Content-Type'] = 'application/json';
     }
 
-    const request = {
-      method: 'POST',
-      mode: 'cors' as const,
-      body: serializeBody(data),
-      headers,
-    };
+    async function makeFormspreeRequest(
+      data: SubmissionData
+    ): Promise<SubmissionResult<T>> {
+      try {
+        const res = await fetchImpl(url, {
+          method: 'POST',
+          mode: 'cors',
+          body: serializeBody(data),
+          headers,
+        });
 
-    // first check if we need to add the stripe paymentMethod
+        const body = await res.json();
+
+        if (typeof body === 'object' && body !== null) {
+          if (isServerErrorResponse(body)) {
+            return Array.isArray(body.error)
+              ? new SubmissionError(...body.error)
+              : new SubmissionError({ message: body.error });
+          }
+
+          if (isServerSuccessResponse(body)) {
+            return new SubmissionSuccess({ next: body.next });
+          }
+        }
+
+        return new SubmissionError({ message: 'Unexpected error' });
+      } catch (err) {
+        const message =
+          err instanceof Error
+            ? err.message
+            : `Unknown error while posting to Formspree: ${err}`;
+        return new SubmissionError({ message: message });
+      }
+    }
+
     if (this.stripePromise && opts.createPaymentMethod) {
-      // Get Stripe payload
       const payload = await opts.createPaymentMethod();
 
       if (payload.error) {
-        // Return the error in case Stripe failed to create a payment method
-        return {
-          response: null,
-          body: {
-            errors: [
-              {
-                code: 'STRIPE_CLIENT_ERROR',
-                message: 'Error creating payment method',
-                field: 'paymentMethod',
-              },
-            ],
-          },
-        };
+        return new SubmissionError({
+          code: 'STRIPE_CLIENT_ERROR',
+          message: 'Error creating payment method',
+          field: 'paymentMethod',
+        });
       }
 
       // Add the paymentMethod to the data
       appendExtraData(data, 'paymentMethod', payload.paymentMethod.id);
 
       // Send a request to Formspree server to handle the payment method
-      const response = await fetchImpl(url, {
-        ...request,
-        body: serializeBody(data),
-      });
-      const responseData = await response.json();
+      // const response = await fetchImpl(url, {
+      //   ...request,
+      //   body: serializeBody(data),
+      // });
+      // const responseData = await response.json();
+      const result = await makeFormspreeRequest(data);
+
+      // if (result.errors) {
+      //   return result;
+      // }
 
       // Handle SCA
-      if (
-        responseData &&
-        responseData.stripe &&
-        responseData.stripe.requiresAction &&
-        responseData.resubmitKey
-      ) {
-        return await handleSCA({
-          stripePromise: this.stripePromise,
-          responseData,
-          response,
-          payload,
-          data,
-          fetchImpl,
-          request,
-          url,
-        });
-      }
+      // if (
+      //   responseData &&
+      //   responseData.stripe &&
+      //   responseData.stripe.requiresAction &&
+      //   responseData.resubmitKey
+      // ) {
+      //   return handleSCA({
+      //     stripePromise: this.stripePromise,
+      //     responseData,
+      //     response,
+      //     payload,
+      //     data,
+      //     fetchImpl,
+      //     request,
+      //     url,
+      //   });
+      // }
 
-      return handleLegacyErrorPayload({
-        response,
-        body: responseData,
-      });
-    } else {
-      return fetchImpl(url, request)
-        .then((response) => {
-          return response
-            .json()
-            .then((body: SubmissionBody): SubmissionResponse => {
-              return handleLegacyErrorPayload({ body, response });
-            });
-        })
-        .catch();
+      // const { data: responseData } = result;
+      // if (
+      //   typeof responseData === 'object' &&
+      //   responseData != null &&
+      //   'stripe' in responseData &&
+      //   typeof responseData.stripe === 'object' &&
+      //   responseData.stripe != null &&
+      //   'requiresAction' in responseData.stripe &&
+      //   'paymentIntentClientSecret' in responseData.stripe &&
+      //   typeof responseData.stripe.paymentIntentClientSecret === 'string'
+      // ) {
+      //   const stripeResult = await this.stripePromise.handleCardAction(
+      //     responseData.stripe.paymentIntentClientSecret
+      //   );
+      // }
+
+      // return handleLegacyErrorPayload({
+      //   response,
+      //   body: responseData,
+      // });
     }
+
+    return makeFormspreeRequest(data);
+    // return handleLegacyErrorPayload({ body, response });
   }
 }
 
