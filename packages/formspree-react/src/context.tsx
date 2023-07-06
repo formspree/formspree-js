@@ -57,11 +57,7 @@ export const FormspreeProvider = (props: FormspreeProviderProps) => {
 
   useEffect(() => {
     client.startBrowserSession();
-
-    return () => {
-      client.teardown();
-    };
-  }, []);
+  }, [client]);
 
   useEffect(() => {
     const getStripePromise = async (stripeKey: string) => {
@@ -80,7 +76,7 @@ export const FormspreeProvider = (props: FormspreeProviderProps) => {
     if (stateStripePromise) {
       setClient(handleCreateClient(stateStripePromise, props.project));
     }
-  }, [stateStripePromise]);
+  }, [props.project, stateStripePromise]);
 
   return (
     <FormspreeContext.Provider value={{ client }}>

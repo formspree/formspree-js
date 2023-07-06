@@ -1,27 +1,25 @@
 import { atob } from './base64';
-import { now } from './utils';
 
+/**
+ * Check whether the user agent is controlled by an automation.
+ */
 const webdriver = (): boolean => {
   return (
     navigator.webdriver ||
     !!document.documentElement.getAttribute(atob('d2ViZHJpdmVy')) ||
-    // @ts-ignore
     !!window.callPhantom ||
-    // @ts-ignore
     !!window._phantom
   );
 };
 
 export class Session {
-  loadedAt: number;
-  webdriver: boolean;
+  private readonly loadedAt: number;
+  private readonly webdriver: boolean;
 
   constructor() {
-    this.loadedAt = now();
+    this.loadedAt = Date.now();
     this.webdriver = webdriver();
   }
-
-  teardown(): void {}
 
   data(): {
     loadedAt: number;
