@@ -22,13 +22,16 @@ export class Client {
   private readonly fetch: typeof window.fetch;
   project: string | undefined;
   stripePromise: Stripe | undefined;
-  private readonly session: Session;
+  private readonly session?: Session;
 
   constructor(config: Config = {}) {
     this.fetch = config.fetch ?? window.fetch;
     this.project = config.project;
     this.stripePromise = config.stripePromise;
-    this.session = new Session();
+
+    if (typeof window !== 'undefined') {
+      this.session = new Session();
+    }
   }
 
   /**
