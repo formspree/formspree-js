@@ -96,13 +96,11 @@ it('fails it initialize without identifying properties', () => {
 it('submits a client name', async () => {
   let submitSpy = jest.fn();
   mockedCreateClient.mockImplementation(() => ({
-    startBrowserSession: () => {},
     submitForm: (_form, _data, opts) => {
       expect(opts.clientName).toBe(`@formspree/react@${version}`);
       submitSpy();
       return success;
     },
-    teardown: () => {},
   }));
 
   act(() => {
@@ -121,12 +119,10 @@ it('submits a client name', async () => {
 
 it('creates the default client if none exists in the context', async () => {
   mockedGetDefaultClient.mockImplementation(() => ({
-    startBrowserSession: () => {},
     submitForm: (form, _data, _opts) => {
       expect(form).toBe('123abc');
       return success;
     },
-    teardown: () => {},
   }));
 
   act(() => {
@@ -139,12 +135,10 @@ it('creates the default client if none exists in the context', async () => {
 
 it('submits successfully form key', async () => {
   mockedCreateClient.mockImplementation(() => ({
-    startBrowserSession: () => {},
     submitForm: (form, _data, _opts) => {
       expect(form).toBe('newsletter');
       return success;
     },
-    teardown: () => {},
   }));
 
   act(() => {
@@ -167,12 +161,10 @@ it('submits successfully form key', async () => {
 
 it('resets successfully', async () => {
   mockedCreateClient.mockImplementation(() => ({
-    startBrowserSession: () => {},
     submitForm: (form, _data, _opts) => {
       expect(form).toBe('newsletter');
       return success;
     },
-    teardown: () => {},
   }));
 
   act(() => {
@@ -200,12 +192,10 @@ it('resets successfully', async () => {
 
 it('appends extra data to form data', async () => {
   mockedCreateClient.mockImplementation(() => ({
-    startBrowserSession: () => {},
     submitForm: (_form, data, _opts) => {
       expect(data.get('extra')).toBe('yep');
       return success;
     },
-    teardown: () => {},
   }));
 
   act(() => {
@@ -222,13 +212,11 @@ it('appends extra data to form data', async () => {
 
 it('evaluates functions passed in data', async () => {
   mockedCreateClient.mockImplementation(() => ({
-    startBrowserSession: () => {},
     submitForm: (_form, data, _opts) => {
       expect(data.get('extraFn')).toBe('yep');
       expect(data.get('extraPromiseFn')).toBe('yep');
       return success;
     },
-    teardown: () => {},
   }));
 
   act(() => {
@@ -257,13 +245,11 @@ it('evaluates functions passed in data', async () => {
 
 it('handles errors in functions passed in data', async () => {
   mockedCreateClient.mockImplementation(() => ({
-    startBrowserSession: () => {},
     submitForm: (_form, data, _opts) => {
       expect(Object.keys(data).includes('extraFn')).toBe(false);
       expect(Object.keys(data).includes('extraPromiseFn')).toBe(false);
       return success;
     },
-    teardown: () => {},
   }));
 
   act(() => {
@@ -299,7 +285,6 @@ it('handles errors in functions passed in data', async () => {
 it('reacts to server-side validation errors', async () => {
   mockedCreateClient.mockImplementation(() => ({
     project: 'xxx',
-    startBrowserSession: () => {},
     submitForm: (_form, _data, _opts) => {
       return new Promise((resolve) => {
         resolve({
@@ -316,7 +301,6 @@ it('reacts to server-side validation errors', async () => {
         });
       });
     },
-    teardown: () => {},
   }));
 
   act(() => {
@@ -339,7 +323,6 @@ it('reacts to server-side validation errors', async () => {
 it('reacts to form disabled errors', async () => {
   mockedCreateClient.mockImplementation(() => ({
     project: 'xxx',
-    startBrowserSession: () => {},
     submitForm: (_form, _data, _opts) => {
       return new Promise((resolve) => {
         resolve({
@@ -355,7 +338,6 @@ it('reacts to form disabled errors', async () => {
         });
       });
     },
-    teardown: () => {},
   }));
 
   act(() => {
@@ -377,14 +359,12 @@ it('reacts to form disabled errors', async () => {
 
 it('allows submit handler to be called with data directly', async () => {
   mockedGetDefaultClient.mockImplementation(() => ({
-    startBrowserSession: () => {},
     submitForm: (form, data, _opts) => {
       expect(form).toBe('123abc');
       expect(data.email).toBe('email@email.com');
       expect(data.extra).toBe(true);
       return success;
     },
-    teardown: () => {},
   }));
 
   function DirectSubmitForm() {
