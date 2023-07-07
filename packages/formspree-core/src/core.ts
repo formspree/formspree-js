@@ -95,7 +95,9 @@ export class Client {
         const message =
           err instanceof Error
             ? err.message
-            : `Unknown error while posting to Formspree: ${err}`;
+            : `Unknown error while posting to Formspree: ${JSON.stringify(
+                err
+              )}`;
         return new SubmissionError({ message: message });
       }
     }

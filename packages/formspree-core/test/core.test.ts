@@ -271,7 +271,8 @@ describe('Client.submitForm', () => {
         const errorResult = result as SubmissionError<typeof data>;
         expect(errorResult.getFormError()).toEqual({
           code: 'UNSPECIFIED',
-          message: 'Unknown error while posting to Formspree: [object Object]',
+          message:
+            'Unknown error while posting to Formspree: {"someKey":"some unknown value"}',
         });
         expect(errorResult.getAllFieldErrors()).toEqual([]);
       });
