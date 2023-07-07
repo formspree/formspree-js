@@ -3,6 +3,7 @@ extends:
   - '../../.eslintrc.yml'
   - plugin:react-hooks/recommended
 ignorePatterns:
+  - jest.config.js
   - dist/
 parserOptions:
   project: './tsconfig.json'
