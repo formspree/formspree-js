@@ -13,28 +13,22 @@ import {
 import { appendExtraData, clientHeader, encode64 } from './utils';
 
 export interface Config {
+  fetch?: typeof window.fetch;
   project?: string;
   stripePromise?: Stripe;
 }
 
 export class Client {
+  private readonly fetch: typeof window.fetch;
   project: string | undefined;
   stripePromise: Stripe | undefined;
-  private session: Session | undefined;
+  private readonly session: Session;
 
   constructor(config: Config = {}) {
+    this.fetch = config.fetch ?? window.fetch;
     this.project = config.project;
     this.stripePromise = config.stripePromise;
-    if (typeof window !== 'undefined') this.startBrowserSession();
-  }
-
-  /**
-   * Starts a browser session.
-   */
-  startBrowserSession(): void {
-    if (!this.session) {
-      this.session = new Session();
-    }
+    this.session = new Session();
   }
 
   /**
@@ -50,7 +44,7 @@ export class Client {
     opts: SubmissionOptions = {}
   ): Promise<SubmissionResult<T>> {
     const endpoint = opts.endpoint || 'https://formspree.io';
-    const fetchImpl = opts.fetchImpl || fetch;
+    const fetch = this.fetch;
     const url = this.project
       ? `${endpoint}/p/${this.project}/f/${formKey}`
       : `${endpoint}/f/${formKey}`;
@@ -72,7 +66,7 @@ export class Client {
       data: SubmissionData<T>
     ): Promise<SubmissionResult<T>> {
       try {
-        const res = await fetchImpl(url, {
+        const res = await fetch(url, {
           method: 'POST',
           mode: 'cors',
           body: data instanceof FormData ? data : JSON.stringify(data),
@@ -83,8 +77,8 @@ export class Client {
 
         if (typeof body === 'object' && body !== null) {
           if (isServerErrorResponse(body)) {
-            return Array.isArray(body.error)
-              ? new SubmissionError(...body.error)
+            return Array.isArray(body.errors)
+              ? new SubmissionError(...body.errors)
               : new SubmissionError({ message: body.error });
           }
 

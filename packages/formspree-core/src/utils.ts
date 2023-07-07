@@ -27,7 +27,7 @@ export function appendExtraData(
   formData: SubmissionData,
   prop: string,
   value: string
-) {
+): void {
   if (formData instanceof FormData) {
     formData.append(prop, value);
   } else {

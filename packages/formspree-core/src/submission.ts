@@ -18,7 +18,6 @@ export type FieldValues = Record<
 export type SubmissionOptions = {
   endpoint?: string;
   clientName?: string;
-  fetchImpl?: typeof fetch;
   createPaymentMethod?: () => Promise<PaymentMethodResult>;
 };
 
@@ -99,7 +98,7 @@ export class SubmissionError<T extends FieldValues> {
 }
 */
 
-type FormError = {
+export type FormError = {
   readonly code: FormErrorCode | 'UNSPECIFIED';
   readonly message: string;
   // metadata: Record<string, string>;
@@ -127,7 +126,7 @@ export const FormErrorCodeEnum = {
 
 // export type FieldErrors<T extends FieldValues> = Record<keyof T, FieldError>;
 
-type FieldError = {
+export type FieldError = {
   readonly code: FieldErrorCode | 'UNSPECIFIED';
   readonly message: string;
   // metadata: Record<string, string>;
