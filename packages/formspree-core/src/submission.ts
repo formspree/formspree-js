@@ -22,31 +22,33 @@ export type SubmissionOptions = {
 };
 
 export type SubmissionResult<T extends FieldValues> =
-  | SubmissionSuccess
-  | SubmissionError<T>;
+  | SubmissionRedirectResult
+  | SubmissionErrorResult<T>;
 
-export class SubmissionSuccess {
-  readonly ok = true;
+export class SubmissionRedirectResult {
+  readonly kind = 'redirect';
   readonly next: string;
 
-  constructor(serverResponse: ServerSuccessResponse) {
+  constructor(serverResponse: ServerRedirectResponse) {
     this.next = serverResponse.next;
   }
 }
 
-type ServerSuccessResponse = { next: string };
+// export class SubmissionStripePend
 
-export function isServerSuccessResponse(
+type ServerRedirectResponse = { next: string };
+
+export function isServerRedirectResponse(
   obj: object
-): obj is ServerSuccessResponse {
+): obj is ServerRedirectResponse {
   return 'next' in obj && typeof obj.next === 'string';
 }
 
-export class SubmissionError<T extends FieldValues> {
+export class SubmissionErrorResult<T extends FieldValues> {
   private formError?: FormError;
   private readonly fieldErrors: Map<keyof T, FieldError> = new Map();
 
-  readonly ok = false;
+  readonly kind = 'error';
 
   constructor(...serverErrors: ServerError[]) {
     for (const err of serverErrors) {

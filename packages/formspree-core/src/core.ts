@@ -1,10 +1,10 @@
 import type { Stripe } from '@stripe/stripe-js';
 import { Session } from './session';
 import {
-  SubmissionError,
-  SubmissionSuccess,
+  SubmissionErrorResult,
+  SubmissionRedirectResult,
   isServerErrorResponse,
-  isServerSuccessResponse,
+  isServerRedirectResponse,
   type FieldValues,
   type SubmissionData,
   type SubmissionOptions,
@@ -81,16 +81,16 @@ export class Client {
         if (typeof body === 'object' && body !== null) {
           if (isServerErrorResponse(body)) {
             return Array.isArray(body.errors)
-              ? new SubmissionError(...body.errors)
-              : new SubmissionError({ message: body.error });
+              ? new SubmissionErrorResult(...body.errors)
+              : new SubmissionErrorResult({ message: body.error });
           }
 
-          if (isServerSuccessResponse(body)) {
-            return new SubmissionSuccess({ next: body.next });
+          if (isServerRedirectResponse(body)) {
+            return new SubmissionRedirectResult({ next: body.next });
           }
         }
 
-        return new SubmissionError({ message: 'Unexpected error' });
+        return new SubmissionErrorResult({ message: 'Unexpected error' });
       } catch (err) {
         const message =
           err instanceof Error
@@ -98,7 +98,7 @@ export class Client {
             : `Unknown error while posting to Formspree: ${JSON.stringify(
                 err
               )}`;
-        return new SubmissionError({ message: message });
+        return new SubmissionErrorResult({ message: message });
       }
     }
 
@@ -106,7 +106,7 @@ export class Client {
       const payload = await opts.createPaymentMethod();
 
       if (payload.error) {
-        return new SubmissionError({
+        return new SubmissionErrorResult({
           code: 'STRIPE_CLIENT_ERROR',
           message: 'Error creating payment method',
           field: 'paymentMethod',
@@ -119,7 +119,7 @@ export class Client {
       // Send a request to Formspree server to handle the payment method
       const result = await makeFormspreeRequest(data);
 
-      if (!result.ok) {
+      if (result.kind === 'error') {
         return result;
       }
 
@@ -174,12 +174,6 @@ export const createClient = (config?: Config): Client => new Client(config);
 export const getDefaultClient = (): Client => {
   if (!defaultClientSingleton) {
     defaultClientSingleton = createClient();
-    // TEMPORARY: testing type
-    const data = { email: '', password: '' };
-    defaultClientSingleton.submitForm('', data).then((result) => {
-      appendExtraData(data, 'foo', 'bar');
-      console.log(result.ok ? result.next : result.getFieldError('email'));
-    });
   }
   return defaultClientSingleton;
 };

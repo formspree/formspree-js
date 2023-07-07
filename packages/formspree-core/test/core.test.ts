@@ -2,8 +2,8 @@ import { version } from '../package.json';
 import { createClient, type Client, type Config } from '../src/core';
 import {
   FormErrorCodeEnum,
-  SubmissionError,
-  SubmissionSuccess,
+  SubmissionErrorResult,
+  SubmissionRedirectResult,
   type FieldError,
   type FormError,
   type ServerErrorResponse,
@@ -209,8 +209,8 @@ describe('Client.submitForm', () => {
       const data = {};
       const result = await client.submitForm('test-form-id', data);
 
-      expect(result).toBeInstanceOf(SubmissionError);
-      const errorResult = result as SubmissionError<typeof data>;
+      expect(result).toBeInstanceOf(SubmissionErrorResult);
+      const errorResult = result as SubmissionErrorResult<typeof data>;
       expect(errorResult.getFormError()).toEqual(expected.formError);
       expect(errorResult.getAllFieldErrors()).toEqual(expected.fieldErrors);
     });
@@ -229,8 +229,8 @@ describe('Client.submitForm', () => {
       const data = { email: 'test@example.com' };
       const result = await client.submitForm('test-form-id', data);
 
-      expect(result).toBeInstanceOf(SubmissionError);
-      const errorResult = result as SubmissionError<typeof data>;
+      expect(result).toBeInstanceOf(SubmissionErrorResult);
+      const errorResult = result as SubmissionErrorResult<typeof data>;
       expect(errorResult.getFormError()).toEqual({
         code: 'UNSPECIFIED',
         message: 'Unexpected error',
@@ -249,8 +249,8 @@ describe('Client.submitForm', () => {
         const data = { email: 'test@example.com' };
         const result = await client.submitForm('test-form-id', {});
 
-        expect(result).toBeInstanceOf(SubmissionError);
-        const errorResult = result as SubmissionError<typeof data>;
+        expect(result).toBeInstanceOf(SubmissionErrorResult);
+        const errorResult = result as SubmissionErrorResult<typeof data>;
         expect(errorResult.getFormError()).toEqual({
           code: 'UNSPECIFIED',
           message: errMessage,
@@ -267,8 +267,8 @@ describe('Client.submitForm', () => {
         const data = { email: 'test@example.com' };
         const result = await client.submitForm('test-form-id', {});
 
-        expect(result).toBeInstanceOf(SubmissionError);
-        const errorResult = result as SubmissionError<typeof data>;
+        expect(result).toBeInstanceOf(SubmissionErrorResult);
+        const errorResult = result as SubmissionErrorResult<typeof data>;
         expect(errorResult.getFormError()).toEqual({
           code: 'UNSPECIFIED',
           message:
@@ -279,7 +279,7 @@ describe('Client.submitForm', () => {
     });
   });
 
-  describe('when the server returns a success (redirect) response', () => {
+  describe('when the server returns a redirect response', () => {
     const responseBody = { next: 'test-redirect-url' };
 
     beforeEach(() => {
@@ -290,15 +290,15 @@ describe('Client.submitForm', () => {
       );
     });
 
-    it('resolves to a SubmissionSuccess result', async () => {
+    it('resolves to a SubmissionRedirectResult', async () => {
       const client = createTestClient();
       const data = { email: 'test@example.com' };
       const result = await client.submitForm('test-form-id', data);
 
-      expect(result).toBeInstanceOf(SubmissionSuccess);
-      const successResult = result as SubmissionSuccess;
-      expect(successResult.ok).toBe(true);
-      expect(successResult.next).toEqual(responseBody.next);
+      expect(result).toBeInstanceOf(SubmissionRedirectResult);
+      const redirectResult = result as SubmissionRedirectResult;
+      expect(redirectResult.kind).toBe('redirect');
+      expect(redirectResult.next).toEqual(responseBody.next);
     });
   });
 });

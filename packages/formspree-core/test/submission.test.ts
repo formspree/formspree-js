@@ -1,12 +1,12 @@
 import {
   FieldErrorCodeEnum,
   FormErrorCodeEnum,
-  SubmissionError,
+  SubmissionErrorResult,
 } from '../src/submission';
 
-describe('SubmissionError', () => {
+describe('SubmissionErrorResult', () => {
   test('no server errors', () => {
-    const err = new SubmissionError();
+    const err = new SubmissionErrorResult();
     expect(err.getFormError()).toBeUndefined();
     expect(err.getFieldError('')).toBeUndefined();
     expect(err.getFieldError('some-key')).toBeUndefined();
@@ -14,7 +14,7 @@ describe('SubmissionError', () => {
   });
 
   test('with one form error', () => {
-    const err = new SubmissionError({ message: '(test) unknown error' });
+    const err = new SubmissionErrorResult({ message: '(test) unknown error' });
     expect(err.getFormError()).toEqual({
       code: 'UNSPECIFIED',
       message: '(test) unknown error',
@@ -25,7 +25,7 @@ describe('SubmissionError', () => {
   });
 
   test('with one form error, with code', () => {
-    const err = new SubmissionError({
+    const err = new SubmissionErrorResult({
       code: FormErrorCodeEnum.EMPTY,
       message: '(test) empty form',
     });
@@ -39,7 +39,7 @@ describe('SubmissionError', () => {
   });
 
   test('with one field error', () => {
-    const err = new SubmissionError({
+    const err = new SubmissionErrorResult({
       field: 'some-key',
       message: '(test) the field is required',
     });
@@ -60,7 +60,7 @@ describe('SubmissionError', () => {
   });
 
   test('with one field error, with code', () => {
-    const err = new SubmissionError({
+    const err = new SubmissionErrorResult({
       code: FieldErrorCodeEnum.REQUIRED_FIELD_EMPTY,
       field: 'some-key',
       message: '(test) the field is required',
@@ -82,7 +82,7 @@ describe('SubmissionError', () => {
   });
 
   test('with a mix of a form error and multiple field errors', () => {
-    const err = new SubmissionError(
+    const err = new SubmissionErrorResult(
       {
         code: FieldErrorCodeEnum.REQUIRED_FIELD_EMPTY,
         field: 'some-key',
