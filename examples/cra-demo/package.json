@@ -2,27 +2,12 @@
   "name": "@formspree/cra-demo",
   "version": "0.1.0",
   "private": true,
-  "dependencies": {
-    "@formspree/react": "*",
-    "react": "^18.2.0",
-    "react-copy-to-clipboard": "^5.1.0",
-    "react-dom": "^18.2.0",
-    "react-google-recaptcha-v3": "^1.10.1",
-    "react-scripts": "5.0.1",
-    "web-vitals": "^2.1.4"
-  },
   "scripts": {
-    "dev": "react-scripts start",
-    "start": "react-scripts start",
     "build": "react-scripts build",
+    "clean": "rm -rf build && rm -rf node_modules",
+    "dev": "react-scripts start",
     "eject": "react-scripts eject",
-    "clean": "rm -rf build && rm -rf node_modules"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+    "start": "react-scripts start"
   },
   "browserslist": {
     "production": [
@@ -36,15 +21,25 @@
       "last 1 safari version"
     ]
   },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "dependencies": {
+    "@formspree/react": "*",
+    "react": "^18.2.0",
+    "react-copy-to-clipboard": "^5.1.0",
+    "react-dom": "^18.2.0",
+    "react-google-recaptcha-v3": "^1.10.1",
+    "react-scripts": "5.0.1",
+    "web-vitals": "^2.1.4"
+  },
   "devDependencies": {
     "@babel/core": "^7.22.1",
     "@babel/plugin-syntax-flow": "^7.21.4",
     "@babel/plugin-transform-react-jsx": "^7.22.0",
-    "@testing-library/dom": "^9.3.0",
-    "@testing-library/jest-dom": "^5.16.4",
-    "@testing-library/react": "^13.3.0",
-    "@testing-library/user-event": "^13.5.0",
-    "@types/jest": "^27.5.2",
     "@types/node": "^16.11.42",
     "@types/react": "^18.0.14",
     "@types/react-copy-to-clipboard": "^5.0.3",
