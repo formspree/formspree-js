@@ -115,17 +115,11 @@ export class Client {
       appendExtraData(data, 'paymentMethod', payload.paymentMethod.id);
 
       // Send a request to Formspree server to handle the payment method
-      // const response = await fetchImpl(url, {
-      //   ...request,
-      //   body: serializeBody(data),
-      // });
-      // const responseData = await response.json();
+      const result = await makeFormspreeRequest(data);
 
-      // const result = await makeFormspreeRequest(data);
-
-      // if (result.errors) {
-      //   return result;
-      // }
+      if (!result.ok) {
+        return result;
+      }
 
       // Handle SCA
       // if (
@@ -161,15 +155,9 @@ export class Client {
       //     responseData.stripe.paymentIntentClientSecret
       //   );
       // }
-
-      // return handleLegacyErrorPayload({
-      //   response,
-      //   body: responseData,
-      // });
     }
 
     return makeFormspreeRequest(data);
-    // return handleLegacyErrorPayload({ body, response });
   }
 }
 
