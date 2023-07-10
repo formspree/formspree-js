@@ -56,8 +56,8 @@ function TestForm(props: TestFormProps) {
 describe('useForm', () => {
   const mockedFetch = jest.spyOn(window, 'fetch');
 
-  afterEach(() => {
-    mockedFetch.mockRestore();
+  beforeEach(() => {
+    mockedFetch.mockReset();
   });
 
   describe('given a successful submission', () => {
