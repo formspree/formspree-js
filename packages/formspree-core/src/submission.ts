@@ -71,18 +71,18 @@ export function isServerStripePluginPendingResponse(
 export class SubmissionErrorResult<T extends FieldValues> {
   readonly kind = 'error';
 
-  private formError?: FormError;
+  private readonly formErrors: FormError[] = [];
   private readonly fieldErrors: Map<keyof T, FieldError> = new Map();
 
   constructor(...serverErrors: ServerError[]) {
     for (const err of serverErrors) {
-      // form error
+      // form errors
       if (!err.field) {
-        this.formError = {
+        this.formErrors.push({
           code:
             err.code && isFormErrorCode(err.code) ? err.code : 'UNSPECIFIED',
           message: err.message,
-        };
+        });
         continue;
       }
 
@@ -93,8 +93,8 @@ export class SubmissionErrorResult<T extends FieldValues> {
     }
   }
 
-  getFormError(): FormError | undefined {
-    return this.formError;
+  getFormErrors(): readonly FormError[] {
+    return [...this.formErrors];
   }
 
   getFieldError<K extends keyof T>(field: K): FieldError | undefined {
