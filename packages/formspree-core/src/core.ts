@@ -21,13 +21,13 @@ export interface Config {
 }
 
 export class Client {
-  private readonly fetch: typeof window.fetch;
+  private readonly fetch?: typeof window.fetch;
   project: string | undefined;
   stripePromise: Stripe | undefined;
   private readonly session?: Session;
 
   constructor(config: Config = {}) {
-    this.fetch = config.fetch ?? window.fetch;
+    this.fetch = config.fetch;
     this.project = config.project;
     this.stripePromise = config.stripePromise;
 
@@ -49,7 +49,7 @@ export class Client {
     opts: SubmissionOptions = {}
   ): Promise<SubmissionResult<T>> {
     const endpoint = opts.endpoint || 'https://formspree.io';
-    const fetch = this.fetch;
+    const fetch = this.fetch ?? window.fetch;
     const url = this.project
       ? `${endpoint}/p/${this.project}/f/${formKey}`
       : `${endpoint}/f/${formKey}`;
