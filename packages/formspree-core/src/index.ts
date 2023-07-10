@@ -5,4 +5,13 @@ export {
   type Config,
 } from './core';
 
-export { type SubmissionData } from './submission';
+export {
+  SubmissionErrorResult,
+  type FieldValues,
+  type SubmissionData,
+  type SubmissionOptions,
+  type SubmissionRedirectResult,
+  type SubmissionResult,
+} from './submission';
+
+export { appendExtraData } from './utils';

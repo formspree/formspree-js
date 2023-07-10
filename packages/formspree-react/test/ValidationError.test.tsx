@@ -1,6 +1,7 @@
+import { SubmissionErrorResult } from '@formspree/core';
+import { act } from '@testing-library/react';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { act } from '@testing-library/react';
 import { ValidationError } from '../src';
 
 let container: HTMLElement;
@@ -21,13 +22,13 @@ it('renders a field error if one exists', () => {
         prefix="Email"
         field="email"
         className="error"
-        errors={[
-          {
+        errors={
+          new SubmissionErrorResult({
             field: 'email',
             message: 'is required',
             code: 'REQUIRED_FIELD_MISSING',
-          },
-        ]}
+          })
+        }
       />
     );
   });
@@ -40,12 +41,12 @@ it('renders field-less errors', () => {
     ReactDOM.createRoot(container).render(
       <ValidationError
         className="error"
-        errors={[
-          {
+        errors={
+          new SubmissionErrorResult({
             message: 'Form is disabled',
             code: 'INACTIVE',
-          },
-        ]}
+          })
+        }
       />
     );
   });
@@ -59,13 +60,13 @@ it('does not render anything if the field does not have an error', () => {
       <ValidationError
         prefix="Email"
         field="email"
-        errors={[
-          {
+        errors={
+          new SubmissionErrorResult({
             field: 'name',
             message: 'is required',
             code: 'REQUIRED_FIELD_MISSING',
-          },
-        ]}
+          })
+        }
       />
     );
   });

@@ -4,6 +4,7 @@ extends:
   - plugin:react-hooks/recommended
 ignorePatterns:
   - jest.config.js
+  - jest.setup.js
   - dist/
 parserOptions:
   project: './tsconfig.json'
