@@ -72,7 +72,7 @@ export class SubmissionErrorResult<T extends FieldValues> {
   readonly kind = 'error';
 
   private readonly formErrors: FormError[] = [];
-  private readonly fieldErrors: Map<keyof T, FieldError> = new Map();
+  private readonly fieldErrors: Map<keyof T, FieldError[]> = new Map();
 
   constructor(...serverErrors: ServerError[]) {
     for (const err of serverErrors) {
@@ -86,10 +86,12 @@ export class SubmissionErrorResult<T extends FieldValues> {
         continue;
       }
 
-      this.fieldErrors.set(err.field, {
+      const fieldErrors = this.fieldErrors.get(err.field) ?? [];
+      fieldErrors.push({
         code: err.code && isFieldErrorCode(err.code) ? err.code : 'UNSPECIFIED',
         message: err.message,
       });
+      this.fieldErrors.set(err.field, fieldErrors);
     }
   }
 
@@ -97,11 +99,11 @@ export class SubmissionErrorResult<T extends FieldValues> {
     return [...this.formErrors];
   }
 
-  getFieldError<K extends keyof T>(field: K): FieldError | undefined {
-    return this.fieldErrors.get(field);
+  getFieldErrors<K extends keyof T>(field: K): readonly FieldError[] {
+    return this.fieldErrors.get(field) ?? [];
   }
 
-  getAllFieldErrors(): [keyof T, FieldError][] {
+  getAllFieldErrors(): readonly [keyof T, readonly FieldError[]][] {
     return Array.from(this.fieldErrors);
   }
 }
