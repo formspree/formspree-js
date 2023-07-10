@@ -123,8 +123,8 @@ describe('Client.submitForm', () => {
         status: number;
       };
       expected: {
-        formError: FormError | undefined;
-        fieldErrors: [string, FieldError][];
+        formErrors: FormError[];
+        fieldErrors: [string, FieldError[]][];
       };
     };
 
@@ -136,10 +136,12 @@ describe('Client.submitForm', () => {
           status: 403,
         },
         expected: {
-          formError: {
-            code: 'UNSPECIFIED',
-            message: 'not authorized (legacy)',
-          },
+          formErrors: [
+            {
+              code: 'UNSPECIFIED',
+              message: 'not authorized (legacy)',
+            },
+          ],
           fieldErrors: [],
         },
       },
@@ -153,7 +155,7 @@ describe('Client.submitForm', () => {
           status: 400,
         },
         expected: {
-          formError: { code: 'UNSPECIFIED', message: 'bad submission' },
+          formErrors: [{ code: 'UNSPECIFIED', message: 'bad submission' }],
           fieldErrors: [],
         },
       },
@@ -182,21 +184,27 @@ describe('Client.submitForm', () => {
           status: 400,
         },
         expected: {
-          formError: { code: FormErrorCodeEnum.EMPTY, message: 'empty form' },
+          formErrors: [
+            { code: FormErrorCodeEnum.EMPTY, message: 'empty form' },
+          ],
           fieldErrors: [
             [
               'some-field',
-              {
-                code: FieldErrorCodeEnum.TYPE_EMAIL,
-                message: 'must be an email',
-              },
+              [
+                {
+                  code: FieldErrorCodeEnum.TYPE_EMAIL,
+                  message: 'must be an email',
+                },
+              ],
             ],
             [
               'some-other-field',
-              {
-                code: FieldErrorCodeEnum.REQUIRED_FIELD_MISSING,
-                message: 'field missing',
-              },
+              [
+                {
+                  code: FieldErrorCodeEnum.REQUIRED_FIELD_MISSING,
+                  message: 'field missing',
+                },
+              ],
             ],
           ],
         },
@@ -217,7 +225,7 @@ describe('Client.submitForm', () => {
 
       expect(result).toBeInstanceOf(SubmissionErrorResult);
       const errorResult = result as SubmissionErrorResult<typeof data>;
-      expect(errorResult.getFormError()).toEqual(expected.formError);
+      expect(errorResult.getFormErrors()).toEqual(expected.formErrors);
       expect(errorResult.getAllFieldErrors()).toEqual(expected.fieldErrors);
     });
   });
@@ -237,10 +245,12 @@ describe('Client.submitForm', () => {
 
       expect(result).toBeInstanceOf(SubmissionErrorResult);
       const errorResult = result as SubmissionErrorResult<typeof data>;
-      expect(errorResult.getFormError()).toEqual({
-        code: 'UNSPECIFIED',
-        message: 'Unexpected error',
-      });
+      expect(errorResult.getFormErrors()).toEqual([
+        {
+          code: 'UNSPECIFIED',
+          message: 'Unexpected response format',
+        },
+      ]);
       expect(errorResult.getAllFieldErrors()).toEqual([]);
     });
   });
@@ -257,10 +267,12 @@ describe('Client.submitForm', () => {
 
         expect(result).toBeInstanceOf(SubmissionErrorResult);
         const errorResult = result as SubmissionErrorResult<typeof data>;
-        expect(errorResult.getFormError()).toEqual({
-          code: 'UNSPECIFIED',
-          message: errMessage,
-        });
+        expect(errorResult.getFormErrors()).toEqual([
+          {
+            code: 'UNSPECIFIED',
+            message: errMessage,
+          },
+        ]);
         expect(errorResult.getAllFieldErrors()).toEqual([]);
       });
     });
@@ -275,11 +287,13 @@ describe('Client.submitForm', () => {
 
         expect(result).toBeInstanceOf(SubmissionErrorResult);
         const errorResult = result as SubmissionErrorResult<typeof data>;
-        expect(errorResult.getFormError()).toEqual({
-          code: 'UNSPECIFIED',
-          message:
-            'Unknown error while posting to Formspree: {"someKey":"some unknown value"}',
-        });
+        expect(errorResult.getFormErrors()).toEqual([
+          {
+            code: 'UNSPECIFIED',
+            message:
+              'Unknown error while posting to Formspree: {"someKey":"some unknown value"}',
+          },
+        ]);
         expect(errorResult.getAllFieldErrors()).toEqual([]);
       });
     });
@@ -330,14 +344,16 @@ describe('Client.submitForm', () => {
 
         expect(result).toBeInstanceOf(SubmissionErrorResult);
         const errorResult = result as SubmissionErrorResult<typeof data>;
-        expect(errorResult.getFormError()).toBeUndefined();
+        expect(errorResult.getFormErrors()).toEqual([]);
         expect(errorResult.getAllFieldErrors()).toEqual([
           [
             'paymentMethod',
-            {
-              code: 'STRIPE_CLIENT_ERROR',
-              message: 'Error creating payment method',
-            },
+            [
+              {
+                code: 'STRIPE_CLIENT_ERROR',
+                message: 'Error creating payment method',
+              },
+            ],
           ],
         ]);
       });
@@ -395,14 +411,16 @@ describe('Client.submitForm', () => {
 
           expect(result).toBeInstanceOf(SubmissionErrorResult);
           const errorResult = result as SubmissionErrorResult<typeof data>;
-          expect(errorResult.getFormError()).toBeUndefined();
+          expect(errorResult.getFormErrors()).toEqual([]);
           expect(errorResult.getAllFieldErrors()).toEqual([
             [
               'paymentMethod',
-              {
-                code: 'STRIPE_CLIENT_ERROR',
-                message: 'Stripe SCA error',
-              },
+              [
+                {
+                  code: 'STRIPE_CLIENT_ERROR',
+                  message: 'Stripe SCA error',
+                },
+              ],
             ],
           ]);
         });
