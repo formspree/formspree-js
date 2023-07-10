@@ -99,7 +99,9 @@ export class Client {
           }
         }
 
-        return new SubmissionErrorResult({ message: 'Unexpected error' });
+        return new SubmissionErrorResult({
+          message: 'Unexpected response format',
+        });
       } catch (err) {
         const message =
           err instanceof Error
