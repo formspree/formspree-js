@@ -1,13 +1,5 @@
 import type { PaymentMethodResult } from '@stripe/stripe-js';
 
-/*
-export type SubmitForm = <T extends FieldValues>(
-  formKey: string,
-  data: SubmissionData<T>, // ...
-  opts?: SubmissionOptions
-) => Promise<SubmissionResult<T>>;
-*/
-
 export type SubmissionData<T extends FieldValues = FieldValues> = FormData | T;
 
 export type FieldValues = Record<
@@ -23,6 +15,7 @@ export type SubmissionOptions = {
 
 export type SubmissionResult<T extends FieldValues> =
   | SubmissionRedirectResult
+  | SubmissionStripePluginPendingResult
   | SubmissionErrorResult<T>;
 
 export class SubmissionRedirectResult {
@@ -34,14 +27,50 @@ export class SubmissionRedirectResult {
   }
 }
 
-// export class SubmissionStripePend
-
 type ServerRedirectResponse = { next: string };
 
 export function isServerRedirectResponse(
   obj: object
 ): obj is ServerRedirectResponse {
   return 'next' in obj && typeof obj.next === 'string';
+}
+
+export class SubmissionStripePluginPendingResult {
+  readonly kind = 'stripePluginPending';
+
+  constructor(
+    readonly paymentIntentClientSecret: string,
+    readonly resubmitKey: string
+  ) {}
+}
+
+type ServerStripePluginPendingResponse = {
+  stripe: {
+    paymentIntentClientSecret: string;
+    requiresAction: boolean;
+  };
+  resubmitKey: string;
+};
+
+export function isServerStripePluginPendingResponse(
+  obj: object
+): obj is ServerStripePluginPendingResponse {
+  if (
+    'stripe' in obj &&
+    'resubmitKey' in obj &&
+    typeof obj.resubmitKey === 'string'
+  ) {
+    const { stripe } = obj;
+    return (
+      typeof stripe === 'object' &&
+      stripe != null &&
+      'paymentIntentClientSecret' in stripe &&
+      typeof stripe.paymentIntentClientSecret === 'string' &&
+      'requiresAction' in stripe &&
+      typeof stripe.requiresAction === 'boolean'
+    );
+  }
+  return false;
 }
 
 export class SubmissionErrorResult<T extends FieldValues> {
@@ -159,21 +188,9 @@ export type ServerErrorResponse = {
 
 type ServerError = {
   code?: string;
+  details?: Record<string, string>;
   field?: string;
   message: string;
 };
 
 type ValueOf<T> = T[keyof T];
-
-/**
- * Draft
- */
-
-export interface StripePaymentError {
-  code: 'STRIPE_PAYMENT_ERROR';
-  details: {
-    stripeCode: string;
-  };
-  field: 'paymentMethod';
-  message: string;
-}

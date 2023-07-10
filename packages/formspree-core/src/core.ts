@@ -3,8 +3,10 @@ import { Session } from './session';
 import {
   SubmissionErrorResult,
   SubmissionRedirectResult,
+  SubmissionStripePluginPendingResult,
   isServerErrorResponse,
   isServerRedirectResponse,
+  isServerStripePluginPendingResponse,
   type FieldValues,
   type SubmissionData,
   type SubmissionOptions,
@@ -85,6 +87,13 @@ export class Client {
               : new SubmissionErrorResult({ message: body.error });
           }
 
+          if (isServerStripePluginPendingResponse(body)) {
+            return new SubmissionStripePluginPendingResult(
+              body.stripe.paymentIntentClientSecret,
+              body.resubmitKey
+            );
+          }
+
           if (isServerRedirectResponse(body)) {
             return new SubmissionRedirectResult({ next: body.next });
           }
@@ -123,40 +132,27 @@ export class Client {
         return result;
       }
 
-      // Handle SCA
-      // if (
-      //   responseData &&
-      //   responseData.stripe &&
-      //   responseData.stripe.requiresAction &&
-      //   responseData.resubmitKey
-      // ) {
-      //   return handleSCA({
-      //     stripePromise: this.stripePromise,
-      //     responseData,
-      //     response,
-      //     payload,
-      //     data,
-      //     fetchImpl,
-      //     request,
-      //     url,
-      //   });
-      // }
+      if (result.kind === 'stripePluginPending') {
+        const stripeResult = await this.stripePromise.handleCardAction(
+          result.paymentIntentClientSecret
+        );
 
-      // const { data: responseData } = result;
-      // if (
-      //   typeof responseData === 'object' &&
-      //   responseData != null &&
-      //   'stripe' in responseData &&
-      //   typeof responseData.stripe === 'object' &&
-      //   responseData.stripe != null &&
-      //   'requiresAction' in responseData.stripe &&
-      //   'paymentIntentClientSecret' in responseData.stripe &&
-      //   typeof responseData.stripe.paymentIntentClientSecret === 'string'
-      // ) {
-      //   const stripeResult = await this.stripePromise.handleCardAction(
-      //     responseData.stripe.paymentIntentClientSecret
-      //   );
-      // }
+        if (stripeResult.error) {
+          return new SubmissionErrorResult({
+            code: 'STRIPE_CLIENT_ERROR',
+            field: 'paymentMethod',
+            message: 'Stripe SCA error',
+          });
+        }
+
+        appendExtraData(data, 'paymentIntent', stripeResult.paymentIntent.id);
+        appendExtraData(data, 'resubmitKey', result.resubmitKey);
+
+        // Resubmit the form with the paymentIntent and resubmitKey
+        return makeFormspreeRequest(data);
+      }
+
+      // Otherwise, let it falls through.
     }
 
     return makeFormspreeRequest(data);
