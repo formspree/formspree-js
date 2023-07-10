@@ -108,28 +108,9 @@ export class SubmissionErrorResult<T extends FieldValues> {
   }
 }
 
-/*
-{
-  errors: {
-    _$root: FormError { code, message: "..." },
-    email: FieldError { code, message: "..." },
-    password: FieldError { code, message: "..." },
-  }
-}
-
-{
-  errors: [
-    FormError { code, message: "..." },
-    FieldError { code, field: "email", message: "..." },
-    FieldError { code, field: "password", message: "..." },
-  ]
-}
-*/
-
 export type FormError = {
   readonly code: FormErrorCode | 'UNSPECIFIED';
   readonly message: string;
-  // metadata: Record<string, string>;
 };
 
 function isFormErrorCode(code: string): code is FormErrorCode {
@@ -152,12 +133,9 @@ export const FormErrorCodeEnum = {
   STRIPE_SCA_ERROR: 'STRIPE_SCA_ERROR',
 } as const;
 
-// export type FieldErrors<T extends FieldValues> = Record<keyof T, FieldError>;
-
 export type FieldError = {
   readonly code: FieldErrorCode | 'UNSPECIFIED';
   readonly message: string;
-  // metadata: Record<string, string>;
 };
 
 function isFieldErrorCode(code: string): code is FieldErrorCode {

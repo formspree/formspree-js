@@ -1,4 +1,3 @@
-// import type { PaymentMethod, Stripe } from '@stripe/stripe-js';
 import { version } from '../package.json';
 import { btoa } from './base64';
 import type { SubmissionData } from './submission';
