@@ -8,9 +8,9 @@ export type FieldValues = Record<
 >;
 
 export type SubmissionOptions = {
-  endpoint?: string;
   clientName?: string;
   createPaymentMethod?: () => Promise<PaymentMethodResult>;
+  endpoint?: string;
 };
 
 export type SubmissionResult<T extends FieldValues> =
