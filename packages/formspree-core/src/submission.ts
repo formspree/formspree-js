@@ -108,6 +108,8 @@ export class SubmissionErrorResult<T extends FieldValues> {
   }
 }
 
+export const emptySubmissionErrorResult = new SubmissionErrorResult();
+
 export type FormError = {
   readonly code: FormErrorCode | 'UNSPECIFIED';
   readonly message: string;
@@ -156,7 +158,12 @@ export const FieldErrorCodeEnum = {
 } as const;
 
 export function isServerErrorResponse(obj: object): obj is ServerErrorResponse {
-  return 'error' in obj && typeof obj.error === 'string';
+  return (
+    ('errors' in obj &&
+      Array.isArray(obj.errors) &&
+      obj.errors.every((err) => typeof err.message === 'string')) ||
+    ('error' in obj && typeof obj.error === 'string')
+  );
 }
 
 export type ServerErrorResponse = {
