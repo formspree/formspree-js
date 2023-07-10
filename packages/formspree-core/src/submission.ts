@@ -44,12 +44,9 @@ export class SubmissionStripePluginPendingResult {
   ) {}
 }
 
-type ServerStripePluginPendingResponse = {
-  stripe: {
-    paymentIntentClientSecret: string;
-    requiresAction: boolean;
-  };
+export type ServerStripePluginPendingResponse = {
   resubmitKey: string;
+  stripe: { paymentIntentClientSecret: string };
 };
 
 export function isServerStripePluginPendingResponse(
@@ -65,19 +62,17 @@ export function isServerStripePluginPendingResponse(
       typeof stripe === 'object' &&
       stripe != null &&
       'paymentIntentClientSecret' in stripe &&
-      typeof stripe.paymentIntentClientSecret === 'string' &&
-      'requiresAction' in stripe &&
-      typeof stripe.requiresAction === 'boolean'
+      typeof stripe.paymentIntentClientSecret === 'string'
     );
   }
   return false;
 }
 
 export class SubmissionErrorResult<T extends FieldValues> {
+  readonly kind = 'error';
+
   private formError?: FormError;
   private readonly fieldErrors: Map<keyof T, FieldError> = new Map();
-
-  readonly kind = 'error';
 
   constructor(...serverErrors: ServerError[]) {
     for (const err of serverErrors) {
@@ -175,6 +170,9 @@ export const FieldErrorCodeEnum = {
   TYPE_EMAIL: 'TYPE_EMAIL',
   TYPE_NUMERIC: 'TYPE_NUMERIC',
   TYPE_TEXT: 'TYPE_TEXT',
+  // Stripe
+  STRIPE_CLIENT_ERROR: 'STRIPE_CLIENT_ERROR',
+  STRIPE_SCA_ERROR: 'STRIPE_SCA_ERROR',
 } as const;
 
 export function isServerErrorResponse(obj: object): obj is ServerErrorResponse {

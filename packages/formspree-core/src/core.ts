@@ -112,18 +112,22 @@ export class Client {
     }
 
     if (this.stripePromise && opts.createPaymentMethod) {
-      const payload = await opts.createPaymentMethod();
+      const createPaymentMethodResult = await opts.createPaymentMethod();
 
-      if (payload.error) {
+      if (createPaymentMethodResult.error) {
         return new SubmissionErrorResult({
           code: 'STRIPE_CLIENT_ERROR',
-          message: 'Error creating payment method',
           field: 'paymentMethod',
+          message: 'Error creating payment method',
         });
       }
 
       // Add the paymentMethod to the data
-      appendExtraData(data, 'paymentMethod', payload.paymentMethod.id);
+      appendExtraData(
+        data,
+        'paymentMethod',
+        createPaymentMethodResult.paymentMethod.id
+      );
 
       // Send a request to Formspree server to handle the payment method
       const result = await makeFormspreeRequest(data);
@@ -143,6 +147,13 @@ export class Client {
             field: 'paymentMethod',
             message: 'Stripe SCA error',
           });
+        }
+
+        // delete 'paymentMethod' to resubmit
+        if (data instanceof FormData) {
+          data.delete('paymentMethod');
+        } else {
+          delete data.paymentMethod;
         }
 
         appendExtraData(data, 'paymentIntent', stripeResult.paymentIntent.id);
