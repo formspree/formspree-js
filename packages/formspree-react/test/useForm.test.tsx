@@ -124,8 +124,7 @@ describe('useForm', () => {
       // Right after clicked, it should show submitting.
       await screen.findByText('Submitting…');
 
-      // Later, ...
-      // await screen.findByText('Thanks!');
+      // Later, it should revert back to form with errors.
       await waitFor(() => {
         screen.getByRole('heading', { name: 'Form' });
         screen.getByLabelText('Email');
