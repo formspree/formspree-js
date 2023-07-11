@@ -20,7 +20,7 @@ export const ValidationError: React.FC<ValidationErrorProps> = (props) => {
 
   return (
     <div {...attrs}>
-      {prefix ? `${prefix} ` : ''}
+      {prefix ? `${prefix} ` : null}
       {errs.map((err) => err.message).join(', ')}
     </div>
   );
