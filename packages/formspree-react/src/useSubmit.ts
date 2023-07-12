@@ -6,6 +6,7 @@ import {
   type SubmissionErrorResult,
   type SubmissionRedirectResult,
 } from '@formspree/core';
+import { CardElement } from '@stripe/react-stripe-js';
 import type { PaymentMethodResult } from '@stripe/stripe-js';
 import { version } from '../package.json';
 import { useFormspree } from './context';
@@ -45,6 +46,9 @@ export function useSubmit<T extends FieldValues>(
     origin,
   } = options;
 
+  const { stripe } = client;
+  const cardElement = stripe?.elements().getElement(CardElement);
+
   return function handleSubmit(
     submission: FormEvent | SubmissionData<T>
   ): void {
@@ -66,13 +70,11 @@ export function useSubmit<T extends FieldValues>(
         }
       }
 
-      const { cardElement } = formspree;
-      const { stripe } = client;
       const result = await client.submitForm(formKey, data, {
         endpoint: origin,
         clientName,
         createPaymentMethod:
-          cardElement && stripe
+          stripe && cardElement
             ? (): Promise<PaymentMethodResult> =>
                 stripe.createPaymentMethod({
                   type: 'card',
