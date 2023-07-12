@@ -1,18 +1,15 @@
-import type { Client } from '@formspree/core';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { ValidationError, useForm, type ExtraData } from '../src';
 
 type TestFormProps = {
-  client?: Client;
   extraData?: ExtraData;
 };
 
 function TestForm(props: TestFormProps) {
-  const { client, extraData } = props;
+  const { extraData } = props;
   const [state, submit, reset] = useForm('test-form-id-42', {
-    client: client,
     data: extraData,
   });
 
