@@ -1,6 +1,13 @@
-import React, { Suspense, lazy, useContext, useEffect, useState } from 'react';
+import React, {
+  Suspense,
+  lazy,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from 'react';
 import { createClient, getDefaultClient } from '@formspree/core';
-import type { Client, Config } from '@formspree/core';
+import type { Client } from '@formspree/core';
 import { loadStripe } from '@stripe/stripe-js/pure.js';
 import type { Stripe } from '@stripe/stripe-js';
 
@@ -15,8 +22,10 @@ export type FromspreeContextType = {
 };
 
 export type FormspreeProviderProps = {
+  children: ReactNode;
   project?: string;
-  children: React.ReactNode;
+  // Stripe
+  loadingStripe?: ReactNode;
   stripePK?: string;
 };
 
@@ -33,61 +42,36 @@ const getStripe = (stripeKey: string) => {
   return stripePromise;
 };
 
-const handleCreateClient = (promise?: Stripe, project?: string) => {
-  const config: Config = {};
-
-  if (promise) {
-    config.stripePromise = promise;
-  }
-
-  if (project) {
-    config.project = project;
-  }
-
-  return createClient(config);
-};
-
+/**
+ * FormspreeProvider creates Formspree Client based on the given props
+ * and makes the client available through via context.
+ */
 export const FormspreeProvider = (props: FormspreeProviderProps) => {
-  const [stateStripePromise, setStateStripePromise] = useState<
-    Stripe | undefined
-  >(undefined);
-  const [client, setClient] = useState<Client>(
-    handleCreateClient(stateStripePromise, props.project)
-  );
+  const { children, project, loadingStripe, stripePK } = props;
+
+  const [client, setClient] = useState<Client>(createClient({ project }));
+  const [stripe, setStripe] = useState<Stripe | undefined>(undefined);
 
   useEffect(() => {
-    const getStripePromise = async (stripeKey: string) => {
-      const promiseStripe = await getStripe(stripeKey);
-      if (promiseStripe) {
-        setStateStripePromise(promiseStripe);
-      }
-    };
-
-    if (props.stripePK) {
-      getStripePromise(props.stripePK);
+    if (stripePK) {
+      getStripe(stripePK).then((stripe) => stripe && setStripe(stripe));
     }
-  }, [props.stripePK]);
+  }, [stripePK]);
 
   useEffect(() => {
-    if (stateStripePromise) {
-      setClient(handleCreateClient(stateStripePromise, props.project));
-    }
-  }, [props.project, stateStripePromise]);
+    setClient(createClient({ project, stripe }));
+  }, [project, stripe]);
 
   return (
     <FormspreeContext.Provider value={{ client }}>
-      {props.stripePK ? (
-        <>
-          {stateStripePromise && (
-            <Suspense fallback={<p>....</p>}>
-              <Elements stripe={stateStripePromise}>
-                <>{props.children}</>
-              </Elements>
-            </Suspense>
-          )}
-        </>
+      {stripePK ? (
+        stripe ? (
+          <Suspense fallback={loadingStripe}>
+            <Elements stripe={stripe}>{children}</Elements>
+          </Suspense>
+        ) : null
       ) : (
-        <>{props.children}</>
+        children
       )}
     </FormspreeContext.Provider>
   );

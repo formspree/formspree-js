@@ -22,19 +22,19 @@ import {
 export interface Config {
   fetch?: typeof window.fetch;
   project?: string;
-  stripePromise?: Stripe;
+  stripe?: Stripe;
 }
 
 export class Client {
   private readonly fetch?: typeof window.fetch;
   project: string | undefined;
-  stripePromise: Stripe | undefined;
+  stripe: Stripe | undefined;
   private readonly session?: Session;
 
   constructor(config: Config = {}) {
     this.fetch = config.fetch;
     this.project = config.project;
-    this.stripePromise = config.stripePromise;
+    this.stripe = config.stripe;
 
     if (typeof window !== 'undefined') {
       this.session = new Session();
@@ -118,7 +118,7 @@ export class Client {
       }
     }
 
-    if (this.stripePromise && opts.createPaymentMethod) {
+    if (this.stripe && opts.createPaymentMethod) {
       const createPaymentMethodResult = await opts.createPaymentMethod();
 
       if (createPaymentMethodResult.error) {
@@ -144,7 +144,7 @@ export class Client {
       }
 
       if (result.kind === 'stripePluginPending') {
-        const stripeResult = await this.stripePromise.handleCardAction(
+        const stripeResult = await this.stripe.handleCardAction(
           result.paymentIntentClientSecret
         );
 

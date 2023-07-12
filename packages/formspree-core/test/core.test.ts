@@ -327,7 +327,7 @@ describe('Client.submitForm', () => {
       handleCardAction?: Stripe['handleCardAction']
     ): Client {
       const stripe = { handleCardAction } as Stripe;
-      return createTestClient({ stripePromise: stripe });
+      return createTestClient({ stripe });
     }
 
     describe('when payment method creation fails', () => {
