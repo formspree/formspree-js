@@ -1,15 +1,16 @@
+import { createClient, getDefaultClient, type Client } from '@formspree/core';
+import { CardElement } from '@stripe/react-stripe-js';
+import type { Stripe, StripeCardElement } from '@stripe/stripe-js';
+import { loadStripe } from '@stripe/stripe-js/pure.js';
 import React, {
   Suspense,
   lazy,
   useContext,
   useEffect,
+  useMemo,
   useState,
   type ReactNode,
 } from 'react';
-import { createClient, getDefaultClient } from '@formspree/core';
-import type { Client } from '@formspree/core';
-import { loadStripe } from '@stripe/stripe-js/pure.js';
-import type { Stripe } from '@stripe/stripe-js';
 
 const Elements = lazy(() =>
   import('@stripe/react-stripe-js').then((module) => {
@@ -18,6 +19,7 @@ const Elements = lazy(() =>
 );
 
 export type FromspreeContextType = {
+  cardElement?: StripeCardElement | null;
   client: Client;
 };
 
@@ -51,6 +53,10 @@ export const FormspreeProvider = (props: FormspreeProviderProps) => {
 
   const [client, setClient] = useState<Client>(createClient({ project }));
   const [stripe, setStripe] = useState<Stripe | undefined>(undefined);
+  const cardElement = useMemo(
+    () => stripe?.elements().getElement(CardElement),
+    [stripe]
+  );
 
   useEffect(() => {
     if (stripePK) {
@@ -63,7 +69,7 @@ export const FormspreeProvider = (props: FormspreeProviderProps) => {
   }, [project, stripe]);
 
   return (
-    <FormspreeContext.Provider value={{ client }}>
+    <FormspreeContext.Provider value={{ cardElement, client }}>
       {stripePK ? (
         stripe ? (
           <Suspense fallback={loadingStripe}>
