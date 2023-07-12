@@ -12,7 +12,12 @@ import {
   type SubmissionOptions,
   type SubmissionResult,
 } from './submission';
-import { appendExtraData, clientHeader, encode64 } from './utils';
+import {
+  appendExtraData,
+  clientHeader,
+  encode64,
+  isUnknownObject,
+} from './utils';
 
 export interface Config {
   fetch?: typeof window.fetch;
@@ -80,7 +85,7 @@ export class Client {
 
         const body = await res.json();
 
-        if (typeof body === 'object' && body !== null) {
+        if (isUnknownObject(body)) {
           if (isServerErrorResponse(body)) {
             return Array.isArray(body.errors)
               ? new SubmissionErrorResult(...body.errors)

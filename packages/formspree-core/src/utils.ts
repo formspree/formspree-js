@@ -33,3 +33,9 @@ export function appendExtraData(
     formData[prop] = value;
   }
 }
+
+export type UnknownObject = Record<string | number | symbol, unknown>;
+
+export function isUnknownObject(value: unknown): value is UnknownObject {
+  return value !== null && typeof value === 'object';
+}

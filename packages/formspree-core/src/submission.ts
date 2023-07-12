@@ -1,4 +1,5 @@
 import type { PaymentMethodResult } from '@stripe/stripe-js';
+import type { UnknownObject } from './utils';
 
 export type SubmissionData<T extends FieldValues = FieldValues> = FormData | T;
 
@@ -30,7 +31,7 @@ export class SubmissionRedirectResult {
 type ServerRedirectResponse = { next: string };
 
 export function isServerRedirectResponse(
-  obj: object
+  obj: UnknownObject
 ): obj is ServerRedirectResponse {
   return 'next' in obj && typeof obj.next === 'string';
 }
@@ -50,7 +51,7 @@ export type ServerStripePluginPendingResponse = {
 };
 
 export function isServerStripePluginPendingResponse(
-  obj: object
+  obj: UnknownObject
 ): obj is ServerStripePluginPendingResponse {
   if (
     'stripe' in obj &&
@@ -157,7 +158,9 @@ export const FieldErrorCodeEnum = {
   STRIPE_SCA_ERROR: 'STRIPE_SCA_ERROR',
 } as const;
 
-export function isServerErrorResponse(obj: object): obj is ServerErrorResponse {
+export function isServerErrorResponse(
+  obj: UnknownObject
+): obj is ServerErrorResponse {
   return (
     ('errors' in obj &&
       Array.isArray(obj.errors) &&
