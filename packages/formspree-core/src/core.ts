@@ -151,7 +151,8 @@ export class Client {
           });
         }
 
-        // delete 'paymentMethod' to resubmit
+        // `paymentMethod` must not be on the payload when resubmitting
+        // the form to handle Stripe SCA.
         if (data instanceof FormData) {
           data.delete('paymentMethod');
         } else {
