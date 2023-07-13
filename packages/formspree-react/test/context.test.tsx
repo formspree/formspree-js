@@ -1,11 +1,10 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import React from 'react';
 import { FormspreeProvider, useFormspree } from '../src';
-
-jest.mock('@stripe/stripe-js/pure');
-
 import type { Stripe } from '@stripe/stripe-js';
 import { loadStripe } from '@stripe/stripe-js/pure';
+
+jest.mock('@stripe/stripe-js/pure');
 
 describe('FormspreeProvider', () => {
   describe('default', () => {

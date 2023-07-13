@@ -32,16 +32,14 @@ const getStripe = (stripeKey: string) => {
  */
 export function FormspreeProvider(props: FormspreeProviderProps) {
   const { children, project, stripePK } = props;
-
   const [client, setClient] = useState<Client>(createClient({ project }));
-  const [stripe, setStripe] = useState<Stripe | undefined>(undefined);
 
   useEffect(() => {
     let isMounted = true;
     if (stripePK) {
       getStripe(stripePK).then((stripe) => {
         if (stripe && isMounted) {
-          setStripe(stripe);
+          setClient((client) => createClient({ ...client, stripe }));
         }
       });
     }
@@ -51,8 +49,10 @@ export function FormspreeProvider(props: FormspreeProviderProps) {
   }, [stripePK]);
 
   useEffect(() => {
-    setClient(createClient({ project, stripe }));
-  }, [project, stripe]);
+    setClient((client) =>
+      client.project !== project ? createClient({ ...client, project }) : client
+    );
+  }, [project]);
 
   return (
     <FormspreeContext.Provider value={{ client }}>
