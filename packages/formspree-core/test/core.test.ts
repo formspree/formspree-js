@@ -366,25 +366,18 @@ describe('Client.submitForm', () => {
         } as PaymentMethodResult;
       }
 
-      describe('and Stripe handleCardAction fails', () => {
-        async function handleCardAction(): Promise<PaymentIntentResult> {
-          return { error: { type: 'card_error' } };
-        }
-
+      describe('and payment submission fails', () => {
         it('returns SubmissionErrorResult', async () => {
           mockedFetch.mockResolvedValueOnce(
             new Response(
               JSON.stringify({
-                resubmitKey: 'test-resubmit-key',
-                stripe: {
-                  paymentIntentClientSecret:
-                    'test-payment-intent-client-secret',
-                },
-              } satisfies ServerStripePluginPendingResponse)
+                error: '(legacy error message)',
+                errors: [{ message: 'bad submission' }],
+              } satisfies ServerErrorResponse)
             )
           );
 
-          const client = createTestClientWithStripe(handleCardAction);
+          const client = createTestClientWithStripe();
           const data = { email: 'test@example.com' };
           const result = await client.submitForm('test-form-id', data, {
             createPaymentMethod,
@@ -411,132 +404,31 @@ describe('Client.submitForm', () => {
 
           expect(result).toBeInstanceOf(SubmissionErrorResult);
           const errorResult = result as SubmissionErrorResult<typeof data>;
-          expect(errorResult.getFormErrors()).toEqual([]);
-          expect(errorResult.getAllFieldErrors()).toEqual([
-            [
-              'paymentMethod',
-              [
-                {
-                  code: 'STRIPE_CLIENT_ERROR',
-                  message: 'Stripe SCA error',
-                },
-              ],
-            ],
+          expect(errorResult.getFormErrors()).toEqual([
+            {
+              code: 'UNSPECIFIED',
+              message: 'bad submission',
+            },
           ]);
+          expect(errorResult.getAllFieldErrors()).toEqual([]);
         });
       });
 
-      describe('and Stripe handleCardAction succeeds (FormData)', () => {
-        async function handleCardAction(): Promise<PaymentIntentResult> {
-          return {
-            paymentIntent: { id: 'test-payment-intent-id' },
-          } as PaymentIntentResult;
-        }
-
-        it('resubmits the form and produces a SubmissionRedirectResult', async () => {
+      describe('and payment submission succeeds', () => {
+        it('returns SubmissionRedirectResult', async () => {
           const redirectResponseBody = { next: 'test-redirect-url' };
-
-          mockedFetch
-            .mockResolvedValueOnce(
-              new Response(
-                JSON.stringify({
-                  resubmitKey: 'test-resubmit-key',
-                  stripe: {
-                    paymentIntentClientSecret:
-                      'test-payment-intent-client-secret',
-                  },
-                } satisfies ServerStripePluginPendingResponse)
-              )
-            )
-            .mockResolvedValueOnce(
-              new Response(JSON.stringify(redirectResponseBody))
-            );
-
-          const client = createTestClientWithStripe(handleCardAction);
-          const data = new FormData();
-          data.set('email', 'test@example.com');
-          data.set('message', 'Hello!');
-          // support files
-          data.set(
-            'attachment',
-            new Blob(['fake-image-content'], { type: 'image/jpeg' })
-          );
-          const result = await client.submitForm('test-form-id', data, {
-            createPaymentMethod,
-          });
-
-          expect(mockedFetch).toHaveBeenCalledTimes(2);
-          expect(mockedFetch).toHaveBeenNthCalledWith(
-            1,
-            'https://formspree.io/f/test-form-id',
-            {
-              body: data,
-              headers: {
-                Accept: 'application/json',
-                'Formspree-Client': '@formspree/core@2.8.3',
-                'Formspree-Session-Data': expectedSessionData,
-              },
-              method: 'POST',
-              mode: 'cors',
-            }
-          );
-          expect(mockedFetch).toHaveBeenNthCalledWith(
-            2,
-            'https://formspree.io/f/test-form-id',
-            {
-              body: data,
-              headers: {
-                Accept: 'application/json',
-                'Formspree-Client': '@formspree/core@2.8.3',
-                'Formspree-Session-Data': expectedSessionData,
-              },
-              method: 'POST',
-              mode: 'cors',
-            }
+          mockedFetch.mockResolvedValueOnce(
+            new Response(JSON.stringify(redirectResponseBody))
           );
 
-          expect(result).toBeInstanceOf(SubmissionRedirectResult);
-          const redirectResult = result as SubmissionRedirectResult;
-          expect(redirectResult.kind).toBe('redirect');
-          expect(redirectResult.next).toEqual(redirectResponseBody.next);
-        });
-      });
-
-      describe('and Stripe handleCardAction succeeds (plain object)', () => {
-        async function handleCardAction(): Promise<PaymentIntentResult> {
-          return {
-            paymentIntent: { id: 'test-payment-intent-id' },
-          } as PaymentIntentResult;
-        }
-
-        it('resubmits the form and produces a SubmissionRedirectResult', async () => {
-          const redirectResponseBody = { next: 'test-redirect-url' };
-
-          mockedFetch
-            .mockResolvedValueOnce(
-              new Response(
-                JSON.stringify({
-                  resubmitKey: 'test-resubmit-key',
-                  stripe: {
-                    paymentIntentClientSecret:
-                      'test-payment-intent-client-secret',
-                  },
-                } satisfies ServerStripePluginPendingResponse)
-              )
-            )
-            .mockResolvedValueOnce(
-              new Response(JSON.stringify(redirectResponseBody))
-            );
-
-          const client = createTestClientWithStripe(handleCardAction);
+          const client = createTestClientWithStripe();
           const data = { email: 'test@example.com' };
           const result = await client.submitForm('test-form-id', data, {
             createPaymentMethod,
           });
 
-          expect(mockedFetch).toHaveBeenCalledTimes(2);
-          expect(mockedFetch).toHaveBeenNthCalledWith(
-            1,
+          expect(mockedFetch).toHaveBeenCalledTimes(1);
+          expect(mockedFetch).toHaveBeenLastCalledWith(
             'https://formspree.io/f/test-form-id',
             {
               body: JSON.stringify({
@@ -553,31 +445,228 @@ describe('Client.submitForm', () => {
               mode: 'cors',
             }
           );
-          expect(mockedFetch).toHaveBeenNthCalledWith(
-            2,
-            'https://formspree.io/f/test-form-id',
-            {
-              body: JSON.stringify({
-                email: 'test@example.com',
-                // paymentMethod is deleted
-                paymentIntent: 'test-payment-intent-id',
-                resubmitKey: 'test-resubmit-key',
-              }),
-              headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-                'Formspree-Client': '@formspree/core@2.8.3',
-                'Formspree-Session-Data': expectedSessionData,
-              },
-              method: 'POST',
-              mode: 'cors',
-            }
-          );
 
           expect(result).toBeInstanceOf(SubmissionRedirectResult);
           const redirectResult = result as SubmissionRedirectResult;
           expect(redirectResult.kind).toBe('redirect');
           expect(redirectResult.next).toEqual(redirectResponseBody.next);
+        });
+      });
+
+      describe('and payment submission requires SCA', () => {
+        describe('and Stripe handleCardAction fails', () => {
+          async function handleCardAction(): Promise<PaymentIntentResult> {
+            return { error: { type: 'card_error' } };
+          }
+
+          it('returns SubmissionErrorResult', async () => {
+            mockedFetch.mockResolvedValueOnce(
+              new Response(
+                JSON.stringify({
+                  resubmitKey: 'test-resubmit-key',
+                  stripe: {
+                    paymentIntentClientSecret:
+                      'test-payment-intent-client-secret',
+                  },
+                } satisfies ServerStripePluginPendingResponse)
+              )
+            );
+
+            const client = createTestClientWithStripe(handleCardAction);
+            const data = { email: 'test@example.com' };
+            const result = await client.submitForm('test-form-id', data, {
+              createPaymentMethod,
+            });
+
+            expect(mockedFetch).toHaveBeenCalledTimes(1);
+            expect(mockedFetch).toHaveBeenLastCalledWith(
+              'https://formspree.io/f/test-form-id',
+              {
+                body: JSON.stringify({
+                  email: 'test@example.com',
+                  paymentMethod: 'test-payment-method-id',
+                }),
+                headers: {
+                  Accept: 'application/json',
+                  'Content-Type': 'application/json',
+                  'Formspree-Client': '@formspree/core@2.8.3',
+                  'Formspree-Session-Data': expectedSessionData,
+                },
+                method: 'POST',
+                mode: 'cors',
+              }
+            );
+
+            expect(result).toBeInstanceOf(SubmissionErrorResult);
+            const errorResult = result as SubmissionErrorResult<typeof data>;
+            expect(errorResult.getFormErrors()).toEqual([]);
+            expect(errorResult.getAllFieldErrors()).toEqual([
+              [
+                'paymentMethod',
+                [
+                  {
+                    code: 'STRIPE_CLIENT_ERROR',
+                    message: 'Stripe SCA error',
+                  },
+                ],
+              ],
+            ]);
+          });
+        });
+
+        describe('and Stripe handleCardAction succeeds (FormData)', () => {
+          async function handleCardAction(): Promise<PaymentIntentResult> {
+            return {
+              paymentIntent: { id: 'test-payment-intent-id' },
+            } as PaymentIntentResult;
+          }
+
+          it('resubmits the form and produces a SubmissionRedirectResult', async () => {
+            const redirectResponseBody = { next: 'test-redirect-url' };
+
+            mockedFetch
+              .mockResolvedValueOnce(
+                new Response(
+                  JSON.stringify({
+                    resubmitKey: 'test-resubmit-key',
+                    stripe: {
+                      paymentIntentClientSecret:
+                        'test-payment-intent-client-secret',
+                    },
+                  } satisfies ServerStripePluginPendingResponse)
+                )
+              )
+              .mockResolvedValueOnce(
+                new Response(JSON.stringify(redirectResponseBody))
+              );
+
+            const client = createTestClientWithStripe(handleCardAction);
+            const data = new FormData();
+            data.set('email', 'test@example.com');
+            data.set('message', 'Hello!');
+            // support files
+            data.set(
+              'attachment',
+              new Blob(['fake-image-content'], { type: 'image/jpeg' })
+            );
+            const result = await client.submitForm('test-form-id', data, {
+              createPaymentMethod,
+            });
+
+            expect(mockedFetch).toHaveBeenCalledTimes(2);
+            expect(mockedFetch).toHaveBeenNthCalledWith(
+              1,
+              'https://formspree.io/f/test-form-id',
+              {
+                body: data,
+                headers: {
+                  Accept: 'application/json',
+                  'Formspree-Client': '@formspree/core@2.8.3',
+                  'Formspree-Session-Data': expectedSessionData,
+                },
+                method: 'POST',
+                mode: 'cors',
+              }
+            );
+            expect(mockedFetch).toHaveBeenNthCalledWith(
+              2,
+              'https://formspree.io/f/test-form-id',
+              {
+                body: data,
+                headers: {
+                  Accept: 'application/json',
+                  'Formspree-Client': '@formspree/core@2.8.3',
+                  'Formspree-Session-Data': expectedSessionData,
+                },
+                method: 'POST',
+                mode: 'cors',
+              }
+            );
+
+            expect(result).toBeInstanceOf(SubmissionRedirectResult);
+            const redirectResult = result as SubmissionRedirectResult;
+            expect(redirectResult.kind).toBe('redirect');
+            expect(redirectResult.next).toEqual(redirectResponseBody.next);
+          });
+        });
+
+        describe('and Stripe handleCardAction succeeds (plain object)', () => {
+          async function handleCardAction(): Promise<PaymentIntentResult> {
+            return {
+              paymentIntent: { id: 'test-payment-intent-id' },
+            } as PaymentIntentResult;
+          }
+
+          it('resubmits the form and produces a SubmissionRedirectResult', async () => {
+            const redirectResponseBody = { next: 'test-redirect-url' };
+
+            mockedFetch
+              .mockResolvedValueOnce(
+                new Response(
+                  JSON.stringify({
+                    resubmitKey: 'test-resubmit-key',
+                    stripe: {
+                      paymentIntentClientSecret:
+                        'test-payment-intent-client-secret',
+                    },
+                  } satisfies ServerStripePluginPendingResponse)
+                )
+              )
+              .mockResolvedValueOnce(
+                new Response(JSON.stringify(redirectResponseBody))
+              );
+
+            const client = createTestClientWithStripe(handleCardAction);
+            const data = { email: 'test@example.com' };
+            const result = await client.submitForm('test-form-id', data, {
+              createPaymentMethod,
+            });
+
+            expect(mockedFetch).toHaveBeenCalledTimes(2);
+            expect(mockedFetch).toHaveBeenNthCalledWith(
+              1,
+              'https://formspree.io/f/test-form-id',
+              {
+                body: JSON.stringify({
+                  email: 'test@example.com',
+                  paymentMethod: 'test-payment-method-id',
+                }),
+                headers: {
+                  Accept: 'application/json',
+                  'Content-Type': 'application/json',
+                  'Formspree-Client': '@formspree/core@2.8.3',
+                  'Formspree-Session-Data': expectedSessionData,
+                },
+                method: 'POST',
+                mode: 'cors',
+              }
+            );
+            expect(mockedFetch).toHaveBeenNthCalledWith(
+              2,
+              'https://formspree.io/f/test-form-id',
+              {
+                body: JSON.stringify({
+                  email: 'test@example.com',
+                  // paymentMethod is deleted
+                  paymentIntent: 'test-payment-intent-id',
+                  resubmitKey: 'test-resubmit-key',
+                }),
+                headers: {
+                  Accept: 'application/json',
+                  'Content-Type': 'application/json',
+                  'Formspree-Client': '@formspree/core@2.8.3',
+                  'Formspree-Session-Data': expectedSessionData,
+                },
+                method: 'POST',
+                mode: 'cors',
+              }
+            );
+
+            expect(result).toBeInstanceOf(SubmissionRedirectResult);
+            const redirectResult = result as SubmissionRedirectResult;
+            expect(redirectResult.kind).toBe('redirect');
+            expect(redirectResult.next).toEqual(redirectResponseBody.next);
+          });
         });
       });
     });

@@ -171,7 +171,7 @@ export class Client {
         return makeFormspreeRequest(data);
       }
 
-      // Otherwise, let it falls through.
+      return result;
     }
 
     return makeFormspreeRequest(data);
