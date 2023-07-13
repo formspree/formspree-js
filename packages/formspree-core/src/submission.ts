@@ -15,24 +15,24 @@ export type SubmissionOptions = {
 };
 
 export type SubmissionResult<T extends FieldValues> =
-  | SubmissionRedirectResult
+  | SubmissionSuccessResult
   | SubmissionStripePluginPendingResult
   | SubmissionErrorResult<T>;
 
-export class SubmissionRedirectResult {
-  readonly kind = 'redirect';
+export class SubmissionSuccessResult {
+  readonly kind = 'success';
   readonly next: string;
 
-  constructor(serverResponse: ServerRedirectResponse) {
+  constructor(serverResponse: ServerSuccessResponse) {
     this.next = serverResponse.next;
   }
 }
 
-type ServerRedirectResponse = { next: string };
+type ServerSuccessResponse = { next: string };
 
-export function isServerRedirectResponse(
+export function isServerSuccessResponse(
   obj: UnknownObject
-): obj is ServerRedirectResponse {
+): obj is ServerSuccessResponse {
   return 'next' in obj && typeof obj.next === 'string';
 }
 

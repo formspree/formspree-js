@@ -9,7 +9,7 @@ import {
   FieldErrorCodeEnum,
   FormErrorCodeEnum,
   SubmissionErrorResult,
-  SubmissionRedirectResult,
+  SubmissionSuccessResult,
   type FieldError,
   type FormError,
   type ServerErrorResponse,
@@ -299,7 +299,7 @@ describe('Client.submitForm', () => {
     });
   });
 
-  describe('when the server returns a redirect response', () => {
+  describe('when the server returns a success response', () => {
     const responseBody = { next: 'test-redirect-url' };
 
     beforeEach(() => {
@@ -310,15 +310,15 @@ describe('Client.submitForm', () => {
       );
     });
 
-    it('resolves to a SubmissionRedirectResult', async () => {
+    it('resolves to a SubmissionSuccessResult', async () => {
       const client = createTestClient();
       const data = { email: 'test@example.com' };
       const result = await client.submitForm('test-form-id', data);
 
-      expect(result).toBeInstanceOf(SubmissionRedirectResult);
-      const redirectResult = result as SubmissionRedirectResult;
-      expect(redirectResult.kind).toBe('redirect');
-      expect(redirectResult.next).toEqual(responseBody.next);
+      expect(result).toBeInstanceOf(SubmissionSuccessResult);
+      const successResult = result as SubmissionSuccessResult;
+      expect(successResult.kind).toBe('success');
+      expect(successResult.next).toEqual(responseBody.next);
     });
   });
 
@@ -415,10 +415,10 @@ describe('Client.submitForm', () => {
       });
 
       describe('and payment submission succeeds', () => {
-        it('returns SubmissionRedirectResult', async () => {
-          const redirectResponseBody = { next: 'test-redirect-url' };
+        it('returns SubmissionSuccessResult', async () => {
+          const responseBody = { next: 'test-redirect-url' };
           mockedFetch.mockResolvedValueOnce(
-            new Response(JSON.stringify(redirectResponseBody))
+            new Response(JSON.stringify(responseBody))
           );
 
           const client = createTestClientWithStripe();
@@ -446,10 +446,10 @@ describe('Client.submitForm', () => {
             }
           );
 
-          expect(result).toBeInstanceOf(SubmissionRedirectResult);
-          const redirectResult = result as SubmissionRedirectResult;
-          expect(redirectResult.kind).toBe('redirect');
-          expect(redirectResult.next).toEqual(redirectResponseBody.next);
+          expect(result).toBeInstanceOf(SubmissionSuccessResult);
+          const successResult = result as SubmissionSuccessResult;
+          expect(successResult.kind).toBe('success');
+          expect(successResult.next).toEqual(responseBody.next);
         });
       });
 
@@ -525,13 +525,13 @@ describe('Client.submitForm', () => {
             } as PaymentIntentResult;
           }
 
-          it('resubmits the form and produces a SubmissionRedirectResult', async () => {
-            const redirectResponseBody = { next: 'test-redirect-url' };
+          it('resubmits the form and produces a SubmissionSuccessResult', async () => {
+            const responseBody = { next: 'test-redirect-url' };
 
             mockedFetch
               .mockResolvedValueOnce(new RequireSCAResponse())
               .mockResolvedValueOnce(
-                new Response(JSON.stringify(redirectResponseBody))
+                new Response(JSON.stringify(responseBody))
               );
 
             const client = createTestClientWithStripe(handleCardAction);
@@ -577,10 +577,10 @@ describe('Client.submitForm', () => {
               }
             );
 
-            expect(result).toBeInstanceOf(SubmissionRedirectResult);
-            const redirectResult = result as SubmissionRedirectResult;
-            expect(redirectResult.kind).toBe('redirect');
-            expect(redirectResult.next).toEqual(redirectResponseBody.next);
+            expect(result).toBeInstanceOf(SubmissionSuccessResult);
+            const successResult = result as SubmissionSuccessResult;
+            expect(successResult.kind).toBe('success');
+            expect(successResult.next).toEqual(responseBody.next);
           });
         });
 
@@ -591,13 +591,13 @@ describe('Client.submitForm', () => {
             } as PaymentIntentResult;
           }
 
-          it('resubmits the form and produces a SubmissionRedirectResult', async () => {
-            const redirectResponseBody = { next: 'test-redirect-url' };
+          it('resubmits the form and produces a SubmissionSuccessResult', async () => {
+            const responseBody = { next: 'test-redirect-url' };
 
             mockedFetch
               .mockResolvedValueOnce(new RequireSCAResponse())
               .mockResolvedValueOnce(
-                new Response(JSON.stringify(redirectResponseBody))
+                new Response(JSON.stringify(responseBody))
               );
 
             const client = createTestClientWithStripe(handleCardAction);
@@ -646,10 +646,10 @@ describe('Client.submitForm', () => {
               }
             );
 
-            expect(result).toBeInstanceOf(SubmissionRedirectResult);
-            const redirectResult = result as SubmissionRedirectResult;
-            expect(redirectResult.kind).toBe('redirect');
-            expect(redirectResult.next).toEqual(redirectResponseBody.next);
+            expect(result).toBeInstanceOf(SubmissionSuccessResult);
+            const successResult = result as SubmissionSuccessResult;
+            expect(successResult.kind).toBe('success');
+            expect(successResult.next).toEqual(responseBody.next);
           });
         });
       });

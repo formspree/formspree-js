@@ -2,10 +2,10 @@ import type { Stripe } from '@stripe/stripe-js';
 import { Session } from './session';
 import {
   SubmissionErrorResult,
-  SubmissionRedirectResult,
+  SubmissionSuccessResult,
   SubmissionStripePluginPendingResult,
   isServerErrorResponse,
-  isServerRedirectResponse,
+  isServerSuccessResponse,
   isServerStripePluginPendingResponse,
   type FieldValues,
   type SubmissionData,
@@ -99,8 +99,8 @@ export class Client {
             );
           }
 
-          if (isServerRedirectResponse(body)) {
-            return new SubmissionRedirectResult({ next: body.next });
+          if (isServerSuccessResponse(body)) {
+            return new SubmissionSuccessResult({ next: body.next });
           }
         }
 

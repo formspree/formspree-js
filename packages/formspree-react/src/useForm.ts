@@ -10,7 +10,7 @@ import {
   type Client,
   type FieldValues,
   type SubmissionData,
-  type SubmissionRedirectResult,
+  type SubmissionSuccessResult,
   type SubmissionErrorResult,
 } from '@formspree/core';
 
@@ -25,7 +25,7 @@ type ResetFunction = () => void;
 export type TUseForm<T extends FieldValues> = [
   {
     errors: SubmissionErrorResult<T> | null;
-    result: SubmissionRedirectResult | null;
+    result: SubmissionSuccessResult | null;
     submitting: boolean;
     succeeded: boolean;
   },
@@ -47,7 +47,7 @@ const useForm = <T extends FieldValues>(
   } = {}
 ): TUseForm<T> => {
   const [errors, setErrors] = useState<SubmissionErrorResult<T> | null>(null);
-  const [result, setResult] = useState<SubmissionRedirectResult | null>(null);
+  const [result, setResult] = useState<SubmissionSuccessResult | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [succeeded, setSucceeded] = useState(false);
   const formspreeContext = useFormspree();
@@ -143,7 +143,7 @@ const useForm = <T extends FieldValues>(
         setResult(null);
         setSucceeded(false);
         break;
-      case 'redirect':
+      case 'success':
         setErrors(null);
         setResult(result);
         setSucceeded(true);
