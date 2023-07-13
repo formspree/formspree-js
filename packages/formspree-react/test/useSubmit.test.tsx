@@ -2,6 +2,11 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { FormspreeProvider, useSubmit, type ExtraData } from '../src';
+import {
+  FieldErrorCodeEnum,
+  FormErrorCodeEnum,
+  SubmissionErrorResult,
+} from '@formspree/core';
 
 describe('useSubmit', () => {
   const mockedFetch = jest.spyOn(window, 'fetch');
@@ -192,8 +197,144 @@ describe('useSubmit', () => {
     });
   });
 
-  // describe('on submit success')
-  // describe('on submit failed')
+  describe('when submission fails', () => {
+    const onError = jest.fn();
+    const onSettled = jest.fn();
+    const onSuccess = jest.fn();
+
+    function TestForm() {
+      const handleSubmit = useSubmit<{ email: string }>('test-formspree-key', {
+        onError,
+        onSettled,
+        onSuccess,
+      });
+      return (
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            handleSubmit({ email: 'test-email' });
+          }}
+        >
+          <button>Submit</button>
+        </form>
+      );
+    }
+
+    it('triggers onError option with the error result', async () => {
+      mockedFetch.mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            errors: [
+              {
+                code: FormErrorCodeEnum.EMPTY,
+                message: 'empty form',
+              },
+              {
+                code: FieldErrorCodeEnum.TYPE_EMAIL,
+                field: 'email',
+                message: 'must be an email',
+              },
+            ],
+          })
+        )
+      );
+
+      render(
+        <FormspreeProvider>
+          <TestForm />
+        </FormspreeProvider>
+      );
+
+      await userEvent.click(screen.getByRole('button'));
+
+      expect(onError).toHaveBeenCalledTimes(1);
+
+      const errorResult = onError.mock.calls[0][0] as SubmissionErrorResult<{
+        email: string;
+      }>;
+
+      expect(errorResult).toBeInstanceOf(SubmissionErrorResult);
+      expect(errorResult.getFormErrors()).toEqual([
+        {
+          code: FormErrorCodeEnum.EMPTY,
+          message: 'empty form',
+        },
+      ]);
+      expect(errorResult.getFieldErrors('email')).toEqual([
+        {
+          code: FieldErrorCodeEnum.TYPE_EMAIL,
+          message: 'must be an email',
+        },
+      ]);
+      expect(errorResult.getAllFieldErrors()).toEqual([
+        [
+          'email',
+          [
+            {
+              code: FieldErrorCodeEnum.TYPE_EMAIL,
+              message: 'must be an email',
+            },
+          ],
+        ],
+      ]);
+
+      expect(onSettled).toHaveBeenCalledTimes(1);
+      expect(onSettled).toHaveBeenLastCalledWith();
+
+      expect(onSuccess).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('when submission succeeds', () => {
+    const onError = jest.fn();
+    const onSettled = jest.fn();
+    const onSuccess = jest.fn();
+
+    function TestForm() {
+      const handleSubmit = useSubmit<{ email: string }>('test-formspree-key', {
+        onError,
+        onSettled,
+        onSuccess,
+      });
+
+      return (
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            handleSubmit({ email: 'test-email' });
+          }}
+        >
+          <button>Submit</button>
+        </form>
+      );
+    }
+
+    it('triggers onSuccess option with the success result', async () => {
+      mockedFetch.mockResolvedValue(
+        new Response(JSON.stringify({ next: 'test-redirect-url' }))
+      );
+
+      render(
+        <FormspreeProvider>
+          <TestForm />
+        </FormspreeProvider>
+      );
+
+      await userEvent.click(screen.getByRole('button'));
+
+      expect(onError).not.toHaveBeenCalled();
+
+      expect(onSettled).toHaveBeenCalledTimes(1);
+      expect(onSettled).toHaveBeenLastCalledWith();
+
+      expect(onSuccess).toHaveBeenCalledTimes(1);
+      const successResult = onSuccess.mock.calls[0][0];
+      expect(successResult).toEqual({
+        kind: 'redirect',
+        next: 'test-redirect-url',
+      });
+    });
+  });
 
   // describe('with Stripe')
 });

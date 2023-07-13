@@ -6,6 +6,8 @@ export {
 } from './core';
 
 export {
+  FieldErrorCodeEnum,
+  FormErrorCodeEnum,
   SubmissionErrorResult,
   type FieldValues,
   type SubmissionData,
