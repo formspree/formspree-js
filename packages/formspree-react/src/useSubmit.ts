@@ -4,7 +4,7 @@ import {
   type FieldValues,
   type SubmissionData,
   type SubmissionErrorResult,
-  type SubmissionRedirectResult,
+  type SubmissionSuccessResult,
 } from '@formspree/core';
 import { CardElement } from '@stripe/react-stripe-js';
 import type { PaymentMethodResult } from '@stripe/stripe-js';
@@ -21,7 +21,7 @@ type Options<T extends FieldValues> = {
   extraData?: ExtraData;
   onError?: (error: SubmissionErrorResult<T>) => void;
   onSettled?: () => void;
-  onSuccess?: (data: SubmissionRedirectResult) => void;
+  onSuccess?: (data: SubmissionSuccessResult) => void;
   // origin overrides the submission origin (default: "https://formspree.io")
   origin?: string;
 };
@@ -82,7 +82,7 @@ export function useSubmit<T extends FieldValues>(
         case 'error':
           onError?.(result);
           break;
-        case 'redirect':
+        case 'success':
           onSuccess?.(result);
           break;
       }

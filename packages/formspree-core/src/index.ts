@@ -12,8 +12,8 @@ export {
   type FieldValues,
   type SubmissionData,
   type SubmissionOptions,
-  type SubmissionRedirectResult,
   type SubmissionResult,
+  type SubmissionSuccessResult,
 } from './submission';
 
 export { appendExtraData } from './utils';

@@ -1,12 +1,14 @@
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import React from 'react';
-import { FormspreeProvider, useSubmit, type ExtraData } from '../src';
 import {
   FieldErrorCodeEnum,
   FormErrorCodeEnum,
   SubmissionErrorResult,
 } from '@formspree/core';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import React from 'react';
+import { FormspreeProvider, useSubmit, type ExtraData } from '../src';
+
+jest.mock('@stripe/stripe-js/pure');
 
 describe('useSubmit', () => {
   const mockedFetch = jest.spyOn(window, 'fetch');

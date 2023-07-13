@@ -3,7 +3,7 @@ import {
   type FieldValues,
   type SubmissionData,
   type SubmissionErrorResult,
-  type SubmissionRedirectResult,
+  type SubmissionSuccessResult,
 } from '@formspree/core';
 import { useState } from 'react';
 import type { ExtraData } from './types';
@@ -20,7 +20,7 @@ type ResetFunction = () => void;
 export type TUseForm<T extends FieldValues> = [
   {
     errors: SubmissionErrorResult<T> | null;
-    result: SubmissionRedirectResult | null;
+    result: SubmissionSuccessResult | null;
     submitting: boolean;
     succeeded: boolean;
   },
@@ -37,7 +37,7 @@ export function useForm<T extends FieldValues>(
   } = {}
 ): TUseForm<T> {
   const [errors, setErrors] = useState<SubmissionErrorResult<T> | null>(null);
-  const [result, setResult] = useState<SubmissionRedirectResult | null>(null);
+  const [result, setResult] = useState<SubmissionSuccessResult | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [succeeded, setSucceeded] = useState(false);
 
@@ -67,7 +67,7 @@ export function useForm<T extends FieldValues>(
   });
 
   return [
-    { result, submitting, succeeded, errors },
+    { errors, result, submitting, succeeded },
 
     function handleSubmit(submissionData) {
       setSubmitting(true);
