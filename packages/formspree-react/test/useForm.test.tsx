@@ -177,4 +177,29 @@ describe('useForm', () => {
       });
     });
   });
+
+  describe('when an empty form key is provided', () => {
+    it('throws an error', async () => {
+      function TestForm() {
+        const [, submit] = useForm('');
+        return (
+          <form onSubmit={submit}>
+            <input type="email" name="email" defaultValue="test@example.com" />
+            <button>Sign up</button>
+          </form>
+        );
+      }
+
+      // avoid thrown error from `render` to be logged to console
+      const spiedConsoleError = jest
+        .spyOn(console, 'error')
+        .mockImplementation();
+
+      expect(() => render(<TestForm />)).toThrowErrorMatchingInlineSnapshot(
+        `"You must provide a form key or hashid (e.g. useForm("myForm") or useForm("123xyz")"`
+      );
+
+      spiedConsoleError.mockRestore();
+    });
+  });
 });
