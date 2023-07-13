@@ -3,10 +3,17 @@ import {
   FormErrorCodeEnum,
   SubmissionErrorResult,
 } from '@formspree/core';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { FormspreeProvider, useSubmit, type ExtraData } from '../src';
+import {
+  FormspreeProvider,
+  useSubmit,
+  type ExtraData,
+  useFormspree,
+} from '../src';
+import { loadStripe } from '@stripe/stripe-js/pure';
+import type { PaymentMethodResult, Stripe } from '@stripe/stripe-js';
 
 jest.mock('@stripe/stripe-js/pure');
 
@@ -222,7 +229,7 @@ describe('useSubmit', () => {
       );
     }
 
-    it('triggers onError option with the error result', async () => {
+    it('calls onError option with the error result', async () => {
       mockedFetch.mockResolvedValue(
         new Response(
           JSON.stringify({
@@ -311,7 +318,7 @@ describe('useSubmit', () => {
       );
     }
 
-    it('triggers onSuccess option with the success result', async () => {
+    it('calls onSuccess option with the success result', async () => {
       mockedFetch.mockResolvedValue(
         new Response(JSON.stringify({ next: 'test-redirect-url' }))
       );
@@ -332,11 +339,81 @@ describe('useSubmit', () => {
       expect(onSuccess).toHaveBeenCalledTimes(1);
       const successResult = onSuccess.mock.calls[0][0];
       expect(successResult).toEqual({
-        kind: 'redirect',
+        kind: 'success',
         next: 'test-redirect-url',
       });
     });
   });
 
-  // describe('with Stripe')
+  describe('with Stripe (success)', () => {
+    it('calls onSuccess option with the success result', async () => {
+      const mockedLoadStripe = loadStripe as jest.MockedFn<typeof loadStripe>;
+      const mockStripe = {
+        async createPaymentMethod() {
+          return {
+            paymentMethod: { id: 'test-payment-method-id' },
+          } as PaymentMethodResult;
+        },
+        elements() {
+          return {
+            getElement() {
+              return { name: 'fake-card-element' };
+            },
+          };
+        },
+      } as unknown as Stripe;
+
+      mockedLoadStripe.mockResolvedValue(mockStripe);
+
+      const onError = jest.fn();
+      const onSettled = jest.fn();
+      const onSuccess = jest.fn();
+
+      function TestForm() {
+        const { client } = useFormspree();
+        const handleSubmit = useSubmit<{ email: string }>(
+          'test-formspree-key',
+          {
+            onError,
+            onSettled,
+            onSuccess,
+          }
+        );
+        return (
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              handleSubmit({ email: 'test-email' });
+            }}
+          >
+            {client.stripe && <span>Stripe is loaded</span>}
+            <button>Submit</button>
+          </form>
+        );
+      }
+
+      render(
+        <FormspreeProvider stripePK="fake-stripe-public-key">
+          <TestForm />
+        </FormspreeProvider>
+      );
+
+      await screen.findByText('Stripe is loaded');
+
+      mockedFetch.mockResolvedValue(
+        new Response(JSON.stringify({ next: 'test-redirect-url' }))
+      );
+
+      await userEvent.click(screen.getByRole('button'));
+      await waitFor(() => {
+        expect(onError).not.toHaveBeenCalled();
+        expect(onSettled).toHaveBeenCalledTimes(1);
+        expect(onSuccess).toHaveBeenCalledTimes(1);
+        expect(onSuccess).toHaveBeenLastCalledWith({
+          kind: 'success',
+          next: 'test-redirect-url',
+        });
+      });
+    });
+  });
 });
