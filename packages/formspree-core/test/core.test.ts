@@ -454,23 +454,27 @@ describe('Client.submitForm', () => {
       });
 
       describe('and payment submission requires SCA', () => {
+        class RequireSCAResponse extends Response {
+          constructor() {
+            super(
+              JSON.stringify({
+                resubmitKey: 'test-resubmit-key',
+                stripe: {
+                  paymentIntentClientSecret:
+                    'test-payment-intent-client-secret',
+                },
+              } satisfies ServerStripePluginPendingResponse)
+            );
+          }
+        }
+
         describe('and Stripe handleCardAction fails', () => {
           async function handleCardAction(): Promise<PaymentIntentResult> {
             return { error: { type: 'card_error' } };
           }
 
           it('returns SubmissionErrorResult', async () => {
-            mockedFetch.mockResolvedValueOnce(
-              new Response(
-                JSON.stringify({
-                  resubmitKey: 'test-resubmit-key',
-                  stripe: {
-                    paymentIntentClientSecret:
-                      'test-payment-intent-client-secret',
-                  },
-                } satisfies ServerStripePluginPendingResponse)
-              )
-            );
+            mockedFetch.mockResolvedValueOnce(new RequireSCAResponse());
 
             const client = createTestClientWithStripe(handleCardAction);
             const data = { email: 'test@example.com' };
@@ -525,17 +529,7 @@ describe('Client.submitForm', () => {
             const redirectResponseBody = { next: 'test-redirect-url' };
 
             mockedFetch
-              .mockResolvedValueOnce(
-                new Response(
-                  JSON.stringify({
-                    resubmitKey: 'test-resubmit-key',
-                    stripe: {
-                      paymentIntentClientSecret:
-                        'test-payment-intent-client-secret',
-                    },
-                  } satisfies ServerStripePluginPendingResponse)
-                )
-              )
+              .mockResolvedValueOnce(new RequireSCAResponse())
               .mockResolvedValueOnce(
                 new Response(JSON.stringify(redirectResponseBody))
               );
@@ -601,17 +595,7 @@ describe('Client.submitForm', () => {
             const redirectResponseBody = { next: 'test-redirect-url' };
 
             mockedFetch
-              .mockResolvedValueOnce(
-                new Response(
-                  JSON.stringify({
-                    resubmitKey: 'test-resubmit-key',
-                    stripe: {
-                      paymentIntentClientSecret:
-                        'test-payment-intent-client-secret',
-                    },
-                  } satisfies ServerStripePluginPendingResponse)
-                )
-              )
+              .mockResolvedValueOnce(new RequireSCAResponse())
               .mockResolvedValueOnce(
                 new Response(JSON.stringify(redirectResponseBody))
               );
