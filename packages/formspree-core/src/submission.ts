@@ -16,7 +16,6 @@ export type SubmissionOptions = {
 
 export type SubmissionResult<T extends FieldValues> =
   | SubmissionSuccessResult
-  | SubmissionStripePluginPendingResult
   | SubmissionErrorResult<T>;
 
 export class SubmissionSuccessResult {
@@ -108,8 +107,6 @@ export class SubmissionErrorResult<T extends FieldValues> {
     return Array.from(this.fieldErrors);
   }
 }
-
-export const emptySubmissionErrorResult = new SubmissionErrorResult();
 
 export type FormError = {
   readonly code: FormErrorCode | 'UNSPECIFIED';

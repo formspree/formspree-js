@@ -74,7 +74,7 @@ export class Client {
 
     async function makeFormspreeRequest(
       data: SubmissionData<T>
-    ): Promise<SubmissionResult<T>> {
+    ): Promise<SubmissionResult<T> | SubmissionStripePluginPendingResult> {
       try {
         const res = await fetch(url, {
           method: 'POST',
@@ -168,13 +168,27 @@ export class Client {
         appendExtraData(data, 'resubmitKey', result.resubmitKey);
 
         // Resubmit the form with the paymentIntent and resubmitKey
-        return makeFormspreeRequest(data);
+        const resubmitResult = await makeFormspreeRequest(data);
+        assertSubmissionResult(resubmitResult);
+        return resubmitResult;
       }
 
       return result;
     }
 
-    return makeFormspreeRequest(data);
+    const result = await makeFormspreeRequest(data);
+    assertSubmissionResult(result);
+    return result;
+  }
+}
+
+// assertSubmissionResult ensures the result is SubmissionResult
+function assertSubmissionResult<T extends FieldValues>(
+  result: SubmissionResult<T> | SubmissionStripePluginPendingResult
+): asserts result is SubmissionResult<T> {
+  const { kind } = result;
+  if (kind !== 'success' && kind !== 'error') {
+    throw new Error(`Unexpected submission result (kind: ${kind})`);
   }
 }
 
