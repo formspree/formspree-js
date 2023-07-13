@@ -19,15 +19,9 @@ type FormEvent = React.FormEvent<HTMLFormElement>;
 type Options<T extends FieldValues> = {
   client?: Client;
   extraData?: ExtraData;
-  onError?: (
-    error: SubmissionErrorResult<T>,
-    submittedData: SubmissionData
-  ) => void;
+  onError?: (error: SubmissionErrorResult<T>) => void;
   onSettled?: () => void;
-  onSuccess?: (
-    data: SubmissionRedirectResult,
-    submittedData: SubmissionData<T>
-  ) => void;
+  onSuccess?: (data: SubmissionRedirectResult) => void;
   // origin overrides the submission origin (default: "https://formspree.io")
   origin?: string;
 };
@@ -86,10 +80,10 @@ export function useSubmit<T extends FieldValues>(
 
       switch (result.kind) {
         case 'error':
-          onError?.(result, data);
+          onError?.(result);
           break;
         case 'redirect':
-          onSuccess?.(result, data);
+          onSuccess?.(result);
           break;
       }
 
