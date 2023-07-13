@@ -13,7 +13,11 @@ import {
   useFormspree,
 } from '../src';
 import { loadStripe } from '@stripe/stripe-js/pure';
-import type { PaymentMethodResult, Stripe } from '@stripe/stripe-js';
+import type {
+  PaymentIntentResult,
+  PaymentMethodResult,
+  Stripe,
+} from '@stripe/stripe-js';
 
 jest.mock('@stripe/stripe-js/pure');
 
@@ -348,18 +352,24 @@ describe('useSubmit', () => {
   describe('with Stripe (success)', () => {
     it('calls onSuccess option with the success result', async () => {
       const mockedLoadStripe = loadStripe as jest.MockedFn<typeof loadStripe>;
+      const mockedCardElement = { name: 'mocked-card-element' };
       const mockStripe = {
-        async createPaymentMethod() {
-          return {
-            paymentMethod: { id: 'test-payment-method-id' },
-          } as PaymentMethodResult;
-        },
+        createPaymentMethod: jest.fn().mockResolvedValue({
+          paymentMethod: { id: 'test-payment-method-id' },
+        } as PaymentMethodResult),
+
         elements() {
           return {
             getElement() {
-              return { name: 'fake-card-element' };
+              return mockedCardElement;
             },
           };
+        },
+
+        async handleCardAction() {
+          return {
+            paymentIntent: { id: 'test-payment-intent-id' },
+          } as PaymentIntentResult;
         },
       } as unknown as Stripe;
 
@@ -371,19 +381,26 @@ describe('useSubmit', () => {
 
       function TestForm() {
         const { client } = useFormspree();
-        const handleSubmit = useSubmit<{ email: string }>(
-          'test-formspree-key',
-          {
-            onError,
-            onSettled,
-            onSuccess,
-          }
-        );
+        const handleSubmit = useSubmit('test-formspree-key', {
+          onError,
+          onSettled,
+          onSuccess,
+        });
         return (
           <form
             onSubmit={(event) => {
               event.preventDefault();
-              handleSubmit({ email: 'test-email' });
+              handleSubmit({
+                address_line1: 'test-addr-line1',
+                address_line2: 'test-addr-line2',
+                address_city: 'test-addr-city',
+                address_country: 'test-addr-country',
+                address_state: 'test-addr-state',
+                address_postal_code: 'test-addr-postal_code',
+                email: 'test-email',
+                name: 'John Doe',
+                phone: 'test-phone-number',
+              });
             }}
           >
             {client.stripe && <span>Stripe is loaded</span>}
@@ -400,9 +417,20 @@ describe('useSubmit', () => {
 
       await screen.findByText('Stripe is loaded');
 
-      mockedFetch.mockResolvedValue(
-        new Response(JSON.stringify({ next: 'test-redirect-url' }))
-      );
+      mockedFetch
+        .mockResolvedValueOnce(
+          new Response(
+            JSON.stringify({
+              resubmitKey: 'test-resubmit-key',
+              stripe: {
+                paymentIntentClientSecret: 'test-payment-intent-client-secret',
+              },
+            })
+          )
+        )
+        .mockResolvedValueOnce(
+          new Response(JSON.stringify({ next: 'test-redirect-url' }))
+        );
 
       await userEvent.click(screen.getByRole('button'));
       await waitFor(() => {
@@ -413,6 +441,25 @@ describe('useSubmit', () => {
           kind: 'success',
           next: 'test-redirect-url',
         });
+      });
+
+      expect(mockStripe.createPaymentMethod).toHaveBeenCalledTimes(1);
+      expect(mockStripe.createPaymentMethod).toHaveBeenLastCalledWith({
+        type: 'card',
+        card: mockedCardElement,
+        billing_details: {
+          address: {
+            line1: 'test-addr-line1',
+            line2: 'test-addr-line2',
+            city: 'test-addr-city',
+            country: 'test-addr-country',
+            state: 'test-addr-state',
+            postal_code: 'test-addr-postal_code',
+          },
+          email: 'test-email',
+          name: 'John Doe',
+          phone: 'test-phone-number',
+        },
       });
     });
   });
