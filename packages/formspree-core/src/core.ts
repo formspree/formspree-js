@@ -3,10 +3,10 @@ import { Session } from './session';
 import {
   SubmissionError,
   SubmissionSuccess,
-  SubmissionStripePluginPendingResult,
+  StripeSCAPending,
   isServerErrorResponse,
   isServerSuccessResponse,
-  isServerStripePluginPendingResponse,
+  isServerStripeSCAPendingResponse,
   type FieldValues,
   type SubmissionData,
   type SubmissionOptions,
@@ -70,7 +70,7 @@ export class Client {
 
     async function makeFormspreeRequest(
       data: SubmissionData<T>
-    ): Promise<SubmissionResult<T> | SubmissionStripePluginPendingResult> {
+    ): Promise<SubmissionResult<T> | StripeSCAPending> {
       try {
         const res = await fetch(url, {
           method: 'POST',
@@ -88,8 +88,8 @@ export class Client {
               : new SubmissionError({ message: body.error });
           }
 
-          if (isServerStripePluginPendingResponse(body)) {
-            return new SubmissionStripePluginPendingResult(
+          if (isServerStripeSCAPendingResponse(body)) {
+            return new StripeSCAPending(
               body.stripe.paymentIntentClientSecret,
               body.resubmitKey
             );
@@ -180,7 +180,7 @@ export class Client {
 
 // assertSubmissionResult ensures the result is SubmissionResult
 function assertSubmissionResult<T extends FieldValues>(
-  result: SubmissionResult<T> | SubmissionStripePluginPendingResult
+  result: SubmissionResult<T> | StripeSCAPending
 ): asserts result is SubmissionResult<T> {
   const { kind } = result;
   if (kind !== 'success' && kind !== 'error') {

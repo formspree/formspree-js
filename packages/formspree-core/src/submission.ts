@@ -35,7 +35,7 @@ export function isServerSuccessResponse(
   return 'next' in obj && typeof obj.next === 'string';
 }
 
-export class SubmissionStripePluginPendingResult {
+export class StripeSCAPending {
   readonly kind = 'stripePluginPending';
 
   constructor(
@@ -44,14 +44,14 @@ export class SubmissionStripePluginPendingResult {
   ) {}
 }
 
-export type ServerStripePluginPendingResponse = {
+export type ServerStripeSCAPendingResponse = {
   resubmitKey: string;
   stripe: { paymentIntentClientSecret: string };
 };
 
-export function isServerStripePluginPendingResponse(
+export function isServerStripeSCAPendingResponse(
   obj: UnknownObject
-): obj is ServerStripePluginPendingResponse {
+): obj is ServerStripeSCAPendingResponse {
   if (
     'stripe' in obj &&
     'resubmitKey' in obj &&

@@ -13,7 +13,7 @@ import {
   type FieldError,
   type FormError,
   type ServerErrorResponse,
-  type ServerStripePluginPendingResponse,
+  type ServerStripeSCAPendingResponse,
 } from '../src/submission';
 
 describe('Client.submitForm', () => {
@@ -459,7 +459,7 @@ describe('Client.submitForm', () => {
                   paymentIntentClientSecret:
                     'test-payment-intent-client-secret',
                 },
-              } satisfies ServerStripePluginPendingResponse)
+              } satisfies ServerStripeSCAPendingResponse)
             );
           }
         }
