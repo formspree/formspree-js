@@ -7,7 +7,9 @@ export {
 
 export {
   SubmissionError,
+  type FieldErrorCode,
   type FieldValues,
+  type FormErrorCode,
   type SubmissionData,
   type SubmissionOptions,
   type SubmissionResult,
