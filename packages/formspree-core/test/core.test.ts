@@ -6,8 +6,6 @@ import type {
 import { version } from '../package.json';
 import { createClient, type Client } from '../src/core';
 import {
-  FieldErrorCodeEnum,
-  FormErrorCodeEnum,
   SubmissionError,
   SubmissionSuccess,
   type FieldError,
@@ -162,16 +160,16 @@ describe('Client.submitForm', () => {
             error: '(legacy error message)',
             errors: [
               {
-                code: FieldErrorCodeEnum.TYPE_EMAIL,
+                code: 'TYPE_EMAIL',
                 field: 'some-field',
                 message: 'must be an email',
               },
               {
-                code: FormErrorCodeEnum.EMPTY,
+                code: 'EMPTY',
                 message: 'empty form',
               },
               {
-                code: FieldErrorCodeEnum.REQUIRED_FIELD_MISSING,
+                code: 'REQUIRED_FIELD_MISSING',
                 field: 'some-other-field',
                 message: 'field missing',
               },
@@ -180,15 +178,13 @@ describe('Client.submitForm', () => {
           status: 400,
         },
         expected: {
-          formErrors: [
-            { code: FormErrorCodeEnum.EMPTY, message: 'empty form' },
-          ],
+          formErrors: [{ code: 'EMPTY', message: 'empty form' }],
           fieldErrors: [
             [
               'some-field',
               [
                 {
-                  code: FieldErrorCodeEnum.TYPE_EMAIL,
+                  code: 'TYPE_EMAIL',
                   message: 'must be an email',
                 },
               ],
@@ -197,7 +193,7 @@ describe('Client.submitForm', () => {
               'some-other-field',
               [
                 {
-                  code: FieldErrorCodeEnum.REQUIRED_FIELD_MISSING,
+                  code: 'REQUIRED_FIELD_MISSING',
                   message: 'field missing',
                 },
               ],

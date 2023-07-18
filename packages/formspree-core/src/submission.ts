@@ -119,7 +119,7 @@ function isFormErrorCode(code: string): code is FormErrorCode {
 
 export type FormErrorCode = ValueOf<typeof FormErrorCodeEnum>;
 
-export const FormErrorCodeEnum = {
+const FormErrorCodeEnum = {
   BLOCKED: 'BLOCKED',
   EMPTY: 'EMPTY',
   FILES_TOO_BIG: 'FILES_TOO_BIG',
@@ -141,7 +141,7 @@ function isFieldErrorCode(code: string): code is FieldErrorCode {
 
 export type FieldErrorCode = ValueOf<typeof FieldErrorCodeEnum>;
 
-export const FieldErrorCodeEnum = {
+const FieldErrorCodeEnum = {
   REQUIRED_FIELD_EMPTY: 'REQUIRED_FIELD_EMPTY',
   REQUIRED_FIELD_MISSING: 'REQUIRED_FIELD_MISSING',
   STRIPE_CLIENT_ERROR: 'STRIPE_CLIENT_ERROR',

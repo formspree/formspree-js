@@ -1,8 +1,4 @@
-import {
-  FieldErrorCodeEnum,
-  FormErrorCodeEnum,
-  SubmissionError,
-} from '../src/submission';
+import { SubmissionError } from '../src/submission';
 
 describe('SubmissionError', () => {
   test('no server errors', () => {
@@ -28,12 +24,12 @@ describe('SubmissionError', () => {
 
   test('with one form error, with code', () => {
     const err = new SubmissionError({
-      code: FormErrorCodeEnum.EMPTY,
+      code: 'EMPTY',
       message: '(test) empty form',
     });
     expect(err.getFormErrors()).toEqual([
       {
-        code: FormErrorCodeEnum.EMPTY,
+        code: 'EMPTY',
         message: '(test) empty form',
       },
     ]);
@@ -69,14 +65,14 @@ describe('SubmissionError', () => {
 
   test('with one field error, with code', () => {
     const err = new SubmissionError({
-      code: FieldErrorCodeEnum.REQUIRED_FIELD_EMPTY,
+      code: 'REQUIRED_FIELD_EMPTY',
       field: 'some-key',
       message: '(test) the field is required',
     });
     expect(err.getFormErrors()).toEqual([]);
     expect(err.getFieldErrors('some-key')).toEqual([
       {
-        code: FieldErrorCodeEnum.REQUIRED_FIELD_EMPTY,
+        code: 'REQUIRED_FIELD_EMPTY',
         message: '(test) the field is required',
       },
     ]);
@@ -85,7 +81,7 @@ describe('SubmissionError', () => {
         'some-key',
         [
           {
-            code: FieldErrorCodeEnum.REQUIRED_FIELD_EMPTY,
+            code: 'REQUIRED_FIELD_EMPTY',
             message: '(test) the field is required',
           },
         ],
@@ -99,21 +95,21 @@ describe('SubmissionError', () => {
         message: '(test) unknown form error',
       },
       {
-        code: FieldErrorCodeEnum.REQUIRED_FIELD_EMPTY,
+        code: 'REQUIRED_FIELD_EMPTY',
         field: 'some-key',
         message: '(test) the field is required',
       },
       {
-        code: FormErrorCodeEnum.EMPTY,
+        code: 'EMPTY',
         message: '(test) empty form',
       },
       {
-        code: FieldErrorCodeEnum.TYPE_EMAIL,
+        code: 'TYPE_EMAIL',
         field: 'some-other-key',
         message: '(test) should be an email',
       },
       {
-        code: FieldErrorCodeEnum.TYPE_TEXT,
+        code: 'TYPE_TEXT',
         field: 'some-key',
         message: '(test) should be a text',
       }
@@ -124,23 +120,23 @@ describe('SubmissionError', () => {
         message: '(test) unknown form error',
       },
       {
-        code: FormErrorCodeEnum.EMPTY,
+        code: 'EMPTY',
         message: '(test) empty form',
       },
     ]);
     expect(err.getFieldErrors('some-key')).toEqual([
       {
-        code: FieldErrorCodeEnum.REQUIRED_FIELD_EMPTY,
+        code: 'REQUIRED_FIELD_EMPTY',
         message: '(test) the field is required',
       },
       {
-        code: FieldErrorCodeEnum.TYPE_TEXT,
+        code: 'TYPE_TEXT',
         message: '(test) should be a text',
       },
     ]);
     expect(err.getFieldErrors('some-other-key')).toEqual([
       {
-        code: FieldErrorCodeEnum.TYPE_EMAIL,
+        code: 'TYPE_EMAIL',
         message: '(test) should be an email',
       },
     ]);
@@ -149,11 +145,11 @@ describe('SubmissionError', () => {
         'some-key',
         [
           {
-            code: FieldErrorCodeEnum.REQUIRED_FIELD_EMPTY,
+            code: 'REQUIRED_FIELD_EMPTY',
             message: '(test) the field is required',
           },
           {
-            code: FieldErrorCodeEnum.TYPE_TEXT,
+            code: 'TYPE_TEXT',
             message: '(test) should be a text',
           },
         ],
@@ -162,7 +158,7 @@ describe('SubmissionError', () => {
         'some-other-key',
         [
           {
-            code: FieldErrorCodeEnum.TYPE_EMAIL,
+            code: 'TYPE_EMAIL',
             message: '(test) should be an email',
           },
         ],
