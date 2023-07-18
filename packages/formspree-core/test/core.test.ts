@@ -4,7 +4,7 @@ import type {
   Stripe,
 } from '@stripe/stripe-js';
 import { version } from '../package.json';
-import { createClient, type Client, type Config } from '../src/core';
+import { createClient, type Client } from '../src/core';
 import {
   FieldErrorCodeEnum,
   FormErrorCodeEnum,
@@ -17,14 +17,10 @@ import {
 } from '../src/submission';
 
 describe('Client.submitForm', () => {
-  const mockedFetch: jest.MockedFn<typeof global.fetch> = jest.fn();
-
-  function createTestClient(config?: Omit<Config, 'fetch'>): Client {
-    return createClient({ ...config, fetch: mockedFetch });
-  }
+  const fetch = jest.spyOn(global, 'fetch');
 
   beforeEach(() => {
-    mockedFetch.mockReset();
+    fetch.mockReset();
   });
 
   const now = new Date('2023-07-07T04:41:09.936Z').getTime();
@@ -43,17 +39,17 @@ describe('Client.submitForm', () => {
     it('makes the request to the submission url', async () => {
       const testCases = [
         {
-          client: createTestClient(),
+          client: createClient(),
           expectedUrl: 'https://formspree.io/f/test-form-id',
         },
         {
-          client: createTestClient({ project: 'test-project-id' }),
+          client: createClient({ project: 'test-project-id' }),
           expectedUrl: 'https://formspree.io/p/test-project-id/f/test-form-id',
         },
       ];
 
       for (const { client, expectedUrl } of testCases) {
-        mockedFetch.mockClear();
+        fetch.mockClear();
 
         const data = new FormData();
         data.set('email', 'test@example.com');
@@ -65,8 +61,8 @@ describe('Client.submitForm', () => {
         );
         await client.submitForm('test-form-id', data);
 
-        expect(mockedFetch).toHaveBeenCalledTimes(1);
-        expect(mockedFetch).toHaveBeenLastCalledWith(expectedUrl, {
+        expect(fetch).toHaveBeenCalledTimes(1);
+        expect(fetch).toHaveBeenLastCalledWith(expectedUrl, {
           body: data,
           headers: {
             Accept: 'application/json',
@@ -84,23 +80,23 @@ describe('Client.submitForm', () => {
     it('makes the request to the submission url', async () => {
       const testCases = [
         {
-          client: createTestClient(),
+          client: createClient(),
           expectedUrl: 'https://formspree.io/f/test-form-id',
         },
         {
-          client: createTestClient({ project: 'test-project-id' }),
+          client: createClient({ project: 'test-project-id' }),
           expectedUrl: 'https://formspree.io/p/test-project-id/f/test-form-id',
         },
       ];
 
       for (const { client, expectedUrl } of testCases) {
-        mockedFetch.mockClear();
+        fetch.mockClear();
 
         const data = { email: 'test@example.com', message: 'Hello!' };
         await client.submitForm('test-form-id', data);
 
-        expect(mockedFetch).toHaveBeenCalledTimes(1);
-        expect(mockedFetch).toHaveBeenLastCalledWith(expectedUrl, {
+        expect(fetch).toHaveBeenCalledTimes(1);
+        expect(fetch).toHaveBeenLastCalledWith(expectedUrl, {
           body: JSON.stringify(data),
           headers: {
             Accept: 'application/json',
@@ -212,14 +208,14 @@ describe('Client.submitForm', () => {
     ];
 
     it.each(testCases)('$name', async ({ response, expected }) => {
-      mockedFetch.mockResolvedValue(
+      fetch.mockResolvedValue(
         new Response(JSON.stringify(response.body), {
           headers: { 'Content-Type': 'application/json' },
           status: response.status,
         })
       );
 
-      const client = createTestClient();
+      const client = createClient();
       const data = {};
       const result = await client.submitForm('test-form-id', data);
 
@@ -232,14 +228,14 @@ describe('Client.submitForm', () => {
 
   describe('when the server returns an unregonized response', () => {
     it('resolves to a SubmissionError result', async () => {
-      mockedFetch.mockResolvedValue(
+      fetch.mockResolvedValue(
         new Response(JSON.stringify({ something: '-' }), {
           headers: { 'Content-Type': 'application/json' },
           status: 400,
         })
       );
 
-      const client = createTestClient();
+      const client = createClient();
       const data = { email: 'test@example.com' };
       const result = await client.submitForm('test-form-id', data);
 
@@ -259,9 +255,9 @@ describe('Client.submitForm', () => {
     describe('with an error', () => {
       it('resolves to a SubmissionError result', async () => {
         const errMessage = '(test) network error with an unknown reason';
-        mockedFetch.mockRejectedValue(new Error(errMessage));
+        fetch.mockRejectedValue(new Error(errMessage));
 
-        const client = createTestClient();
+        const client = createClient();
         const data = { email: 'test@example.com' };
         const result = await client.submitForm('test-form-id', {});
 
@@ -279,9 +275,9 @@ describe('Client.submitForm', () => {
 
     describe('with an unknown value', () => {
       it('resolves to a SubmissionError result', async () => {
-        mockedFetch.mockRejectedValue({ someKey: 'some unknown value' });
+        fetch.mockRejectedValue({ someKey: 'some unknown value' });
 
-        const client = createTestClient();
+        const client = createClient();
         const data = { email: 'test@example.com' };
         const result = await client.submitForm('test-form-id', {});
 
@@ -303,7 +299,7 @@ describe('Client.submitForm', () => {
     const responseBody = { next: 'test-redirect-url' };
 
     beforeEach(() => {
-      mockedFetch.mockResolvedValue(
+      fetch.mockResolvedValue(
         new Response(JSON.stringify(responseBody), {
           headers: { 'Content-Type': 'application/json' },
         })
@@ -311,7 +307,7 @@ describe('Client.submitForm', () => {
     });
 
     it('resolves to a SubmissionSuccessResult', async () => {
-      const client = createTestClient();
+      const client = createClient();
       const data = { email: 'test@example.com' };
       const result = await client.submitForm('test-form-id', data);
 
@@ -323,11 +319,11 @@ describe('Client.submitForm', () => {
   });
 
   describe('with Stripe', () => {
-    function createTestClientWithStripe(
+    function createClientWithStripe(
       handleCardAction?: Stripe['handleCardAction']
     ): Client {
       const stripe = { handleCardAction } as Stripe;
-      return createTestClient({ stripePromise: stripe });
+      return createClient({ stripePromise: stripe });
     }
 
     describe('when payment method creation fails', () => {
@@ -336,7 +332,7 @@ describe('Client.submitForm', () => {
       }
 
       it('returns an error result', async () => {
-        const client = createTestClientWithStripe();
+        const client = createClientWithStripe();
         const data = { email: 'test@example.com' };
         const result = await client.submitForm('test-form-id', data, {
           createPaymentMethod,
@@ -368,7 +364,7 @@ describe('Client.submitForm', () => {
 
       describe('and payment submission fails', () => {
         it('returns SubmissionErrorResult', async () => {
-          mockedFetch.mockResolvedValueOnce(
+          fetch.mockResolvedValueOnce(
             new Response(
               JSON.stringify({
                 error: '(legacy error message)',
@@ -377,14 +373,14 @@ describe('Client.submitForm', () => {
             )
           );
 
-          const client = createTestClientWithStripe();
+          const client = createClientWithStripe();
           const data = { email: 'test@example.com' };
           const result = await client.submitForm('test-form-id', data, {
             createPaymentMethod,
           });
 
-          expect(mockedFetch).toHaveBeenCalledTimes(1);
-          expect(mockedFetch).toHaveBeenLastCalledWith(
+          expect(fetch).toHaveBeenCalledTimes(1);
+          expect(fetch).toHaveBeenLastCalledWith(
             'https://formspree.io/f/test-form-id',
             {
               body: JSON.stringify({
@@ -417,18 +413,18 @@ describe('Client.submitForm', () => {
       describe('and payment submission succeeds', () => {
         it('returns SubmissionSuccessResult', async () => {
           const responseBody = { next: 'test-redirect-url' };
-          mockedFetch.mockResolvedValueOnce(
+          fetch.mockResolvedValueOnce(
             new Response(JSON.stringify(responseBody))
           );
 
-          const client = createTestClientWithStripe();
+          const client = createClientWithStripe();
           const data = { email: 'test@example.com' };
           const result = await client.submitForm('test-form-id', data, {
             createPaymentMethod,
           });
 
-          expect(mockedFetch).toHaveBeenCalledTimes(1);
-          expect(mockedFetch).toHaveBeenLastCalledWith(
+          expect(fetch).toHaveBeenCalledTimes(1);
+          expect(fetch).toHaveBeenLastCalledWith(
             'https://formspree.io/f/test-form-id',
             {
               body: JSON.stringify({
@@ -474,16 +470,16 @@ describe('Client.submitForm', () => {
           }
 
           it('returns SubmissionErrorResult', async () => {
-            mockedFetch.mockResolvedValueOnce(new RequireSCAResponse());
+            fetch.mockResolvedValueOnce(new RequireSCAResponse());
 
-            const client = createTestClientWithStripe(handleCardAction);
+            const client = createClientWithStripe(handleCardAction);
             const data = { email: 'test@example.com' };
             const result = await client.submitForm('test-form-id', data, {
               createPaymentMethod,
             });
 
-            expect(mockedFetch).toHaveBeenCalledTimes(1);
-            expect(mockedFetch).toHaveBeenLastCalledWith(
+            expect(fetch).toHaveBeenCalledTimes(1);
+            expect(fetch).toHaveBeenLastCalledWith(
               'https://formspree.io/f/test-form-id',
               {
                 body: JSON.stringify({
@@ -528,13 +524,13 @@ describe('Client.submitForm', () => {
           it('resubmits the form and produces a SubmissionSuccessResult', async () => {
             const responseBody = { next: 'test-redirect-url' };
 
-            mockedFetch
+            fetch
               .mockResolvedValueOnce(new RequireSCAResponse())
               .mockResolvedValueOnce(
                 new Response(JSON.stringify(responseBody))
               );
 
-            const client = createTestClientWithStripe(handleCardAction);
+            const client = createClientWithStripe(handleCardAction);
             const data = new FormData();
             data.set('email', 'test@example.com');
             data.set('message', 'Hello!');
@@ -547,8 +543,8 @@ describe('Client.submitForm', () => {
               createPaymentMethod,
             });
 
-            expect(mockedFetch).toHaveBeenCalledTimes(2);
-            expect(mockedFetch).toHaveBeenNthCalledWith(
+            expect(fetch).toHaveBeenCalledTimes(2);
+            expect(fetch).toHaveBeenNthCalledWith(
               1,
               'https://formspree.io/f/test-form-id',
               {
@@ -562,7 +558,7 @@ describe('Client.submitForm', () => {
                 mode: 'cors',
               }
             );
-            expect(mockedFetch).toHaveBeenNthCalledWith(
+            expect(fetch).toHaveBeenNthCalledWith(
               2,
               'https://formspree.io/f/test-form-id',
               {
@@ -594,20 +590,20 @@ describe('Client.submitForm', () => {
           it('resubmits the form and produces a SubmissionSuccessResult', async () => {
             const responseBody = { next: 'test-redirect-url' };
 
-            mockedFetch
+            fetch
               .mockResolvedValueOnce(new RequireSCAResponse())
               .mockResolvedValueOnce(
                 new Response(JSON.stringify(responseBody))
               );
 
-            const client = createTestClientWithStripe(handleCardAction);
+            const client = createClientWithStripe(handleCardAction);
             const data = { email: 'test@example.com' };
             const result = await client.submitForm('test-form-id', data, {
               createPaymentMethod,
             });
 
-            expect(mockedFetch).toHaveBeenCalledTimes(2);
-            expect(mockedFetch).toHaveBeenNthCalledWith(
+            expect(fetch).toHaveBeenCalledTimes(2);
+            expect(fetch).toHaveBeenNthCalledWith(
               1,
               'https://formspree.io/f/test-form-id',
               {
@@ -625,7 +621,7 @@ describe('Client.submitForm', () => {
                 mode: 'cors',
               }
             );
-            expect(mockedFetch).toHaveBeenNthCalledWith(
+            expect(fetch).toHaveBeenNthCalledWith(
               2,
               'https://formspree.io/f/test-form-id',
               {
