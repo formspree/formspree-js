@@ -10,8 +10,8 @@ import {
   type Client,
   type FieldValues,
   type SubmissionData,
-  type SubmissionSuccessResult,
-  type SubmissionErrorResult,
+  type SubmissionSuccess,
+  type SubmissionError,
 } from '@formspree/core';
 
 type FormEvent = React.FormEvent<HTMLFormElement>;
@@ -24,8 +24,8 @@ type ResetFunction = () => void;
 
 export type TUseForm<T extends FieldValues> = [
   {
-    errors: SubmissionErrorResult<T> | null;
-    result: SubmissionSuccessResult | null;
+    errors: SubmissionError<T> | null;
+    result: SubmissionSuccess | null;
     submitting: boolean;
     succeeded: boolean;
   },
@@ -46,8 +46,8 @@ const useForm = <T extends FieldValues>(
     debug?: boolean;
   } = {}
 ): TUseForm<T> => {
-  const [errors, setErrors] = useState<SubmissionErrorResult<T> | null>(null);
-  const [result, setResult] = useState<SubmissionSuccessResult | null>(null);
+  const [errors, setErrors] = useState<SubmissionError<T> | null>(null);
+  const [result, setResult] = useState<SubmissionSuccess | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [succeeded, setSucceeded] = useState(false);
   const formspreeContext = useFormspree();

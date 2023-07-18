@@ -1,8 +1,8 @@
 import React, { type ComponentPropsWithoutRef } from 'react';
-import type { FieldValues, SubmissionErrorResult } from '@formspree/core';
+import type { FieldValues, SubmissionError } from '@formspree/core';
 
 export type ValidationErrorProps<T extends FieldValues = FieldValues> = {
-  errors: SubmissionErrorResult<T> | null;
+  errors: SubmissionError<T> | null;
   field?: keyof T;
   prefix?: string;
 } & ComponentPropsWithoutRef<'div'>;

@@ -8,8 +8,8 @@ import { createClient, type Client } from '../src/core';
 import {
   FieldErrorCodeEnum,
   FormErrorCodeEnum,
-  SubmissionErrorResult,
-  SubmissionSuccessResult,
+  SubmissionError,
+  SubmissionSuccess,
   type FieldError,
   type FormError,
   type ServerErrorResponse,
@@ -219,8 +219,8 @@ describe('Client.submitForm', () => {
       const data = {};
       const result = await client.submitForm('test-form-id', data);
 
-      expect(result).toBeInstanceOf(SubmissionErrorResult);
-      const errorResult = result as SubmissionErrorResult<typeof data>;
+      expect(result).toBeInstanceOf(SubmissionError);
+      const errorResult = result as SubmissionError<typeof data>;
       expect(errorResult.getFormErrors()).toEqual(expected.formErrors);
       expect(errorResult.getAllFieldErrors()).toEqual(expected.fieldErrors);
     });
@@ -239,8 +239,8 @@ describe('Client.submitForm', () => {
       const data = { email: 'test@example.com' };
       const result = await client.submitForm('test-form-id', data);
 
-      expect(result).toBeInstanceOf(SubmissionErrorResult);
-      const errorResult = result as SubmissionErrorResult<typeof data>;
+      expect(result).toBeInstanceOf(SubmissionError);
+      const errorResult = result as SubmissionError<typeof data>;
       expect(errorResult.getFormErrors()).toEqual([
         {
           code: 'UNSPECIFIED',
@@ -261,8 +261,8 @@ describe('Client.submitForm', () => {
         const data = { email: 'test@example.com' };
         const result = await client.submitForm('test-form-id', {});
 
-        expect(result).toBeInstanceOf(SubmissionErrorResult);
-        const errorResult = result as SubmissionErrorResult<typeof data>;
+        expect(result).toBeInstanceOf(SubmissionError);
+        const errorResult = result as SubmissionError<typeof data>;
         expect(errorResult.getFormErrors()).toEqual([
           {
             code: 'UNSPECIFIED',
@@ -281,8 +281,8 @@ describe('Client.submitForm', () => {
         const data = { email: 'test@example.com' };
         const result = await client.submitForm('test-form-id', {});
 
-        expect(result).toBeInstanceOf(SubmissionErrorResult);
-        const errorResult = result as SubmissionErrorResult<typeof data>;
+        expect(result).toBeInstanceOf(SubmissionError);
+        const errorResult = result as SubmissionError<typeof data>;
         expect(errorResult.getFormErrors()).toEqual([
           {
             code: 'UNSPECIFIED',
@@ -306,13 +306,13 @@ describe('Client.submitForm', () => {
       );
     });
 
-    it('resolves to a SubmissionSuccessResult', async () => {
+    it('resolves to a SubmissionSuccess', async () => {
       const client = createClient();
       const data = { email: 'test@example.com' };
       const result = await client.submitForm('test-form-id', data);
 
-      expect(result).toBeInstanceOf(SubmissionSuccessResult);
-      const successResult = result as SubmissionSuccessResult;
+      expect(result).toBeInstanceOf(SubmissionSuccess);
+      const successResult = result as SubmissionSuccess;
       expect(successResult.kind).toBe('success');
       expect(successResult.next).toEqual(responseBody.next);
     });
@@ -338,8 +338,8 @@ describe('Client.submitForm', () => {
           createPaymentMethod,
         });
 
-        expect(result).toBeInstanceOf(SubmissionErrorResult);
-        const errorResult = result as SubmissionErrorResult<typeof data>;
+        expect(result).toBeInstanceOf(SubmissionError);
+        const errorResult = result as SubmissionError<typeof data>;
         expect(errorResult.getFormErrors()).toEqual([]);
         expect(errorResult.getAllFieldErrors()).toEqual([
           [
@@ -363,7 +363,7 @@ describe('Client.submitForm', () => {
       }
 
       describe('and payment submission fails', () => {
-        it('returns SubmissionErrorResult', async () => {
+        it('returns SubmissionError', async () => {
           fetch.mockResolvedValueOnce(
             new Response(
               JSON.stringify({
@@ -398,8 +398,8 @@ describe('Client.submitForm', () => {
             }
           );
 
-          expect(result).toBeInstanceOf(SubmissionErrorResult);
-          const errorResult = result as SubmissionErrorResult<typeof data>;
+          expect(result).toBeInstanceOf(SubmissionError);
+          const errorResult = result as SubmissionError<typeof data>;
           expect(errorResult.getFormErrors()).toEqual([
             {
               code: 'UNSPECIFIED',
@@ -411,7 +411,7 @@ describe('Client.submitForm', () => {
       });
 
       describe('and payment submission succeeds', () => {
-        it('returns SubmissionSuccessResult', async () => {
+        it('returns SubmissionSuccess', async () => {
           const responseBody = { next: 'test-redirect-url' };
           fetch.mockResolvedValueOnce(
             new Response(JSON.stringify(responseBody))
@@ -442,8 +442,8 @@ describe('Client.submitForm', () => {
             }
           );
 
-          expect(result).toBeInstanceOf(SubmissionSuccessResult);
-          const successResult = result as SubmissionSuccessResult;
+          expect(result).toBeInstanceOf(SubmissionSuccess);
+          const successResult = result as SubmissionSuccess;
           expect(successResult.kind).toBe('success');
           expect(successResult.next).toEqual(responseBody.next);
         });
@@ -469,7 +469,7 @@ describe('Client.submitForm', () => {
             return { error: { type: 'card_error' } };
           }
 
-          it('returns SubmissionErrorResult', async () => {
+          it('returns SubmissionError', async () => {
             fetch.mockResolvedValueOnce(new RequireSCAResponse());
 
             const client = createClientWithStripe(handleCardAction);
@@ -497,8 +497,8 @@ describe('Client.submitForm', () => {
               }
             );
 
-            expect(result).toBeInstanceOf(SubmissionErrorResult);
-            const errorResult = result as SubmissionErrorResult<typeof data>;
+            expect(result).toBeInstanceOf(SubmissionError);
+            const errorResult = result as SubmissionError<typeof data>;
             expect(errorResult.getFormErrors()).toEqual([]);
             expect(errorResult.getAllFieldErrors()).toEqual([
               [
@@ -521,7 +521,7 @@ describe('Client.submitForm', () => {
             } as PaymentIntentResult;
           }
 
-          it('resubmits the form and produces a SubmissionSuccessResult', async () => {
+          it('resubmits the form and produces a SubmissionSuccess', async () => {
             const responseBody = { next: 'test-redirect-url' };
 
             fetch
@@ -573,8 +573,8 @@ describe('Client.submitForm', () => {
               }
             );
 
-            expect(result).toBeInstanceOf(SubmissionSuccessResult);
-            const successResult = result as SubmissionSuccessResult;
+            expect(result).toBeInstanceOf(SubmissionSuccess);
+            const successResult = result as SubmissionSuccess;
             expect(successResult.kind).toBe('success');
             expect(successResult.next).toEqual(responseBody.next);
           });
@@ -587,7 +587,7 @@ describe('Client.submitForm', () => {
             } as PaymentIntentResult;
           }
 
-          it('resubmits the form and produces a SubmissionSuccessResult', async () => {
+          it('resubmits the form and produces a SubmissionSuccess', async () => {
             const responseBody = { next: 'test-redirect-url' };
 
             fetch
@@ -642,8 +642,8 @@ describe('Client.submitForm', () => {
               }
             );
 
-            expect(result).toBeInstanceOf(SubmissionSuccessResult);
-            const successResult = result as SubmissionSuccessResult;
+            expect(result).toBeInstanceOf(SubmissionSuccess);
+            const successResult = result as SubmissionSuccess;
             expect(successResult.kind).toBe('success');
             expect(successResult.next).toEqual(responseBody.next);
           });

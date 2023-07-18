@@ -15,10 +15,10 @@ export type SubmissionOptions = {
 };
 
 export type SubmissionResult<T extends FieldValues> =
-  | SubmissionSuccessResult
-  | SubmissionErrorResult<T>;
+  | SubmissionSuccess
+  | SubmissionError<T>;
 
-export class SubmissionSuccessResult {
+export class SubmissionSuccess {
   readonly kind = 'success';
   readonly next: string;
 
@@ -68,7 +68,7 @@ export function isServerStripePluginPendingResponse(
   return false;
 }
 
-export class SubmissionErrorResult<T extends FieldValues> {
+export class SubmissionError<T extends FieldValues> {
   readonly kind = 'error';
 
   private readonly formErrors: FormError[] = [];

@@ -1,8 +1,8 @@
 import type { Stripe } from '@stripe/stripe-js';
 import { Session } from './session';
 import {
-  SubmissionErrorResult,
-  SubmissionSuccessResult,
+  SubmissionError,
+  SubmissionSuccess,
   SubmissionStripePluginPendingResult,
   isServerErrorResponse,
   isServerSuccessResponse,
@@ -84,8 +84,8 @@ export class Client {
         if (isUnknownObject(body)) {
           if (isServerErrorResponse(body)) {
             return Array.isArray(body.errors)
-              ? new SubmissionErrorResult(...body.errors)
-              : new SubmissionErrorResult({ message: body.error });
+              ? new SubmissionError(...body.errors)
+              : new SubmissionError({ message: body.error });
           }
 
           if (isServerStripePluginPendingResponse(body)) {
@@ -96,11 +96,11 @@ export class Client {
           }
 
           if (isServerSuccessResponse(body)) {
-            return new SubmissionSuccessResult({ next: body.next });
+            return new SubmissionSuccess({ next: body.next });
           }
         }
 
-        return new SubmissionErrorResult({
+        return new SubmissionError({
           message: 'Unexpected response format',
         });
       } catch (err) {
@@ -110,7 +110,7 @@ export class Client {
             : `Unknown error while posting to Formspree: ${JSON.stringify(
                 err
               )}`;
-        return new SubmissionErrorResult({ message: message });
+        return new SubmissionError({ message: message });
       }
     }
 
@@ -118,7 +118,7 @@ export class Client {
       const createPaymentMethodResult = await opts.createPaymentMethod();
 
       if (createPaymentMethodResult.error) {
-        return new SubmissionErrorResult({
+        return new SubmissionError({
           code: 'STRIPE_CLIENT_ERROR',
           field: 'paymentMethod',
           message: 'Error creating payment method',
@@ -145,7 +145,7 @@ export class Client {
         );
 
         if (stripeResult.error) {
-          return new SubmissionErrorResult({
+          return new SubmissionError({
             code: 'STRIPE_CLIENT_ERROR',
             field: 'paymentMethod',
             message: 'Stripe SCA error',
