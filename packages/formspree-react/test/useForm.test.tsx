@@ -51,15 +51,15 @@ function TestForm(props: TestFormProps) {
 }
 
 describe('useForm', () => {
-  const mockedFetch = jest.spyOn(window, 'fetch');
+  const fetch = jest.spyOn(window, 'fetch');
 
   beforeEach(() => {
-    mockedFetch.mockReset();
+    fetch.mockReset();
   });
 
   describe('given a successful submission', () => {
     it('renders the correct states', async () => {
-      mockedFetch.mockResolvedValue(
+      fetch.mockResolvedValue(
         new Response(JSON.stringify({ next: 'test-redirect-url' }))
       );
 
@@ -72,8 +72,8 @@ describe('useForm', () => {
       // Later, we should find the confirmation text.
       await screen.findByText('Thanks!');
 
-      expect(mockedFetch).toHaveBeenCalledTimes(1);
-      expect(mockedFetch).toHaveBeenLastCalledWith(
+      expect(fetch).toHaveBeenCalledTimes(1);
+      expect(fetch).toHaveBeenLastCalledWith(
         'https://formspree.io/f/test-form-id-42',
         expect.objectContaining({
           body: expect.any(FormData),
@@ -87,7 +87,7 @@ describe('useForm', () => {
         })
       );
 
-      const fetchPayload = mockedFetch.mock.calls[0][1]?.body as FormData;
+      const fetchPayload = fetch.mock.calls[0][1]?.body as FormData;
       expect(Array.from(fetchPayload)).toEqual([
         ['email', 'test@example.com'],
         // extra data is added
@@ -98,7 +98,7 @@ describe('useForm', () => {
 
   describe('given a failed submission', () => {
     it('renders the correct states', async () => {
-      mockedFetch.mockResolvedValue(
+      fetch.mockResolvedValue(
         new Response(
           JSON.stringify({
             errors: [
@@ -134,8 +134,8 @@ describe('useForm', () => {
         '(test) should be an email'
       );
 
-      expect(mockedFetch).toHaveBeenCalledTimes(1);
-      expect(mockedFetch).toHaveBeenLastCalledWith(
+      expect(fetch).toHaveBeenCalledTimes(1);
+      expect(fetch).toHaveBeenLastCalledWith(
         'https://formspree.io/f/test-form-id-42',
         expect.objectContaining({
           body: expect.any(FormData),
@@ -149,7 +149,7 @@ describe('useForm', () => {
         })
       );
 
-      const fetchPayload = mockedFetch.mock.calls[0][1]?.body as FormData;
+      const fetchPayload = fetch.mock.calls[0][1]?.body as FormData;
       expect(Array.from(fetchPayload)).toEqual([
         ['email', 'test@example.com'],
         // extra data is added
@@ -160,7 +160,7 @@ describe('useForm', () => {
 
   describe('when the reset function is called', () => {
     it('resets the form state', async () => {
-      mockedFetch.mockResolvedValue(
+      fetch.mockResolvedValue(
         new Response(JSON.stringify({ next: 'test-redirect-url' }))
       );
       render(<TestForm />);
@@ -168,7 +168,7 @@ describe('useForm', () => {
       await userEvent.click(screen.getByText('Sign up'));
       await screen.findByText('Thanks!');
 
-      expect(mockedFetch).toHaveBeenCalledTimes(1);
+      expect(fetch).toHaveBeenCalledTimes(1);
 
       await userEvent.click(screen.getByText('Reset'));
       await waitFor(() => {
