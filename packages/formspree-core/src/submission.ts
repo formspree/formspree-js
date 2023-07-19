@@ -18,6 +18,12 @@ export type SubmissionResult<T extends FieldValues> =
   | SubmissionSuccess
   | SubmissionError<T>;
 
+export function isSubmissionError<T extends FieldValues>(
+  result: SubmissionResult<T>
+): result is SubmissionError<T> {
+  return result.kind === 'error';
+}
+
 export class SubmissionSuccess {
   readonly kind = 'success';
   readonly next: string;

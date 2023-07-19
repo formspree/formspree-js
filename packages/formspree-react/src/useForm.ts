@@ -7,6 +7,7 @@ import type { ExtraData } from './types';
 import { version } from '../package.json';
 import {
   appendExtraData,
+  isSubmissionError,
   type Client,
   type FieldValues,
   type SubmissionData,
@@ -137,17 +138,14 @@ const useForm = <T extends FieldValues>(
           : undefined,
     });
 
-    switch (result.kind) {
-      case 'error':
-        setErrors(result);
-        setResult(null);
-        setSucceeded(false);
-        break;
-      case 'success':
-        setErrors(null);
-        setResult(result);
-        setSucceeded(true);
-        break;
+    if (isSubmissionError(result)) {
+      setErrors(result);
+      setResult(null);
+      setSucceeded(false);
+    } else {
+      setErrors(null);
+      setResult(result);
+      setSucceeded(true);
     }
 
     setSubmitting(false);
