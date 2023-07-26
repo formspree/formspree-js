@@ -1,13 +1,15 @@
 import React, { type ComponentPropsWithoutRef } from 'react';
 import type { FieldValues, SubmissionError } from '@formspree/core';
 
-export type ValidationErrorProps<T extends FieldValues = FieldValues> = {
+export type ValidationErrorProps<T extends FieldValues> = {
   errors: SubmissionError<T> | null;
   field?: keyof T;
   prefix?: string;
 } & ComponentPropsWithoutRef<'div'>;
 
-export const ValidationError: React.FC<ValidationErrorProps> = (props) => {
+export function ValidationError<T extends FieldValues>(
+  props: ValidationErrorProps<T>
+) {
   const { prefix, field, errors, ...attrs } = props;
   if (errors == null) {
     return null;
@@ -24,4 +26,4 @@ export const ValidationError: React.FC<ValidationErrorProps> = (props) => {
       {errs.map((err) => err.message).join(', ')}
     </div>
   );
-};
+}
