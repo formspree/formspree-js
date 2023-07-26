@@ -2,6 +2,8 @@ root: true
 extends:
   - '../../.eslintrc.yml'
 ignorePatterns:
+  - jest.config.js
+  - jest.setup.js
   - dist/
 parserOptions:
   project: './tsconfig.json'

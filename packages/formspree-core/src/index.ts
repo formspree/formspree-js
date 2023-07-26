@@ -1,9 +1,20 @@
-export { Client, type Config, createClient, getDefaultClient } from './core';
 export {
-  isFieldError,
-  type FormError,
-  type SubmissionResponse,
+  createClient,
+  getDefaultClient,
+  type Client,
+  type Config,
+} from './core';
+
+export {
+  SubmissionError,
+  isSubmissionError,
+  type FieldErrorCode,
+  type FieldValues,
+  type FormErrorCode,
   type SubmissionData,
-  type ErrorBody,
-  type FieldError,
-} from './forms';
+  type SubmissionOptions,
+  type SubmissionResult,
+  type SubmissionSuccess,
+} from './submission';
+
+export { appendExtraData } from './utils';

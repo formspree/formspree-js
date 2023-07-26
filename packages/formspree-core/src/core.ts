@@ -1,18 +1,23 @@
 import type { Stripe } from '@stripe/stripe-js';
-import type {
-  SubmissionData,
-  SubmissionOptions,
-  SubmissionBody,
-  SubmissionResponse,
-} from './forms';
+import { Session } from './session';
+import {
+  SubmissionError,
+  SubmissionSuccess,
+  StripeSCAPending,
+  isServerErrorResponse,
+  isServerSuccessResponse,
+  isServerStripeSCAPendingResponse,
+  type FieldValues,
+  type SubmissionData,
+  type SubmissionOptions,
+  type SubmissionResult,
+} from './submission';
 import {
   appendExtraData,
   clientHeader,
   encode64,
-  handleLegacyErrorPayload,
-  handleSCA,
+  isUnknownObject,
 } from './utils';
-import { Session } from './session';
 
 export interface Config {
   project?: string;
@@ -22,19 +27,13 @@ export interface Config {
 export class Client {
   project: string | undefined;
   stripePromise: Stripe | undefined;
-  private session: Session | undefined;
+  private readonly session?: Session;
 
   constructor(config: Config = {}) {
     this.project = config.project;
     this.stripePromise = config.stripePromise;
-    if (typeof window !== 'undefined') this.startBrowserSession();
-  }
 
-  /**
-   * Starts a browser session.
-   */
-  startBrowserSession(): void {
-    if (!this.session) {
+    if (typeof window !== 'undefined') {
       this.session = new Session();
     }
   }
@@ -46,21 +45,15 @@ export class Client {
    * @param data - An object or FormData instance containing submission data.
    * @param args - An object of form submission data.
    */
-  async submitForm(
+  async submitForm<T extends FieldValues>(
     formKey: string,
-    data: SubmissionData,
+    data: SubmissionData<T>,
     opts: SubmissionOptions = {}
-  ): Promise<SubmissionResponse> {
+  ): Promise<SubmissionResult<T>> {
     const endpoint = opts.endpoint || 'https://formspree.io';
-    const fetchImpl = opts.fetchImpl || fetch;
     const url = this.project
       ? `${endpoint}/p/${this.project}/f/${formKey}`
       : `${endpoint}/f/${formKey}`;
-
-    const serializeBody = (data: SubmissionData): FormData | string => {
-      if (data instanceof FormData) return data;
-      return JSON.stringify(data);
-    };
 
     const headers: { [key: string]: string } = {
       Accept: 'application/json',
@@ -75,78 +68,123 @@ export class Client {
       headers['Content-Type'] = 'application/json';
     }
 
-    const request = {
-      method: 'POST',
-      mode: 'cors' as const,
-      body: serializeBody(data),
-      headers,
-    };
+    async function makeFormspreeRequest(
+      data: SubmissionData<T>
+    ): Promise<SubmissionResult<T> | StripeSCAPending> {
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          mode: 'cors',
+          body: data instanceof FormData ? data : JSON.stringify(data),
+          headers,
+        });
 
-    // first check if we need to add the stripe paymentMethod
-    if (this.stripePromise && opts.createPaymentMethod) {
-      // Get Stripe payload
-      const payload = await opts.createPaymentMethod();
+        const body = await res.json();
 
-      if (payload.error) {
-        // Return the error in case Stripe failed to create a payment method
-        return {
-          response: null,
-          body: {
-            errors: [
-              {
-                code: 'STRIPE_CLIENT_ERROR',
-                message: 'Error creating payment method',
-                field: 'paymentMethod',
-              },
-            ],
-          },
-        };
+        if (isUnknownObject(body)) {
+          if (isServerErrorResponse(body)) {
+            return Array.isArray(body.errors)
+              ? new SubmissionError(...body.errors)
+              : new SubmissionError({ message: body.error });
+          }
+
+          if (isServerStripeSCAPendingResponse(body)) {
+            return new StripeSCAPending(
+              body.stripe.paymentIntentClientSecret,
+              body.resubmitKey
+            );
+          }
+
+          if (isServerSuccessResponse(body)) {
+            return new SubmissionSuccess({ next: body.next });
+          }
+        }
+
+        return new SubmissionError({
+          message: 'Unexpected response format',
+        });
+      } catch (err) {
+        const message =
+          err instanceof Error
+            ? err.message
+            : `Unknown error while posting to Formspree: ${JSON.stringify(
+                err
+              )}`;
+        return new SubmissionError({ message: message });
       }
+    }
 
-      // Add the paymentMethod to the data
-      appendExtraData(data, 'paymentMethod', payload.paymentMethod.id);
+    if (this.stripePromise && opts.createPaymentMethod) {
+      const createPaymentMethodResult = await opts.createPaymentMethod();
 
-      // Send a request to Formspree server to handle the payment method
-      const response = await fetchImpl(url, {
-        ...request,
-        body: serializeBody(data),
-      });
-      const responseData = await response.json();
-
-      // Handle SCA
-      if (
-        responseData &&
-        responseData.stripe &&
-        responseData.stripe.requiresAction &&
-        responseData.resubmitKey
-      ) {
-        return await handleSCA({
-          stripePromise: this.stripePromise,
-          responseData,
-          response,
-          payload,
-          data,
-          fetchImpl,
-          request,
-          url,
+      if (createPaymentMethodResult.error) {
+        return new SubmissionError({
+          code: 'STRIPE_CLIENT_ERROR',
+          field: 'paymentMethod',
+          message: 'Error creating payment method',
         });
       }
 
-      return handleLegacyErrorPayload({
-        response,
-        body: responseData,
-      });
-    } else {
-      return fetchImpl(url, request)
-        .then((response) => {
-          return response
-            .json()
-            .then((body: SubmissionBody): SubmissionResponse => {
-              return handleLegacyErrorPayload({ body, response });
-            });
-        })
-        .catch();
+      // Add the paymentMethod to the data
+      appendExtraData(
+        data,
+        'paymentMethod',
+        createPaymentMethodResult.paymentMethod.id
+      );
+
+      // Send a request to Formspree server to handle the payment method
+      const result = await makeFormspreeRequest(data);
+
+      if (result.kind === 'error') {
+        return result;
+      }
+
+      if (result.kind === 'stripePluginPending') {
+        const stripeResult = await this.stripePromise.handleCardAction(
+          result.paymentIntentClientSecret
+        );
+
+        if (stripeResult.error) {
+          return new SubmissionError({
+            code: 'STRIPE_CLIENT_ERROR',
+            field: 'paymentMethod',
+            message: 'Stripe SCA error',
+          });
+        }
+
+        // `paymentMethod` must not be on the payload when resubmitting
+        // the form to handle Stripe SCA.
+        if (data instanceof FormData) {
+          data.delete('paymentMethod');
+        } else {
+          delete data.paymentMethod;
+        }
+
+        appendExtraData(data, 'paymentIntent', stripeResult.paymentIntent.id);
+        appendExtraData(data, 'resubmitKey', result.resubmitKey);
+
+        // Resubmit the form with the paymentIntent and resubmitKey
+        const resubmitResult = await makeFormspreeRequest(data);
+        assertSubmissionResult(resubmitResult);
+        return resubmitResult;
+      }
+
+      return result;
     }
+
+    const result = await makeFormspreeRequest(data);
+    assertSubmissionResult(result);
+    return result;
+  }
+}
+
+// assertSubmissionResult ensures the result is SubmissionResult
+function assertSubmissionResult<T extends FieldValues>(
+  result: SubmissionResult<T> | StripeSCAPending
+): asserts result is SubmissionResult<T> {
+  const { kind } = result;
+  if (kind !== 'success' && kind !== 'error') {
+    throw new Error(`Unexpected submission result (kind: ${kind})`);
   }
 }
 

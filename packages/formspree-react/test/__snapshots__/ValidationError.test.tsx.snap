@@ -7,8 +7,7 @@ exports[`renders a field error if one exists 1`] = `
   <div
     class="error"
   >
-    Email
-     
+    Email 
     is required
   </div>
 </div>
@@ -19,7 +18,6 @@ exports[`renders field-less errors 1`] = `
   <div
     class="error"
   >
-     
     Form is disabled
   </div>
 </div>

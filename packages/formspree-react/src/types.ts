@@ -1,10 +1,3 @@
-import type * as Forms from '@formspree/core';
-
-export { isFieldError } from '@formspree/core';
-
-export type FormError = Forms.FormError;
-export type FieldError = Forms.FieldError;
-
 /**
  * ExtraData values can be strings or functions that return a string, or a
  * promise that resolves to a string. Errors should be handled internally.
@@ -21,7 +14,3 @@ export type ExtraDataValue =
 export type ExtraData = {
   [key: string]: ExtraDataValue;
 };
-
-// @deprecated
-// Will be removed in next major version
-export type ErrorPayload = Forms.FormError;

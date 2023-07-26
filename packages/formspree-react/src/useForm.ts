@@ -5,30 +5,32 @@ import { useElements, CardElement, useStripe } from '@stripe/react-stripe-js';
 import { useFormspree } from './context';
 import type { ExtraData } from './types';
 import { version } from '../package.json';
-import type {
-  Client,
-  SubmissionResponse,
-  SubmissionData,
-  ErrorBody,
-  FormError,
+import {
+  appendExtraData,
+  isSubmissionError,
+  type Client,
+  type FieldValues,
+  type SubmissionData,
+  type SubmissionSuccess,
+  type SubmissionError,
 } from '@formspree/core';
 
 type FormEvent = React.FormEvent<HTMLFormElement>;
 
-type SubmitHandler = (
-  submissionData: FormEvent | SubmissionData
-) => Promise<SubmissionResponse>;
+type SubmitHandler<T extends FieldValues> = (
+  submissionData: FormEvent | SubmissionData<T>
+) => Promise<void>;
 
 type ResetFunction = () => void;
 
-export type TUseForm = [
+export type TUseForm<T extends FieldValues> = [
   {
-    result: SubmissionResponse | null;
+    errors: SubmissionError<T> | null;
+    result: SubmissionSuccess | null;
     submitting: boolean;
     succeeded: boolean;
-    errors: FormError[];
   },
-  SubmitHandler,
+  SubmitHandler<T>,
   ResetFunction
 ];
 
@@ -36,7 +38,7 @@ const isEvent = (data: FormEvent | SubmissionData): data is FormEvent => {
   return (data as FormEvent).preventDefault !== undefined;
 };
 
-const useForm = (
+const useForm = <T extends FieldValues>(
   formKey: string,
   args: {
     client?: Client;
@@ -44,11 +46,11 @@ const useForm = (
     endpoint?: string;
     debug?: boolean;
   } = {}
-): TUseForm => {
-  const [result, setResult] = useState<SubmissionResponse | null>(null);
+): TUseForm<T> => {
+  const [errors, setErrors] = useState<SubmissionError<T> | null>(null);
+  const [result, setResult] = useState<SubmissionSuccess | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [succeeded, setSucceeded] = useState(false);
-  const [errors, setErrors] = useState<FormError[]>([]);
   const formspreeContext = useFormspree();
   const client = args.client || formspreeContext;
   let stripe: Stripe | null;
@@ -74,16 +76,16 @@ const useForm = (
     elements = useElements();
   }
 
-  const debug = !!args.debug;
   const extraData = args.data;
 
   const reset: ResetFunction = () => {
+    setErrors(null);
+    setResult(null);
     setSubmitting(false);
     setSucceeded(false);
-    setErrors([]);
   };
 
-  const handleSubmit: SubmitHandler = async (submissionData) => {
+  const handleSubmit: SubmitHandler<T> = async (submissionData) => {
     const getFormData = (event: FormEvent) => {
       event.preventDefault();
 
@@ -98,14 +100,6 @@ const useForm = (
       ? getFormData(submissionData)
       : submissionData;
 
-    const appendExtraData = (prop: string, value: string) => {
-      if (formData instanceof FormData) {
-        formData.append(prop, value);
-      } else {
-        formData[prop] = value;
-      }
-    };
-
     // Append extra data from config
     if (typeof extraData === 'object') {
       for (const [prop, value] of Object.entries(extraData)) {
@@ -116,7 +110,7 @@ const useForm = (
           extraDataValue = value;
         }
         if (extraDataValue !== undefined) {
-          appendExtraData(prop, extraDataValue);
+          appendExtraData(formData, prop, extraDataValue);
         }
       }
     }
@@ -135,46 +129,26 @@ const useForm = (
 
     setSubmitting(true);
 
-    return formspreeContext.client
-      .submitForm(formKey, formData, {
-        endpoint: args.endpoint,
-        clientName: `@formspree/react@${version}`,
-        createPaymentMethod:
-          formspreeContext.client && formspreeContext.client.stripePromise
-            ? createPaymentMethod
-            : undefined,
-      })
-      .then((result: SubmissionResponse) => {
-        // @ts-ignore: unhandled result.response is possibly null
-        const status = result.response.status;
-        let body;
+    const result = await formspreeContext.client.submitForm(formKey, formData, {
+      endpoint: args.endpoint,
+      clientName: `@formspree/react@${version}`,
+      createPaymentMethod:
+        formspreeContext.client && formspreeContext.client.stripePromise
+          ? createPaymentMethod
+          : undefined,
+    });
 
-        if (status === 200) {
-          if (debug) console.log('Form submitted', result);
-          setSucceeded(true);
-          setResult(result);
-          setErrors([]);
-        } else if (status >= 400) {
-          body = result.body as ErrorBody;
-          if (body.errors) {
-            setErrors(body.errors);
-            if (debug) console.log('Error', result);
-          } else {
-            setErrors([{ message: 'Unexpected error' }]);
-            if (debug) console.log('Unexpected error', result);
-          }
-          setSucceeded(false);
-        }
-        return result;
-      })
-      .catch((error: Error) => {
-        if (debug) console.log('Unexpected error', error);
-        setSucceeded(false);
-        throw error;
-      })
-      .finally(() => {
-        setSubmitting(false);
-      });
+    if (isSubmissionError(result)) {
+      setErrors(result);
+      setResult(null);
+      setSucceeded(false);
+    } else {
+      setErrors(null);
+      setResult(result);
+      setSucceeded(true);
+    }
+
+    setSubmitting(false);
   };
 
   return [{ result, submitting, succeeded, errors }, handleSubmit, reset];

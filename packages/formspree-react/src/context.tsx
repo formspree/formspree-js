@@ -56,10 +56,6 @@ export const FormspreeProvider = (props: FormspreeProviderProps) => {
   );
 
   useEffect(() => {
-    client.startBrowserSession();
-  }, [client]);
-
-  useEffect(() => {
     const getStripePromise = async (stripeKey: string) => {
       const promiseStripe = await getStripe(stripeKey);
       if (promiseStripe) {
