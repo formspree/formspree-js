@@ -6,13 +6,13 @@ export {
 } from './core';
 
 export {
+  SubmissionError,
   isSubmissionError,
   type FieldErrorCode,
   type FieldValues,
   type FormErrorCode,
   type SubmissionData,
   type SubmissionOptions,
-  type SubmissionError,
   type SubmissionResult,
   type SubmissionSuccess,
 } from './submission';
