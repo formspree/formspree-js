@@ -3,7 +3,7 @@ import type { Stripe } from '@stripe/stripe-js';
 import { loadStripe } from '@stripe/stripe-js/pure';
 import React, { useContext, useEffect, useState, type ReactNode } from 'react';
 
-export type FromspreeContextType = {
+export type FormspreeContextType = {
   client: Client;
 };
 
@@ -13,7 +13,7 @@ export type FormspreeProviderProps = {
   stripePK?: string;
 };
 
-const FormspreeContext = React.createContext<FromspreeContextType | null>(null);
+const FormspreeContext = React.createContext<FormspreeContextType | null>(null);
 
 FormspreeContext.displayName = 'Formspree';
 
@@ -61,6 +61,6 @@ export function FormspreeProvider(props: FormspreeProviderProps) {
   );
 }
 
-export function useFormspree(): FromspreeContextType {
+export function useFormspree(): FormspreeContextType {
   return useContext(FormspreeContext) ?? { client: getDefaultClient() };
 }

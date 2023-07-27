@@ -3,8 +3,8 @@ export { ValidationError, type ValidationErrorProps } from './ValidationError';
 export {
   FormspreeProvider,
   useFormspree,
+  type FormspreeContextType,
   type FormspreeProviderProps,
-  type FromspreeContextType,
 } from './context';
 export * from './types';
 export { useForm, type TUseForm } from './useForm';
