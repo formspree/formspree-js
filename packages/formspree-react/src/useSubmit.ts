@@ -15,8 +15,6 @@ import type { ExtraData } from './types';
 
 const clientName = `@formspree/react@${version}`;
 
-type FormEvent = React.FormEvent<HTMLFormElement>;
-
 type Options<T extends FieldValues> = {
   client?: Client;
   extraData?: ExtraData;
@@ -27,10 +25,16 @@ type Options<T extends FieldValues> = {
   origin?: string;
 };
 
+type FormEvent = React.FormEvent<HTMLFormElement>;
+
+export type SubmitHandler<T extends FieldValues> = (
+  submission: FormEvent | SubmissionData<T>
+) => Promise<void>;
+
 export function useSubmit<T extends FieldValues>(
   formKey: string,
   options: Options<T> = {}
-) {
+): SubmitHandler<T> {
   const formspree = useFormspree();
   const {
     client = formspree.client,
@@ -44,49 +48,45 @@ export function useSubmit<T extends FieldValues>(
   const { stripe } = client;
   const cardElement = stripe?.elements().getElement(CardElement);
 
-  return function handleSubmit(
-    submission: FormEvent | SubmissionData<T>
-  ): void {
-    (async () => {
-      const data = isEvent(submission) ? getFormData(submission) : submission;
+  return async function handleSubmit(submission) {
+    const data = isEvent(submission) ? getFormData(submission) : submission;
 
-      // Append extra data from config
-      if (typeof extraData === 'object') {
-        for (const [prop, value] of Object.entries(extraData)) {
-          let extraDataValue: string | undefined;
-          if (typeof value === 'function') {
-            extraDataValue = await value();
-          } else {
-            extraDataValue = value;
-          }
-          if (extraDataValue !== undefined) {
-            appendExtraData(data, prop, extraDataValue);
-          }
+    // Append extra data from config
+    if (typeof extraData === 'object') {
+      for (const [prop, value] of Object.entries(extraData)) {
+        let extraDataValue: string | undefined;
+        if (typeof value === 'function') {
+          extraDataValue = await value();
+        } else {
+          extraDataValue = value;
+        }
+        if (extraDataValue !== undefined) {
+          appendExtraData(data, prop, extraDataValue);
         }
       }
+    }
 
-      const result = await client.submitForm(formKey, data, {
-        endpoint: origin,
-        clientName,
-        createPaymentMethod:
-          stripe && cardElement
-            ? (): Promise<PaymentMethodResult> =>
-                stripe.createPaymentMethod({
-                  type: 'card',
-                  card: cardElement,
-                  billing_details: mapBillingDetailsPayload(data),
-                })
-            : undefined,
-      });
+    const result = await client.submitForm(formKey, data, {
+      endpoint: origin,
+      clientName,
+      createPaymentMethod:
+        stripe && cardElement
+          ? (): Promise<PaymentMethodResult> =>
+              stripe.createPaymentMethod({
+                type: 'card',
+                card: cardElement,
+                billing_details: mapBillingDetailsPayload(data),
+              })
+          : undefined,
+    });
 
-      if (isSubmissionError(result)) {
-        onError?.(result);
-      } else {
-        onSuccess?.(result);
-      }
+    if (isSubmissionError(result)) {
+      onError?.(result);
+    } else {
+      onSuccess?.(result);
+    }
 
-      onSettled?.();
-    })();
+    onSettled?.();
   };
 }
 
