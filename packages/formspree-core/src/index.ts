@@ -6,15 +6,13 @@ export {
 } from './core';
 
 export {
-  FieldErrorCodeEnum,
-  FormErrorCodeEnum,
   isSubmissionError,
-  SubmissionError,
   type FieldErrorCode,
   type FieldValues,
   type FormErrorCode,
   type SubmissionData,
   type SubmissionOptions,
+  type SubmissionError,
   type SubmissionResult,
   type SubmissionSuccess,
 } from './submission';

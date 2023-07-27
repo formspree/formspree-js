@@ -1,8 +1,4 @@
-import {
-  FieldErrorCodeEnum,
-  FormErrorCodeEnum,
-  SubmissionError,
-} from '@formspree/core';
+import { isSubmissionError, type SubmissionError } from '@formspree/core';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -239,11 +235,11 @@ describe('useSubmit', () => {
           JSON.stringify({
             errors: [
               {
-                code: FormErrorCodeEnum.EMPTY,
+                code: 'EMPTY',
                 message: 'empty form',
               },
               {
-                code: FieldErrorCodeEnum.TYPE_EMAIL,
+                code: 'TYPE_EMAIL',
                 field: 'email',
                 message: 'must be an email',
               },
@@ -266,16 +262,16 @@ describe('useSubmit', () => {
         email: string;
       }>;
 
-      expect(errorResult).toBeInstanceOf(SubmissionError);
+      expect(isSubmissionError(errorResult)).toBe(true);
       expect(errorResult.getFormErrors()).toEqual([
         {
-          code: FormErrorCodeEnum.EMPTY,
+          code: 'EMPTY',
           message: 'empty form',
         },
       ]);
       expect(errorResult.getFieldErrors('email')).toEqual([
         {
-          code: FieldErrorCodeEnum.TYPE_EMAIL,
+          code: 'TYPE_EMAIL',
           message: 'must be an email',
         },
       ]);
@@ -284,7 +280,7 @@ describe('useSubmit', () => {
           'email',
           [
             {
-              code: FieldErrorCodeEnum.TYPE_EMAIL,
+              code: 'TYPE_EMAIL',
               message: 'must be an email',
             },
           ],
