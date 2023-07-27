@@ -19,7 +19,6 @@ type Options<T extends FieldValues> = {
   client?: Client;
   extraData?: ExtraData;
   onError?: (error: SubmissionError<T>) => void;
-  onSettled?: () => void;
   onSuccess?: (data: SubmissionSuccess) => void;
   // origin overrides the submission origin (default: "https://formspree.io")
   origin?: string;
@@ -40,7 +39,6 @@ export function useSubmit<T extends FieldValues>(
     client = formspree.client,
     extraData,
     onError,
-    onSettled,
     onSuccess,
     origin,
   } = options;
@@ -85,8 +83,6 @@ export function useSubmit<T extends FieldValues>(
     } else {
       onSuccess?.(result);
     }
-
-    onSettled?.();
   };
 }
 

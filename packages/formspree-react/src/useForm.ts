@@ -46,15 +46,14 @@ export function useForm<T extends FieldValues>(
     extraData: args.data,
     onError(error) {
       setErrors(error);
+      setSubmitting(false);
       setSucceeded(false);
     },
     onSuccess(result) {
       setErrors(null);
       setResult(result);
-      setSucceeded(true);
-    },
-    onSettled() {
       setSubmitting(false);
+      setSucceeded(true);
     },
     origin: args.endpoint,
   });

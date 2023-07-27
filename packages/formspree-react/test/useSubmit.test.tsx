@@ -208,13 +208,11 @@ describe('useSubmit', () => {
 
   describe('when submission fails', () => {
     const onError = jest.fn();
-    const onSettled = jest.fn();
     const onSuccess = jest.fn();
 
     function TestForm() {
       const handleSubmit = useSubmit<{ email: string }>('test-formspree-key', {
         onError,
-        onSettled,
         onSuccess,
       });
       return (
@@ -287,22 +285,17 @@ describe('useSubmit', () => {
         ],
       ]);
 
-      expect(onSettled).toHaveBeenCalledTimes(1);
-      expect(onSettled).toHaveBeenLastCalledWith();
-
       expect(onSuccess).not.toHaveBeenCalled();
     });
   });
 
   describe('when submission succeeds', () => {
     const onError = jest.fn();
-    const onSettled = jest.fn();
     const onSuccess = jest.fn();
 
     function TestForm() {
       const handleSubmit = useSubmit<{ email: string }>('test-formspree-key', {
         onError,
-        onSettled,
         onSuccess,
       });
 
@@ -332,9 +325,6 @@ describe('useSubmit', () => {
       await userEvent.click(screen.getByRole('button'));
 
       expect(onError).not.toHaveBeenCalled();
-
-      expect(onSettled).toHaveBeenCalledTimes(1);
-      expect(onSettled).toHaveBeenLastCalledWith();
 
       expect(onSuccess).toHaveBeenCalledTimes(1);
       const successResult = onSuccess.mock.calls[0][0];
@@ -372,14 +362,12 @@ describe('useSubmit', () => {
       mockedLoadStripe.mockResolvedValue(mockStripe);
 
       const onError = jest.fn();
-      const onSettled = jest.fn();
       const onSuccess = jest.fn();
 
       function TestForm() {
         const { client } = useFormspree();
         const handleSubmit = useSubmit('test-formspree-key', {
           onError,
-          onSettled,
           onSuccess,
         });
         return (
@@ -431,7 +419,6 @@ describe('useSubmit', () => {
       await userEvent.click(screen.getByRole('button'));
       await waitFor(() => {
         expect(onError).not.toHaveBeenCalled();
-        expect(onSettled).toHaveBeenCalledTimes(1);
         expect(onSuccess).toHaveBeenCalledTimes(1);
         expect(onSuccess).toHaveBeenLastCalledWith({
           kind: 'success',
