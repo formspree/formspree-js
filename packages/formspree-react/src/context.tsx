@@ -32,7 +32,7 @@ const getStripe = (stripeKey: string) => {
  */
 export function FormspreeProvider(props: FormspreeProviderProps) {
   const { children, project, stripePK } = props;
-  const [client, setClient] = useState<Client>(createClient({ project }));
+  const [client, setClient] = useState(createClient({ project }));
 
   useEffect(() => {
     let isMounted = true;

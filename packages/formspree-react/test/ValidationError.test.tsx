@@ -1,4 +1,4 @@
-import { SubmissionErrorResult } from '@formspree/core';
+import { SubmissionError } from '@formspree/core';
 import { act } from '@testing-library/react';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
@@ -23,7 +23,7 @@ it('renders a field error if one exists', () => {
         field="email"
         className="error"
         errors={
-          new SubmissionErrorResult({
+          new SubmissionError({
             field: 'email',
             message: 'is required',
             code: 'REQUIRED_FIELD_MISSING',
@@ -42,7 +42,7 @@ it('renders field-less errors', () => {
       <ValidationError
         className="error"
         errors={
-          new SubmissionErrorResult({
+          new SubmissionError({
             message: 'Form is disabled',
             code: 'INACTIVE',
           })
@@ -61,7 +61,7 @@ it('does not render anything if the field does not have an error', () => {
         prefix="Email"
         field="email"
         errors={
-          new SubmissionErrorResult({
+          new SubmissionError({
             field: 'name',
             message: 'is required',
             code: 'REQUIRED_FIELD_MISSING',

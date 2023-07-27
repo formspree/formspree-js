@@ -8,12 +8,15 @@ export {
 export {
   FieldErrorCodeEnum,
   FormErrorCodeEnum,
-  SubmissionErrorResult,
+  isSubmissionError,
+  SubmissionError,
+  type FieldErrorCode,
   type FieldValues,
+  type FormErrorCode,
   type SubmissionData,
   type SubmissionOptions,
   type SubmissionResult,
-  type SubmissionSuccessResult,
+  type SubmissionSuccess,
 } from './submission';
 
 export { appendExtraData } from './utils';

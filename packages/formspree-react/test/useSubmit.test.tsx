@@ -1,7 +1,7 @@
 import {
   FieldErrorCodeEnum,
   FormErrorCodeEnum,
-  SubmissionErrorResult,
+  SubmissionError,
 } from '@formspree/core';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -262,11 +262,11 @@ describe('useSubmit', () => {
 
       expect(onError).toHaveBeenCalledTimes(1);
 
-      const errorResult = onError.mock.calls[0][0] as SubmissionErrorResult<{
+      const errorResult = onError.mock.calls[0][0] as SubmissionError<{
         email: string;
       }>;
 
-      expect(errorResult).toBeInstanceOf(SubmissionErrorResult);
+      expect(errorResult).toBeInstanceOf(SubmissionError);
       expect(errorResult.getFormErrors()).toEqual([
         {
           code: FormErrorCodeEnum.EMPTY,

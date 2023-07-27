@@ -15,10 +15,10 @@ export type SubmissionOptions = {
 };
 
 export type SubmissionResult<T extends FieldValues> =
-  | SubmissionSuccessResult
-  | SubmissionErrorResult<T>;
+  | SubmissionSuccess
+  | SubmissionError<T>;
 
-export class SubmissionSuccessResult {
+export class SubmissionSuccess {
   readonly kind = 'success';
   readonly next: string;
 
@@ -35,7 +35,7 @@ export function isServerSuccessResponse(
   return 'next' in obj && typeof obj.next === 'string';
 }
 
-export class SubmissionStripePluginPendingResult {
+export class StripeSCAPending {
   readonly kind = 'stripePluginPending';
 
   constructor(
@@ -44,14 +44,14 @@ export class SubmissionStripePluginPendingResult {
   ) {}
 }
 
-export type ServerStripePluginPendingResponse = {
+export type ServerStripeSCAPendingResponse = {
   resubmitKey: string;
   stripe: { paymentIntentClientSecret: string };
 };
 
-export function isServerStripePluginPendingResponse(
+export function isServerStripeSCAPendingResponse(
   obj: UnknownObject
-): obj is ServerStripePluginPendingResponse {
+): obj is ServerStripeSCAPendingResponse {
   if (
     'stripe' in obj &&
     'resubmitKey' in obj &&
@@ -68,7 +68,13 @@ export function isServerStripePluginPendingResponse(
   return false;
 }
 
-export class SubmissionErrorResult<T extends FieldValues> {
+export function isSubmissionError<T extends FieldValues>(
+  result: SubmissionResult<T>
+): result is SubmissionError<T> {
+  return result.kind === 'error';
+}
+
+export class SubmissionError<T extends FieldValues> {
   readonly kind = 'error';
 
   private readonly formErrors: FormError[] = [];
@@ -128,9 +134,6 @@ export const FormErrorCodeEnum = {
   NO_FILE_UPLOADS: 'NO_FILE_UPLOADS',
   PROJECT_NOT_FOUND: 'PROJECT_NOT_FOUND',
   TOO_MANY_FILES: 'TOO_MANY_FILES',
-  // Stripe
-  STRIPE_CLIENT_ERROR: 'STRIPE_CLIENT_ERROR',
-  STRIPE_SCA_ERROR: 'STRIPE_SCA_ERROR',
 } as const;
 
 export type FieldError = {
@@ -147,12 +150,11 @@ export type FieldErrorCode = ValueOf<typeof FieldErrorCodeEnum>;
 export const FieldErrorCodeEnum = {
   REQUIRED_FIELD_EMPTY: 'REQUIRED_FIELD_EMPTY',
   REQUIRED_FIELD_MISSING: 'REQUIRED_FIELD_MISSING',
+  STRIPE_CLIENT_ERROR: 'STRIPE_CLIENT_ERROR',
+  STRIPE_SCA_ERROR: 'STRIPE_SCA_ERROR',
   TYPE_EMAIL: 'TYPE_EMAIL',
   TYPE_NUMERIC: 'TYPE_NUMERIC',
   TYPE_TEXT: 'TYPE_TEXT',
-  // Stripe
-  STRIPE_CLIENT_ERROR: 'STRIPE_CLIENT_ERROR',
-  STRIPE_SCA_ERROR: 'STRIPE_SCA_ERROR',
 } as const;
 
 export function isServerErrorResponse(

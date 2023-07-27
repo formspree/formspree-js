@@ -1,12 +1,12 @@
 import type { Stripe } from '@stripe/stripe-js';
 import { Session } from './session';
 import {
-  SubmissionErrorResult,
-  SubmissionSuccessResult,
-  SubmissionStripePluginPendingResult,
+  SubmissionError,
+  SubmissionSuccess,
+  StripeSCAPending,
   isServerErrorResponse,
   isServerSuccessResponse,
-  isServerStripePluginPendingResponse,
+  isServerStripeSCAPendingResponse,
   type FieldValues,
   type SubmissionData,
   type SubmissionOptions,
@@ -20,19 +20,16 @@ import {
 } from './utils';
 
 export interface Config {
-  fetch?: typeof window.fetch;
   project?: string;
   stripe?: Stripe;
 }
 
 export class Client {
-  private readonly fetch?: typeof window.fetch;
   project: string | undefined;
   stripe: Stripe | undefined;
   private readonly session?: Session;
 
   constructor(config: Config = {}) {
-    this.fetch = config.fetch;
     this.project = config.project;
     this.stripe = config.stripe;
 
@@ -54,7 +51,6 @@ export class Client {
     opts: SubmissionOptions = {}
   ): Promise<SubmissionResult<T>> {
     const endpoint = opts.endpoint || 'https://formspree.io';
-    const fetch = this.fetch ?? window.fetch;
     const url = this.project
       ? `${endpoint}/p/${this.project}/f/${formKey}`
       : `${endpoint}/f/${formKey}`;
@@ -74,7 +70,7 @@ export class Client {
 
     async function makeFormspreeRequest(
       data: SubmissionData<T>
-    ): Promise<SubmissionResult<T> | SubmissionStripePluginPendingResult> {
+    ): Promise<SubmissionResult<T> | StripeSCAPending> {
       try {
         const res = await fetch(url, {
           method: 'POST',
@@ -88,23 +84,23 @@ export class Client {
         if (isUnknownObject(body)) {
           if (isServerErrorResponse(body)) {
             return Array.isArray(body.errors)
-              ? new SubmissionErrorResult(...body.errors)
-              : new SubmissionErrorResult({ message: body.error });
+              ? new SubmissionError(...body.errors)
+              : new SubmissionError({ message: body.error });
           }
 
-          if (isServerStripePluginPendingResponse(body)) {
-            return new SubmissionStripePluginPendingResult(
+          if (isServerStripeSCAPendingResponse(body)) {
+            return new StripeSCAPending(
               body.stripe.paymentIntentClientSecret,
               body.resubmitKey
             );
           }
 
           if (isServerSuccessResponse(body)) {
-            return new SubmissionSuccessResult({ next: body.next });
+            return new SubmissionSuccess({ next: body.next });
           }
         }
 
-        return new SubmissionErrorResult({
+        return new SubmissionError({
           message: 'Unexpected response format',
         });
       } catch (err) {
@@ -114,7 +110,7 @@ export class Client {
             : `Unknown error while posting to Formspree: ${JSON.stringify(
                 err
               )}`;
-        return new SubmissionErrorResult({ message: message });
+        return new SubmissionError({ message });
       }
     }
 
@@ -122,7 +118,7 @@ export class Client {
       const createPaymentMethodResult = await opts.createPaymentMethod();
 
       if (createPaymentMethodResult.error) {
-        return new SubmissionErrorResult({
+        return new SubmissionError({
           code: 'STRIPE_CLIENT_ERROR',
           field: 'paymentMethod',
           message: 'Error creating payment method',
@@ -149,7 +145,7 @@ export class Client {
         );
 
         if (stripeResult.error) {
-          return new SubmissionErrorResult({
+          return new SubmissionError({
             code: 'STRIPE_CLIENT_ERROR',
             field: 'paymentMethod',
             message: 'Stripe SCA error',
@@ -184,7 +180,7 @@ export class Client {
 
 // assertSubmissionResult ensures the result is SubmissionResult
 function assertSubmissionResult<T extends FieldValues>(
-  result: SubmissionResult<T> | SubmissionStripePluginPendingResult
+  result: SubmissionResult<T> | StripeSCAPending
 ): asserts result is SubmissionResult<T> {
   const { kind } = result;
   if (kind !== 'success' && kind !== 'error') {

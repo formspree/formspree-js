@@ -2,8 +2,8 @@ import {
   type Client,
   type FieldValues,
   type SubmissionData,
-  type SubmissionErrorResult,
-  type SubmissionSuccessResult,
+  type SubmissionError,
+  type SubmissionSuccess,
 } from '@formspree/core';
 import { useState } from 'react';
 import type { ExtraData } from './types';
@@ -19,8 +19,8 @@ type ResetFunction = () => void;
 
 export type TUseForm<T extends FieldValues> = [
   {
-    errors: SubmissionErrorResult<T> | null;
-    result: SubmissionSuccessResult | null;
+    errors: SubmissionError<T> | null;
+    result: SubmissionSuccess | null;
     submitting: boolean;
     succeeded: boolean;
   },
@@ -36,8 +36,8 @@ export function useForm<T extends FieldValues>(
     endpoint?: string;
   } = {}
 ): TUseForm<T> {
-  const [errors, setErrors] = useState<SubmissionErrorResult<T> | null>(null);
-  const [result, setResult] = useState<SubmissionSuccessResult | null>(null);
+  const [errors, setErrors] = useState<SubmissionError<T> | null>(null);
+  const [result, setResult] = useState<SubmissionSuccess | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [succeeded, setSucceeded] = useState(false);
 

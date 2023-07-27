@@ -1,10 +1,11 @@
 import {
   appendExtraData,
+  isSubmissionError,
   type Client,
   type FieldValues,
   type SubmissionData,
-  type SubmissionErrorResult,
-  type SubmissionSuccessResult,
+  type SubmissionError,
+  type SubmissionSuccess,
 } from '@formspree/core';
 import { CardElement } from '@stripe/react-stripe-js';
 import type { PaymentMethodResult } from '@stripe/stripe-js';
@@ -19,9 +20,9 @@ type FormEvent = React.FormEvent<HTMLFormElement>;
 type Options<T extends FieldValues> = {
   client?: Client;
   extraData?: ExtraData;
-  onError?: (error: SubmissionErrorResult<T>) => void;
+  onError?: (error: SubmissionError<T>) => void;
   onSettled?: () => void;
-  onSuccess?: (data: SubmissionSuccessResult) => void;
+  onSuccess?: (data: SubmissionSuccess) => void;
   // origin overrides the submission origin (default: "https://formspree.io")
   origin?: string;
 };
@@ -78,13 +79,10 @@ export function useSubmit<T extends FieldValues>(
             : undefined,
       });
 
-      switch (result.kind) {
-        case 'error':
-          onError?.(result);
-          break;
-        case 'success':
-          onSuccess?.(result);
-          break;
+      if (isSubmissionError(result)) {
+        onError?.(result);
+      } else {
+        onSuccess?.(result);
       }
 
       onSettled?.();

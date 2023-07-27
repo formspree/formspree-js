@@ -1,12 +1,12 @@
 import {
   FieldErrorCodeEnum,
   FormErrorCodeEnum,
-  SubmissionErrorResult,
+  SubmissionError,
 } from '../src/submission';
 
-describe('SubmissionErrorResult', () => {
+describe('SubmissionError', () => {
   test('no server errors', () => {
-    const err = new SubmissionErrorResult();
+    const err = new SubmissionError();
     expect(err.getFormErrors()).toEqual([]);
     expect(err.getFieldErrors('')).toEqual([]);
     expect(err.getFieldErrors('some-key')).toEqual([]);
@@ -14,7 +14,7 @@ describe('SubmissionErrorResult', () => {
   });
 
   test('with one form error', () => {
-    const err = new SubmissionErrorResult({ message: '(test) unknown error' });
+    const err = new SubmissionError({ message: '(test) unknown error' });
     expect(err.getFormErrors()).toEqual([
       {
         code: 'UNSPECIFIED',
@@ -27,7 +27,7 @@ describe('SubmissionErrorResult', () => {
   });
 
   test('with one form error, with code', () => {
-    const err = new SubmissionErrorResult({
+    const err = new SubmissionError({
       code: FormErrorCodeEnum.EMPTY,
       message: '(test) empty form',
     });
@@ -43,7 +43,7 @@ describe('SubmissionErrorResult', () => {
   });
 
   test('with one field error', () => {
-    const err = new SubmissionErrorResult({
+    const err = new SubmissionError({
       field: 'some-key',
       message: '(test) the field is required',
     });
@@ -68,7 +68,7 @@ describe('SubmissionErrorResult', () => {
   });
 
   test('with one field error, with code', () => {
-    const err = new SubmissionErrorResult({
+    const err = new SubmissionError({
       code: FieldErrorCodeEnum.REQUIRED_FIELD_EMPTY,
       field: 'some-key',
       message: '(test) the field is required',
@@ -94,7 +94,7 @@ describe('SubmissionErrorResult', () => {
   });
 
   test('with a mix of a form error and multiple field errors', () => {
-    const err = new SubmissionErrorResult(
+    const err = new SubmissionError(
       {
         message: '(test) unknown form error',
       },
