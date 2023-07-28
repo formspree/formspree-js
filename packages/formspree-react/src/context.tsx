@@ -1,6 +1,6 @@
 import { createClient, getDefaultClient, type Client } from '@formspree/core';
 import type { Stripe } from '@stripe/stripe-js';
-import { loadStripe } from '@stripe/stripe-js/pure';
+import { loadStripe } from '@stripe/stripe-js/pure.js';
 import React, { useContext, useEffect, useState, type ReactNode } from 'react';
 
 export type FormspreeContextType = {

@@ -8,14 +8,14 @@ import {
   type ExtraData,
   useFormspree,
 } from '../src';
-import { loadStripe } from '@stripe/stripe-js/pure';
+import { loadStripe } from '@stripe/stripe-js/pure.js';
 import type {
   PaymentIntentResult,
   PaymentMethodResult,
   Stripe,
 } from '@stripe/stripe-js';
 
-jest.mock('@stripe/stripe-js/pure');
+jest.mock('@stripe/stripe-js/pure.js');
 
 describe('useSubmit', () => {
   const mockedFetch = jest.spyOn(window, 'fetch');
