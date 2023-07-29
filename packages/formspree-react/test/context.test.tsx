@@ -1,8 +1,10 @@
+import { useStripe } from '@stripe/react-stripe-js';
 import type { Stripe } from '@stripe/stripe-js';
 import { loadStripe } from '@stripe/stripe-js/pure.js';
 import { render, renderHook, waitFor } from '@testing-library/react';
 import React from 'react';
 import { CardElement, FormspreeProvider, useFormspree } from '../src';
+import { createMockStripe } from './mockStripe';
 
 jest.mock('@stripe/stripe-js/pure.js');
 
@@ -37,10 +39,12 @@ describe('FormspreeProvider', () => {
   });
 
   describe('with Stripe', () => {
+    let mockStripe: Stripe | undefined;
+
     beforeEach(() => {
-      const stripe = {} as Stripe;
+      mockStripe = createMockStripe();
       const mock = loadStripe as jest.MockedFn<typeof loadStripe>;
-      mock.mockResolvedValue(stripe);
+      mock.mockResolvedValue(mockStripe);
     });
 
     let consoleError: jest.SpyInstance<void, string[]>;
@@ -62,14 +66,26 @@ describe('FormspreeProvider', () => {
         ),
       });
 
-      const { client } = result.current;
-      expect(client).toBeTruthy();
-      expect(client.project).toBeUndefined();
-
       await waitFor(() => {
-        // need to grab the updated client from result.current
         const { client } = result.current;
-        expect(client.stripe).not.toBeUndefined();
+        expect(client).toBeTruthy();
+        expect(client.project).toBeUndefined();
+        expect(client.stripe).toBeUndefined();
+      });
+    });
+
+    it('passes Stripe client via Stripe Elements context', async () => {
+      const { result } = renderHook(useStripe, {
+        wrapper: ({ children }) => (
+          <FormspreeProvider stripePK="test-stripe-public-key">
+            {children}
+          </FormspreeProvider>
+        ),
+      });
+
+      expect(result.current).toBeNull();
+      await waitFor(() => {
+        expect(result.current).toBe(mockStripe);
       });
     });
 
