@@ -9,6 +9,7 @@ import {
 } from '@formspree/core';
 import { CardElement } from '@stripe/react-stripe-js';
 import type { PaymentMethodResult } from '@stripe/stripe-js';
+import { useMemo } from 'react';
 import { version } from '../package.json';
 import { useFormspree } from './context';
 import type { ExtraData } from './types';
@@ -44,7 +45,10 @@ export function useSubmit<T extends FieldValues>(
   } = options;
 
   const { stripe } = client;
-  const cardElement = stripe?.elements().getElement(CardElement);
+  const cardElement = useMemo(
+    () => stripe?.elements().getElement(CardElement),
+    [stripe]
+  );
 
   return async function handleSubmit(submission) {
     const data = isEvent(submission) ? getFormData(submission) : submission;

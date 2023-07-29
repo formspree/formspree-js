@@ -1,19 +1,20 @@
 import { isSubmissionError, type SubmissionError } from '@formspree/core';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import React from 'react';
-import {
-  FormspreeProvider,
-  useSubmit,
-  type ExtraData,
-  useFormspree,
-} from '../src';
-import { loadStripe } from '@stripe/stripe-js/pure.js';
 import type {
   PaymentIntentResult,
   PaymentMethodResult,
   Stripe,
 } from '@stripe/stripe-js';
+import { loadStripe } from '@stripe/stripe-js/pure.js';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import React from 'react';
+import {
+  FormspreeProvider,
+  useFormspree,
+  useSubmit,
+  type ExtraData,
+} from '../src';
+import { createMockStripe } from './mockStripe';
 
 jest.mock('@stripe/stripe-js/pure.js');
 
@@ -337,29 +338,25 @@ describe('useSubmit', () => {
 
   describe('with Stripe (success)', () => {
     it('calls onSuccess option with the success result', async () => {
-      const mockedLoadStripe = loadStripe as jest.MockedFn<typeof loadStripe>;
-      const mockedCardElement = { name: 'mocked-card-element' };
-      const mockStripe = {
-        createPaymentMethod: jest.fn().mockResolvedValue({
-          paymentMethod: { id: 'test-payment-method-id' },
-        } as PaymentMethodResult),
+      const mockLoadStripe = loadStripe as jest.MockedFn<typeof loadStripe>;
+      const mockCardElement = { name: 'mocked-card-element' };
+      const mockStripe = createMockStripe();
 
-        elements() {
-          return {
-            getElement() {
-              return mockedCardElement;
-            },
-          };
+      mockStripe.createPaymentMethod.mockResolvedValue({
+        paymentMethod: { id: 'test-payment-method-id' },
+      } as PaymentMethodResult);
+
+      mockStripe.elements.mockReturnValue({
+        getElement() {
+          return mockCardElement;
         },
+      });
 
-        async handleCardAction() {
-          return {
-            paymentIntent: { id: 'test-payment-intent-id' },
-          } as PaymentIntentResult;
-        },
-      } as unknown as Stripe;
+      mockStripe.handleCardAction.mockResolvedValue({
+        paymentIntent: { id: 'test-payment-intent-id' },
+      } as PaymentIntentResult);
 
-      mockedLoadStripe.mockResolvedValue(mockStripe);
+      mockLoadStripe.mockResolvedValue(mockStripe as unknown as Stripe);
 
       const onError = jest.fn();
       const onSuccess = jest.fn();
@@ -429,7 +426,7 @@ describe('useSubmit', () => {
       expect(mockStripe.createPaymentMethod).toHaveBeenCalledTimes(1);
       expect(mockStripe.createPaymentMethod).toHaveBeenLastCalledWith({
         type: 'card',
-        card: mockedCardElement,
+        card: mockCardElement,
         billing_details: {
           address: {
             line1: 'test-addr-line1',

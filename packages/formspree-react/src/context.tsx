@@ -34,10 +34,30 @@ export function FormspreeProvider(props: FormspreeProviderProps) {
   );
 
   useEffect(() => {
-    setClient((client) =>
-      client.project !== project ? createClient({ ...client, project }) : client
-    );
+    let isMounted = true;
+    if (isMounted) {
+      setClient((client) =>
+        client.project !== project
+          ? createClient({ ...client, project })
+          : client
+      );
+    }
+    return () => {
+      isMounted = false;
+    };
   }, [project]);
+
+  useEffect(() => {
+    let isMounted = true;
+    stripePromise?.then((stripe) => {
+      if (isMounted && stripe) {
+        setClient((client) => createClient({ ...client, stripe }));
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, [stripePromise]);
 
   return (
     <FormspreeContext.Provider value={{ client }}>

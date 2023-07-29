@@ -39,12 +39,12 @@ describe('FormspreeProvider', () => {
   });
 
   describe('with Stripe', () => {
-    let mockStripe: Stripe | undefined;
+    let mockStripe: ReturnType<typeof createMockStripe>;
 
     beforeEach(() => {
       mockStripe = createMockStripe();
       const mock = loadStripe as jest.MockedFn<typeof loadStripe>;
-      mock.mockResolvedValue(mockStripe);
+      mock.mockResolvedValue(mockStripe as unknown as Stripe);
     });
 
     let consoleError: jest.SpyInstance<void, string[]>;
@@ -70,7 +70,7 @@ describe('FormspreeProvider', () => {
         const { client } = result.current;
         expect(client).toBeTruthy();
         expect(client.project).toBeUndefined();
-        expect(client.stripe).toBeUndefined();
+        expect(client.stripe).toBe(mockStripe);
       });
     });
 
