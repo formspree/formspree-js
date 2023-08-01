@@ -1,98 +1,75 @@
-import React, { Suspense, lazy, useContext, useEffect, useState } from 'react';
-import { createClient, getDefaultClient } from '@formspree/core';
-import type { Client, Config } from '@formspree/core';
+import { createClient, getDefaultClient, type Client } from '@formspree/core';
+import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js/pure.js';
-import type { Stripe } from '@stripe/stripe-js';
+import React, {
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react';
 
-const Elements = lazy(() =>
-  import('@stripe/react-stripe-js').then((module) => {
-    return { default: module.Elements };
-  })
-);
-
-export type FromspreeContextType = {
+export type FormspreeContextType = {
   client: Client;
 };
 
 export type FormspreeProviderProps = {
+  children: ReactNode;
   project?: string;
-  children: React.ReactNode;
   stripePK?: string;
 };
 
-const FormspreeContext = React.createContext<FromspreeContextType | null>(null);
+const FormspreeContext = React.createContext<FormspreeContextType | null>(null);
 
-FormspreeContext.displayName = 'Formspree';
-
-let stripePromise: Promise<Stripe | null>;
-
-const getStripe = (stripeKey: string) => {
-  if (!stripePromise) {
-    stripePromise = loadStripe(stripeKey);
-  }
-  return stripePromise;
-};
-
-const handleCreateClient = (promise?: Stripe, project?: string) => {
-  const config: Config = {};
-
-  if (promise) {
-    config.stripePromise = promise;
-  }
-
-  if (project) {
-    config.project = project;
-  }
-
-  return createClient(config);
-};
-
-export const FormspreeProvider = (props: FormspreeProviderProps) => {
-  const [stateStripePromise, setStateStripePromise] = useState<
-    Stripe | undefined
-  >(undefined);
-  const [client, setClient] = useState<Client>(
-    handleCreateClient(stateStripePromise, props.project)
+/**
+ * FormspreeProvider creates Formspree Client based on the given props
+ * and makes the client available via context.
+ */
+export function FormspreeProvider(props: FormspreeProviderProps) {
+  const { children, project, stripePK } = props;
+  const [client, setClient] = useState(createClient({ project }));
+  const stripePromise = useMemo(
+    () => (stripePK ? loadStripe(stripePK) : null),
+    [stripePK]
   );
 
   useEffect(() => {
-    const getStripePromise = async (stripeKey: string) => {
-      const promiseStripe = await getStripe(stripeKey);
-      if (promiseStripe) {
-        setStateStripePromise(promiseStripe);
-      }
-    };
-
-    if (props.stripePK) {
-      getStripePromise(props.stripePK);
+    let isMounted = true;
+    if (isMounted) {
+      setClient((client) =>
+        client.project !== project
+          ? createClient({ ...client, project })
+          : client
+      );
     }
-  }, [props.stripePK]);
+    return () => {
+      isMounted = false;
+    };
+  }, [project]);
 
   useEffect(() => {
-    if (stateStripePromise) {
-      setClient(handleCreateClient(stateStripePromise, props.project));
-    }
-  }, [props.project, stateStripePromise]);
+    let isMounted = true;
+    stripePromise?.then((stripe) => {
+      if (isMounted && stripe) {
+        setClient((client) => createClient({ ...client, stripe }));
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, [stripePromise]);
 
   return (
     <FormspreeContext.Provider value={{ client }}>
-      {props.stripePK ? (
-        <>
-          {stateStripePromise && (
-            <Suspense fallback={<p>....</p>}>
-              <Elements stripe={stateStripePromise}>
-                <>{props.children}</>
-              </Elements>
-            </Suspense>
-          )}
-        </>
+      {stripePromise ? (
+        <Elements stripe={stripePromise}>{children}</Elements>
       ) : (
-        <>{props.children}</>
+        children
       )}
     </FormspreeContext.Provider>
   );
-};
+}
 
-export function useFormspree(): FromspreeContextType {
+export function useFormspree(): FormspreeContextType {
   return useContext(FormspreeContext) ?? { client: getDefaultClient() };
 }

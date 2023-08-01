@@ -323,7 +323,7 @@ describe('Client.submitForm', () => {
       handleCardAction?: Stripe['handleCardAction']
     ): Client {
       const stripe = { handleCardAction } as Stripe;
-      return createClient({ stripePromise: stripe });
+      return createClient({ stripe });
     }
 
     describe('when payment method creation fails', () => {

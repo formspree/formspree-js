@@ -21,17 +21,17 @@ import {
 
 export interface Config {
   project?: string;
-  stripePromise?: Stripe;
+  stripe?: Stripe;
 }
 
 export class Client {
   project: string | undefined;
-  stripePromise: Stripe | undefined;
+  stripe: Stripe | undefined;
   private readonly session?: Session;
 
   constructor(config: Config = {}) {
     this.project = config.project;
-    this.stripePromise = config.stripePromise;
+    this.stripe = config.stripe;
 
     if (typeof window !== 'undefined') {
       this.session = new Session();
@@ -110,11 +110,11 @@ export class Client {
             : `Unknown error while posting to Formspree: ${JSON.stringify(
                 err
               )}`;
-        return new SubmissionError({ message: message });
+        return new SubmissionError({ message });
       }
     }
 
-    if (this.stripePromise && opts.createPaymentMethod) {
+    if (this.stripe && opts.createPaymentMethod) {
       const createPaymentMethodResult = await opts.createPaymentMethod();
 
       if (createPaymentMethodResult.error) {
@@ -140,7 +140,7 @@ export class Client {
       }
 
       if (result.kind === 'stripePluginPending') {
-        const stripeResult = await this.stripePromise.handleCardAction(
+        const stripeResult = await this.stripe.handleCardAction(
           result.paymentIntentClientSecret
         );
 
