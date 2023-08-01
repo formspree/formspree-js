@@ -1,5 +1,46 @@
 # Changelog
 
+## 3.0.0
+
+### Major Changes
+
+- 49730d9: ## Improve error handling
+
+  - `@formspree/core` `submitForm` function now will never rejects but always produces a type of `SubmissionResult`, different types of the result can be refined/narrowed down using the field `kind`.
+  - Provide `SubmissionErrorResult` which can be used to get an array of form errors and/or field errors (by field name)
+  - `Response` is no longer made available on the submission result
+  - Update `@formspree/react` for the changes introduced to `@formspree/core`
+
+- d025831: `@formspree/core`
+
+  - rename client config `stripePromise` to `stripe` since it expects the resolved Stripe client not a promise
+
+  `@formspree/react`
+
+  - add a new hook: `useSubmit` which is suitable with code that uses other ways to manage submission state (e.g. with a library like react-hook-form)
+  - update `useForm` to use `useSubmit` under the hood
+  - fix: `FormspreeContext` updates the client when `props.project` change
+
+### Minor Changes
+
+- 4c40e1b: # Fix types in @formspree/core
+
+  ## `@formspree/core`
+
+  - fix `SubmissionData` has a type of `any` causing everything after it to opt-out typechecking
+  - remove a no-op `teardown` method on `Client` and `Session`
+  - remove `utils.now` and use `Date.now` instead
+  - remove unused functions from `utils` module: `append`, `toCamel`, `camelizeTopKeys`
+  - add tests for `utils.appendExtraData` and convert the test file to typescript
+  - add tests for `session.data()`
+  - no longer export `Session` type
+
+  ## `@formspree/react`
+
+  - update types as a result of `SubmissionData` is no longer `any`
+  - fix `createPaymentMethod` does not properly map payload when the submission data is a type of `FormData`
+  - fix the `Client` is not updated when project changes
+
 ## 2.8.3
 
 ### Patch Changes
