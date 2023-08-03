@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.1
+
+### Patch Changes
+
+- 56a444b: remove unused package-specific yarn.lock
+
 ## 3.0.0
 
 ### Major Changes
