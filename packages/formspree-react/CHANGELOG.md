@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.5.1
+
+### Patch Changes
+
+- 56a444b: remove unused package-specific yarn.lock
+- Updated dependencies [56a444b]
+  - @formspree/core@3.0.1
+
 ## 2.5.0
 
 ### Minor Changes
