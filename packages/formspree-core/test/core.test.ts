@@ -390,7 +390,7 @@ describe('Client.submitForm', () => {
               headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
-                'Formspree-Client': '@formspree/core@2.8.3',
+                'Formspree-Client': `@formspree/core@${version}`,
                 'Formspree-Session-Data': expectedSessionData,
               },
               method: 'POST',
@@ -434,7 +434,7 @@ describe('Client.submitForm', () => {
               headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
-                'Formspree-Client': '@formspree/core@2.8.3',
+                'Formspree-Client': `@formspree/core@${version}`,
                 'Formspree-Session-Data': expectedSessionData,
               },
               method: 'POST',
@@ -489,7 +489,7 @@ describe('Client.submitForm', () => {
                 headers: {
                   Accept: 'application/json',
                   'Content-Type': 'application/json',
-                  'Formspree-Client': '@formspree/core@2.8.3',
+                  'Formspree-Client': `@formspree/core@${version}`,
                   'Formspree-Session-Data': expectedSessionData,
                 },
                 method: 'POST',
@@ -551,7 +551,7 @@ describe('Client.submitForm', () => {
                 body: data,
                 headers: {
                   Accept: 'application/json',
-                  'Formspree-Client': '@formspree/core@2.8.3',
+                  'Formspree-Client': `@formspree/core@${version}`,
                   'Formspree-Session-Data': expectedSessionData,
                 },
                 method: 'POST',
@@ -565,7 +565,7 @@ describe('Client.submitForm', () => {
                 body: data,
                 headers: {
                   Accept: 'application/json',
-                  'Formspree-Client': '@formspree/core@2.8.3',
+                  'Formspree-Client': `@formspree/core@${version}`,
                   'Formspree-Session-Data': expectedSessionData,
                 },
                 method: 'POST',
@@ -614,7 +614,7 @@ describe('Client.submitForm', () => {
                 headers: {
                   Accept: 'application/json',
                   'Content-Type': 'application/json',
-                  'Formspree-Client': '@formspree/core@2.8.3',
+                  'Formspree-Client': `@formspree/core@${version}`,
                   'Formspree-Session-Data': expectedSessionData,
                 },
                 method: 'POST',
@@ -634,7 +634,7 @@ describe('Client.submitForm', () => {
                 headers: {
                   Accept: 'application/json',
                   'Content-Type': 'application/json',
-                  'Formspree-Client': '@formspree/core@2.8.3',
+                  'Formspree-Client': `@formspree/core@${version}`,
                   'Formspree-Session-Data': expectedSessionData,
                 },
                 method: 'POST',

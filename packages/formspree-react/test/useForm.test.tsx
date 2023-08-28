@@ -79,7 +79,9 @@ describe('useForm', () => {
           body: expect.any(FormData),
           headers: {
             Accept: 'application/json',
-            'Formspree-Client': '@formspree/react@2.4.4 @formspree/core@2.8.3',
+            'Formspree-Client': expect.stringMatching(
+              /^@formspree\/react@[\d.]+ @formspree\/core@[\d.]+$/
+            ),
             'Formspree-Session-Data': expect.any(String),
           },
           method: 'POST',
@@ -141,7 +143,9 @@ describe('useForm', () => {
           body: expect.any(FormData),
           headers: {
             Accept: 'application/json',
-            'Formspree-Client': '@formspree/react@2.4.4 @formspree/core@2.8.3',
+            'Formspree-Client': expect.stringMatching(
+              /^@formspree\/react@[\d.]+ @formspree\/core@[\d.]+$/
+            ),
             'Formspree-Session-Data': expect.any(String),
           },
           method: 'POST',
