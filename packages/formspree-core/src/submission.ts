@@ -3,10 +3,8 @@ import type { UnknownObject } from './utils';
 
 export type SubmissionData<T extends FieldValues = FieldValues> = FormData | T;
 
-export type FieldValues = Record<
-  string,
-  string | number | boolean | null | undefined
->;
+export type FieldValues = Record<string, FieldValue | FieldValue[]>;
+type FieldValue = string | number | boolean | null | undefined;
 
 export type SubmissionOptions = {
   clientName?: string;
