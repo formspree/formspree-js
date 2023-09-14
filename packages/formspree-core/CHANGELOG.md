@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.2
+
+### Patch Changes
+
+- 6c31cd1: (type) Support array as FieldValue
+
 ## 3.0.1
 
 ### Patch Changes
