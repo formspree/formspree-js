@@ -28,6 +28,7 @@ const App = () => {
           <button
             type="button"
             className={`tab ${tab === 'stripe' && 'active'}`}
+            disabled={!process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY}
             onClick={() => setTab('stripe')}
           >
             Stripe form

@@ -82,6 +82,13 @@ button {
   -webkit-transition: all 150ms ease;
   transition: all 150ms ease;
   margin-top: 10px;
+  user-select: none;
+}
+
+button:disabled {
+  box-shadow: none;
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 button:hover {
