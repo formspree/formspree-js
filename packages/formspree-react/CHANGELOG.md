@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.5.2
+
+### Patch Changes
+
+- 6c31cd1: (type) Support array as FieldValue
+- Updated dependencies [6c31cd1]
+  - @formspree/core@3.0.2
+
 ## 2.5.1
 
 ### Patch Changes
