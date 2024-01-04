@@ -3,6 +3,7 @@ import { FormspreeProvider } from '@formspree/react';
 import PaymentForm from './PaymentForm';
 import SimpleForm from './SimpleForm';
 import RecaptchaForm from './RecaptchaForm';
+import { WithReactHookForm } from './WithReactHookForm';
 
 const App = () => {
   const [tab, setTab] = useState('simple');
@@ -33,6 +34,13 @@ const App = () => {
           >
             Stripe form
           </button>
+          <button
+            type="button"
+            className={`tab ${tab === 'react-hook-form' && 'active'}`}
+            onClick={() => setTab('react-hook-form')}
+          >
+            With react-hook-form
+          </button>
         </div>
         {tab === 'stripe' ? (
           <FormspreeProvider
@@ -42,6 +50,8 @@ const App = () => {
           </FormspreeProvider>
         ) : tab === 'recaptcha' ? (
           <RecaptchaForm />
+        ) : tab === 'react-hook-form' ? (
+          <WithReactHookForm />
         ) : (
           <SimpleForm />
         )}
