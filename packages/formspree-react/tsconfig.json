@@ -8,7 +8,10 @@
     "declarationDir": "dist/types",
     "declarationMap": true,
     "jsx": "react",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "paths": {
+      "@formspree/core": ["../formspree-core/src"]
+    }
   },
   "include": ["src/**/*", "test/**/*"],
   "exclude": ["node_modules", "dist"]

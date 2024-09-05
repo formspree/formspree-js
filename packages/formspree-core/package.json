@@ -19,7 +19,15 @@
     "Ismail Ghallou"
   ],
   "sideEffects": false,
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "files": [
     "dist/**"
@@ -27,10 +35,11 @@
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts --minify",
     "clean": "rm -rf dist && rm -rf node_modules",
-    "dev": "tsup src/index.ts --format esm,cjs --dts --sourcemap --watch",
+    "dev": "echo 'Use watch instead of dev for this package'",
     "lint": "eslint ./src ./test",
     "test": "jest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "watch": "tsup src/index.ts --format esm,cjs --dts --sourcemap --watch"
   },
   "dependencies": {
     "@stripe/stripe-js": "^1.35.0"

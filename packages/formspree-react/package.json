@@ -26,10 +26,11 @@
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts --external react --minify",
     "clean": "rm -rf dist && rm -rf node_modules",
-    "dev": "tsup src/index.ts --format esm,cjs --dts --external react --sourcemap --watch",
+    "dev": "echo 'Use watch instead of dev for this package'",
     "lint": "eslint ./src ./test",
     "test": "jest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "watch": "tsup src/index.ts --format esm,cjs --dts --external react --sourcemap --watch"
   },
   "dependencies": {
     "@formspree/core": "^3.0.2",

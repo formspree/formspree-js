@@ -1,4 +1,5 @@
 {
+  "name": "formspree-js",
   "private": true,
   "workspaces": [
     "packages/*",
@@ -8,7 +9,9 @@
     "build": "turbo run build",
     "changeset": "changeset",
     "clean": "turbo run clean && rm -rf node_modules",
-    "dev": "turbo run dev",
+    "dev": "echo \"dev what? See dev:??? scripts in package.json\"",
+    "dev:astro-react": "turbo run dev watch --parallel --filter=astro-react-demo --filter=@formspree/react --filter=@formspree/core",
+    "dev:react": "echo 'dev what? See dev:??? scripts in package.json'",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "lint": "turbo run lint",
     "prepare": "husky install",
@@ -40,5 +43,6 @@
     "tsup": "^6.2.2",
     "turbo": "latest",
     "typescript": "^5.1.3"
-  }
+  },
+  "packageManager": "yarn@1.22.21"
 }
