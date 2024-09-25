@@ -25,7 +25,7 @@ function ContactForm() {
         prefix="Email" 
         field="email"
         errors={state.errors}
-        className="error-message"
+        className="error"
       />
       <label htmlFor="message" className="form-label">
         Message
@@ -39,11 +39,15 @@ function ContactForm() {
         prefix="Message" 
         field="message"
         errors={state.errors}
-        className="error-message"
+        className="error"
       />
       <button type="submit" disabled={state.submitting} className="submit-button">
         Submit
       </button>
+      <ValidationError 
+        errors={state.errors}
+        className="error"
+      />
     </form>
   );
 }
