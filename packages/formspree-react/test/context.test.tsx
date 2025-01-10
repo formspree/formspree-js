@@ -1,12 +1,11 @@
 import { useStripe } from '@stripe/react-stripe-js';
-import type { Stripe } from '@stripe/stripe-js';
-import { loadStripe } from '@stripe/stripe-js/pure.js';
+import { loadStripe, type Stripe } from '@stripe/stripe-js';
 import { render, renderHook, waitFor } from '@testing-library/react';
 import React from 'react';
 import { CardElement, FormspreeProvider, useFormspree } from '../src';
 import { createMockStripe } from './mockStripe';
 
-jest.mock('@stripe/stripe-js/pure.js');
+jest.mock('@stripe/stripe-js');
 
 describe('FormspreeProvider', () => {
   describe('default', () => {

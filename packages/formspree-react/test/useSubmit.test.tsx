@@ -1,10 +1,10 @@
 import { isSubmissionError, type SubmissionError } from '@formspree/core';
-import type {
-  PaymentIntentResult,
-  PaymentMethodResult,
-  Stripe,
+import {
+  loadStripe,
+  type PaymentIntentResult,
+  type PaymentMethodResult,
+  type Stripe,
 } from '@stripe/stripe-js';
-import { loadStripe } from '@stripe/stripe-js/pure.js';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -16,7 +16,7 @@ import {
 } from '../src';
 import { createMockStripe } from './mockStripe';
 
-jest.mock('@stripe/stripe-js/pure.js');
+jest.mock('@stripe/stripe-js');
 
 describe('useSubmit', () => {
   const mockedFetch = jest.spyOn(window, 'fetch');

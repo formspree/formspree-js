@@ -18,6 +18,9 @@
     "typecheck": "turbo run typecheck",
     "version-packages": "changeset version"
   },
+  "resolutions": {
+    "@types/react": "^19.0.0"
+  },
   "devDependencies": {
     "@babel/core": "^7.22.5",
     "@babel/preset-env": "^7.22.5",
