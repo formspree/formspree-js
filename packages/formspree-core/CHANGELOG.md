@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.3
+
+### Patch Changes
+
+- 805aa4d: Bump (patch) @formspree/core and @formspree/react to fix the release pipeline
+
 ## 3.0.2
 
 ### Patch Changes
