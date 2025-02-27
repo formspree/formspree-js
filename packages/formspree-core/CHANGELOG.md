@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.4
+
+### Patch Changes
+
+- ceaae3d: Bump (patch) @formspree/core and @formspree/react to verify that the release pipeline is fixed
+
 ## 3.0.3
 
 ### Patch Changes
