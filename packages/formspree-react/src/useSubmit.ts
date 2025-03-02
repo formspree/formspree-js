@@ -1,48 +1,32 @@
 import {
   appendExtraData,
-  isSubmissionError,
   type Client,
   type FieldValues,
   type SubmissionData,
-  type SubmissionError,
-  type SubmissionSuccess,
+  type SubmissionResult,
 } from '@formspree/core';
 import { CardElement } from '@stripe/react-stripe-js';
 import type { PaymentMethodResult } from '@stripe/stripe-js';
 import { useMemo } from 'react';
 import { version } from '../package.json';
 import { useFormspree } from './context';
-import type { ExtraData } from './types';
+import type { ExtraData, FormEvent, SubmitHandler } from './types';
 
 const clientName = `@formspree/react@${version}`;
 
-type Options<T extends FieldValues> = {
+type Options = {
   client?: Client;
   extraData?: ExtraData;
-  onError?: (error: SubmissionError<T>) => void;
-  onSuccess?: (data: SubmissionSuccess) => void;
   // origin overrides the submission origin (default: "https://formspree.io")
   origin?: string;
 };
 
-type FormEvent = React.FormEvent<HTMLFormElement>;
-
-export type SubmitHandler<T extends FieldValues> = (
-  submission: FormEvent | SubmissionData<T>
-) => Promise<void>;
-
 export function useSubmit<T extends FieldValues>(
   formKey: string,
-  options: Options<T> = {}
-): SubmitHandler<T> {
+  options: Options = {}
+): SubmitHandler<T, SubmissionResult<T>> {
   const formspree = useFormspree();
-  const {
-    client = formspree.client,
-    extraData,
-    onError,
-    onSuccess,
-    origin,
-  } = options;
+  const { client = formspree.client, extraData, origin } = options;
 
   const { stripe } = client;
   const cardElement = useMemo(
@@ -68,7 +52,7 @@ export function useSubmit<T extends FieldValues>(
       }
     }
 
-    const result = await client.submitForm(formKey, data, {
+    return client.submitForm(formKey, data, {
       endpoint: origin,
       clientName,
       createPaymentMethod:
@@ -81,12 +65,6 @@ export function useSubmit<T extends FieldValues>(
               })
           : undefined,
     });
-
-    if (isSubmissionError(result)) {
-      onError?.(result);
-    } else {
-      onSuccess?.(result);
-    }
   };
 }
 

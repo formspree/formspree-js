@@ -12,7 +12,7 @@ export type SubmissionOptions = {
   endpoint?: string;
 };
 
-export type SubmissionResult<T extends FieldValues> =
+export type SubmissionResult<T extends FieldValues = FieldValues> =
   | SubmissionSuccess
   | SubmissionError<T>;
 
@@ -72,7 +72,7 @@ export function isSubmissionError<T extends FieldValues>(
   return result.kind === 'error';
 }
 
-export class SubmissionError<T extends FieldValues> {
+export class SubmissionError<T extends FieldValues = FieldValues> {
   readonly kind = 'error';
 
   private readonly formErrors: FormError[] = [];

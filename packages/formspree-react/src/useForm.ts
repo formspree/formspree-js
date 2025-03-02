@@ -1,12 +1,13 @@
 import {
+  isSubmissionError,
   type Client,
   type FieldValues,
   type SubmissionError,
   type SubmissionSuccess,
 } from '@formspree/core';
 import { useState } from 'react';
-import type { ExtraData } from './types';
-import { useSubmit, type SubmitHandler } from './useSubmit';
+import type { ExtraData, SubmitHandler } from './types';
+import { useSubmit } from './useSubmit';
 
 type ResetFunction = () => void;
 
@@ -17,7 +18,7 @@ export type TUseForm<T extends FieldValues> = [
     submitting: boolean;
     succeeded: boolean;
   },
-  SubmitHandler<T>,
+  SubmitHandler<T, void>,
   ResetFunction
 ];
 
@@ -44,17 +45,6 @@ export function useForm<T extends FieldValues>(
   const submit = useSubmit<T>(formKey, {
     client: args.client,
     extraData: args.data,
-    onError(error) {
-      setErrors(error);
-      setSubmitting(false);
-      setSucceeded(false);
-    },
-    onSuccess(result) {
-      setErrors(null);
-      setResult(result);
-      setSubmitting(false);
-      setSucceeded(true);
-    },
     origin: args.endpoint,
   });
 
@@ -63,7 +53,16 @@ export function useForm<T extends FieldValues>(
 
     async function handleSubmit(submissionData) {
       setSubmitting(true);
-      await submit(submissionData);
+      const result = await submit(submissionData);
+      setSubmitting(false);
+      if (isSubmissionError(result)) {
+        setErrors(result);
+        setSucceeded(false);
+      } else {
+        setErrors(null);
+        setResult(result);
+        setSucceeded(true);
+      }
     },
 
     function reset() {
