@@ -1,6 +1,5 @@
 import {
   isSubmissionError,
-  type FieldValues,
   type SubmissionError,
   type SubmissionResult,
 } from '@formspree/core';
