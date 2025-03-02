@@ -1,8 +1,4 @@
-import {
-  isSubmissionError,
-  type SubmissionError,
-  type SubmissionResult,
-} from '@formspree/core';
+import { SubmissionError, type SubmissionResult } from '@formspree/core';
 import type {
   PaymentIntentResult,
   PaymentMethodResult,
@@ -262,8 +258,7 @@ describe('useSubmit', () => {
 
       await userEvent.click(screen.getByRole('button'));
 
-      expect(isSubmissionError(result)).toBe(true);
-
+      expect(result).toBeInstanceOf(SubmissionError);
       const errorResult = result as SubmissionError<FormData>;
       expect(errorResult.getFormErrors()).toEqual([
         {
