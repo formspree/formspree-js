@@ -5,8 +5,16 @@ import SimpleForm from './SimpleForm';
 import RecaptchaForm from './RecaptchaForm';
 import { WithReactHookForm } from './WithReactHookForm';
 
+enum Tab {
+  React19 = 'react-19',
+  ReactHookForm = 'react-hook-form',
+  Recaptcha = 'recaptcha',
+  Simple = 'simple',
+  Stripe = 'stripe',
+}
+
 const App = () => {
-  const [tab, setTab] = useState('simple');
+  const [tab, setTab] = useState(Tab.Simple);
 
   return (
     <>
@@ -14,43 +22,52 @@ const App = () => {
         <div className="tabs">
           <button
             type="button"
-            className={`tab ${tab === 'simple' && 'active'}`}
-            onClick={() => setTab('simple')}
+            className={`tab ${tab === Tab.Simple && 'active'}`}
+            onClick={() => setTab(Tab.Simple)}
           >
             Simple form
           </button>
           <button
             type="button"
-            className={`tab ${tab === 'recaptcha' && 'active'}`}
-            onClick={() => setTab('recaptcha')}
+            className={`tab ${tab === Tab.Recaptcha && 'active'}`}
+            onClick={() => setTab(Tab.Recaptcha)}
           >
             ReCaptcha form
           </button>
           <button
             type="button"
-            className={`tab ${tab === 'stripe' && 'active'}`}
+            className={`tab ${tab === Tab.Stripe && 'active'}`}
             disabled={!process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY}
-            onClick={() => setTab('stripe')}
+            onClick={() => setTab(Tab.Stripe)}
           >
             Stripe form
           </button>
           <button
             type="button"
-            className={`tab ${tab === 'react-hook-form' && 'active'}`}
-            onClick={() => setTab('react-hook-form')}
+            className={`tab ${tab === Tab.ReactHookForm && 'active'}`}
+            onClick={() => setTab(Tab.ReactHookForm)}
           >
             With react-hook-form
           </button>
+          <button
+            type="button"
+            className={`tab ${tab === Tab.React19 && 'active'}`}
+            onClick={() => setTab(Tab.React19)}
+          >
+            React 19
+          </button>
         </div>
-        {tab === 'stripe' ? (
+        {tab === Tab.Stripe ? (
           <FormspreeProvider
             stripePK={process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY}
           >
             <PaymentForm />
           </FormspreeProvider>
-        ) : tab === 'recaptcha' ? (
+        ) : tab === Tab.Recaptcha ? (
           <RecaptchaForm />
-        ) : tab === 'react-hook-form' ? (
+        ) : tab === Tab.ReactHookForm ? (
+          <WithReactHookForm />
+        ) : tab === Tab.React19 ? (
           <WithReactHookForm />
         ) : (
           <SimpleForm />

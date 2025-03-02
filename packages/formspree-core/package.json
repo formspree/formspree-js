@@ -33,7 +33,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@stripe/stripe-js": "^1.35.0"
+    "@stripe/stripe-js": "^5.7.0"
   },
   "publishConfig": {
     "access": "public",
