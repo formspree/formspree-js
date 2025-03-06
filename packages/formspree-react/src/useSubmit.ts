@@ -7,12 +7,11 @@ import {
   type SubmissionError,
   type SubmissionSuccess,
 } from '@formspree/core';
-import { CardElement } from '@stripe/react-stripe-js';
-import type { PaymentMethodResult } from '@stripe/stripe-js';
-import { useMemo } from 'react';
 import { version } from '../package.json';
 import { useFormspree } from './context';
 import type { ExtraData } from './types';
+import { CardElement } from '@stripe/react-stripe-js';
+import { useStripeContext } from './stripe';
 
 const clientName = `@formspree/react@${version}`;
 
@@ -36,6 +35,7 @@ export function useSubmit<T extends FieldValues>(
   options: Options<T> = {}
 ): SubmitHandler<T> {
   const formspree = useFormspree();
+  const { elements } = useStripeContext();
   const {
     client = formspree.client,
     extraData,
@@ -45,10 +45,6 @@ export function useSubmit<T extends FieldValues>(
   } = options;
 
   const { stripe } = client;
-  const cardElement = useMemo(
-    () => stripe?.elements().getElement(CardElement),
-    [stripe]
-  );
 
   return async function handleSubmit(submission) {
     const data = isEvent(submission) ? getFormData(submission) : submission;
@@ -68,18 +64,21 @@ export function useSubmit<T extends FieldValues>(
       }
     }
 
+    const cardElement = elements?.getElement(CardElement);
+    const createPaymentMethod =
+      stripe && cardElement
+        ? () =>
+            stripe.createPaymentMethod({
+              type: 'card',
+              card: cardElement,
+              billing_details: mapBillingDetailsPayload(data),
+            })
+        : undefined;
+
     const result = await client.submitForm(formKey, data, {
       endpoint: origin,
       clientName,
-      createPaymentMethod:
-        stripe && cardElement
-          ? (): Promise<PaymentMethodResult> =>
-              stripe.createPaymentMethod({
-                type: 'card',
-                card: cardElement,
-                billing_details: mapBillingDetailsPayload(data),
-              })
-          : undefined,
+      createPaymentMethod,
     });
 
     if (isSubmissionError(result)) {
