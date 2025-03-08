@@ -8,7 +8,6 @@ import React, {
   useState,
   type ReactNode,
 } from 'react';
-import { StripeProvider } from './stripe';
 
 export type FormspreeContextType = {
   client: Client;
@@ -63,9 +62,7 @@ export function FormspreeProvider(props: FormspreeProviderProps) {
   return (
     <FormspreeContext.Provider value={{ client }}>
       {stripePromise ? (
-        <Elements stripe={stripePromise}>
-          <StripeProvider>{children}</StripeProvider>
-        </Elements>
+        <Elements stripe={stripePromise}>{children}</Elements>
       ) : (
         children
       )}
