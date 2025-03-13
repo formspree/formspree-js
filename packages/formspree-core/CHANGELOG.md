@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.0.0
+
+### Major Changes
+
+- a00b642: Support React 19 and stripe-js 5
+
 ## 3.0.4
 
 ### Patch Changes
