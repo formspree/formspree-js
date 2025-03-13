@@ -5,12 +5,11 @@ import {
   type SubmissionData,
   type SubmissionResult,
 } from '@formspree/core';
-import { CardElement } from '@stripe/react-stripe-js';
-import type { PaymentMethodResult } from '@stripe/stripe-js';
-import { useMemo } from 'react';
 import { version } from '../package.json';
 import { useFormspree } from './context';
 import type { ExtraData, FormEvent, SubmitHandler } from './types';
+import { CardElement } from '@stripe/react-stripe-js';
+import { useStripeContext } from './stripe';
 
 const clientName = `@formspree/react@${version}`;
 
@@ -27,12 +26,9 @@ export function useSubmit<T extends FieldValues>(
 ): SubmitHandler<T, SubmissionResult<T>> {
   const formspree = useFormspree();
   const { client = formspree.client, extraData, origin } = options;
+  const { elements } = useStripeContext();
 
   const { stripe } = client;
-  const cardElement = useMemo(
-    () => stripe?.elements().getElement(CardElement),
-    [stripe]
-  );
 
   return async function handleSubmit(submission) {
     const data = isEvent(submission) ? getFormData(submission) : submission;
@@ -52,18 +48,21 @@ export function useSubmit<T extends FieldValues>(
       }
     }
 
+    const cardElement = elements?.getElement(CardElement);
+    const createPaymentMethod =
+      stripe && cardElement
+        ? () =>
+            stripe.createPaymentMethod({
+              type: 'card',
+              card: cardElement,
+              billing_details: mapBillingDetailsPayload(data),
+            })
+        : undefined;
+
     return client.submitForm(formKey, data, {
       endpoint: origin,
       clientName,
-      createPaymentMethod:
-        stripe && cardElement
-          ? (): Promise<PaymentMethodResult> =>
-              stripe.createPaymentMethod({
-                type: 'card',
-                card: cardElement,
-                billing_details: mapBillingDetailsPayload(data),
-              })
-          : undefined,
+      createPaymentMethod,
     });
   };
 }
