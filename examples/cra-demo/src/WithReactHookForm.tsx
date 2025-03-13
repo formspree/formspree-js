@@ -1,3 +1,4 @@
+import { isSubmissionError } from '@formspree/core';
 import { useSubmit } from '@formspree/react';
 import { useForm } from 'react-hook-form';
 
@@ -16,33 +17,36 @@ export function WithReactHookForm() {
   } = useForm<Inputs>();
 
   const submit = useSubmit<Inputs>(
-    process.env.REACT_APP_REACT_HOOK_FORM_ID as string,
-    {
-      onError(errs) {
-        const formErrs = errs.getFormErrors();
-        for (const { code, message } of formErrs) {
-          setError(`root.${code}`, {
-            type: code,
-            message,
-          });
-        }
-
-        const fieldErrs = errs.getAllFieldErrors();
-        for (const [field, errs] of fieldErrs) {
-          setError(field, {
-            message: errs.map((e) => e.message).join(', '),
-          });
-        }
-      },
-    }
+    process.env.REACT_APP_REACT_HOOK_FORM_ID as string
   );
+
+  async function onSubmit(inputs: Inputs): Promise<void> {
+    const result = await submit(inputs);
+
+    if (isSubmissionError(result)) {
+      const formErrs = result.getFormErrors();
+      for (const { code, message } of formErrs) {
+        setError(`root.${code}`, {
+          type: code,
+          message,
+        });
+      }
+
+      const fieldErrs = result.getAllFieldErrors();
+      for (const [field, errs] of fieldErrs) {
+        setError(field, {
+          message: errs.map((e) => e.message).join(', '),
+        });
+      }
+    }
+  }
 
   return (
     <div>
       {isSubmitSuccessful ? (
         <h2>Your message has been sent successfully!</h2>
       ) : (
-        <form onSubmit={handleSubmit(submit)}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="block">
             <label htmlFor="email">Email</label>
             <input {...register('email')} id="email" type="email" />

@@ -16,11 +16,12 @@ body {
 .container {
   max-width: 960px;
   margin: 0 auto;
-  padding: 4rem 0;
+  padding: 4rem 2rem;
 }
 
 .tabs {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-start;
   align-items: center;
   margin-bottom: 4rem;

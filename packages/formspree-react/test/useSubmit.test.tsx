@@ -1,13 +1,13 @@
-import { isSubmissionError, type SubmissionError } from '@formspree/core';
+import { SubmissionError, type SubmissionResult } from '@formspree/core';
 import type {
   PaymentIntentResult,
   PaymentMethodResult,
   Stripe,
 } from '@stripe/stripe-js';
-import { loadStripe } from '@stripe/stripe-js/pure.js';
+import { loadStripe } from '@stripe/stripe-js/pure/index.js';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
+import React, { type FormEvent } from 'react';
 import {
   FormspreeProvider,
   useFormspree,
@@ -16,7 +16,7 @@ import {
 } from '../src';
 import { createMockStripe } from './mockStripe';
 
-jest.mock('@stripe/stripe-js/pure.js');
+jest.mock('@stripe/stripe-js/pure/index.js');
 
 describe('useSubmit', () => {
   const mockedFetch = jest.spyOn(window, 'fetch');
@@ -208,27 +208,30 @@ describe('useSubmit', () => {
   });
 
   describe('when submission fails', () => {
-    const onError = jest.fn();
-    const onSuccess = jest.fn();
+    type FormData = {
+      email: string;
+    };
+
+    let result: SubmissionResult<FormData>;
 
     function TestForm() {
-      const handleSubmit = useSubmit<{ email: string }>('test-formspree-key', {
-        onError,
-        onSuccess,
-      });
+      const submit = useSubmit<FormData>('test-formspree-key');
+
+      async function handleSubmit(
+        event: FormEvent<HTMLFormElement>
+      ): Promise<void> {
+        event.preventDefault();
+        result = await submit({ email: 'test-email' });
+      }
+
       return (
-        <form
-          onSubmit={(event) => {
-            event.preventDefault();
-            handleSubmit({ email: 'test-email' });
-          }}
-        >
+        <form onSubmit={handleSubmit}>
           <button>Submit</button>
         </form>
       );
     }
 
-    it('calls onError option with the error result', async () => {
+    it('returns an error result', async () => {
       mockedFetch.mockResolvedValue(
         new Response(
           JSON.stringify({
@@ -255,13 +258,8 @@ describe('useSubmit', () => {
 
       await userEvent.click(screen.getByRole('button'));
 
-      expect(onError).toHaveBeenCalledTimes(1);
-
-      const errorResult = onError.mock.calls[0][0] as SubmissionError<{
-        email: string;
-      }>;
-
-      expect(isSubmissionError(errorResult)).toBe(true);
+      expect(result).toBeInstanceOf(SubmissionError);
+      const errorResult = result as SubmissionError<FormData>;
       expect(errorResult.getFormErrors()).toEqual([
         {
           code: 'EMPTY',
@@ -285,34 +283,34 @@ describe('useSubmit', () => {
           ],
         ],
       ]);
-
-      expect(onSuccess).not.toHaveBeenCalled();
     });
   });
 
   describe('when submission succeeds', () => {
-    const onError = jest.fn();
-    const onSuccess = jest.fn();
+    type FormData = {
+      email: string;
+    };
+
+    let result: SubmissionResult<FormData>;
 
     function TestForm() {
-      const handleSubmit = useSubmit<{ email: string }>('test-formspree-key', {
-        onError,
-        onSuccess,
-      });
+      const submit = useSubmit<FormData>('test-formspree-key');
+
+      async function handleSubmit(
+        event: FormEvent<HTMLFormElement>
+      ): Promise<void> {
+        event.preventDefault();
+        result = await submit({ email: 'test-email' });
+      }
 
       return (
-        <form
-          onSubmit={(event) => {
-            event.preventDefault();
-            handleSubmit({ email: 'test-email' });
-          }}
-        >
+        <form onSubmit={handleSubmit}>
           <button>Submit</button>
         </form>
       );
     }
 
-    it('calls onSuccess option with the success result', async () => {
+    it('returns a success result', async () => {
       mockedFetch.mockResolvedValue(
         new Response(JSON.stringify({ next: 'test-redirect-url' }))
       );
@@ -325,11 +323,7 @@ describe('useSubmit', () => {
 
       await userEvent.click(screen.getByRole('button'));
 
-      expect(onError).not.toHaveBeenCalled();
-
-      expect(onSuccess).toHaveBeenCalledTimes(1);
-      const successResult = onSuccess.mock.calls[0][0];
-      expect(successResult).toEqual({
+      expect(result).toEqual({
         kind: 'success',
         next: 'test-redirect-url',
       });
@@ -337,7 +331,7 @@ describe('useSubmit', () => {
   });
 
   describe('with Stripe (success)', () => {
-    it('calls onSuccess option with the success result', async () => {
+    it('returns a success result', async () => {
       const mockLoadStripe = loadStripe as jest.MockedFn<typeof loadStripe>;
       const mockCardElement = { name: 'mocked-card-element' };
       const mockStripe = createMockStripe();
@@ -358,20 +352,16 @@ describe('useSubmit', () => {
 
       mockLoadStripe.mockResolvedValue(mockStripe as unknown as Stripe);
 
-      const onError = jest.fn();
-      const onSuccess = jest.fn();
+      let result: SubmissionResult;
 
       function TestForm() {
         const { client } = useFormspree();
-        const handleSubmit = useSubmit('test-formspree-key', {
-          onError,
-          onSuccess,
-        });
+        const handleSubmit = useSubmit('test-formspree-key');
         return (
           <form
-            onSubmit={(event) => {
+            onSubmit={async (event) => {
               event.preventDefault();
-              handleSubmit({
+              result = await handleSubmit({
                 address_line1: 'test-addr-line1',
                 address_line2: 'test-addr-line2',
                 address_city: 'test-addr-city',
@@ -415,9 +405,7 @@ describe('useSubmit', () => {
 
       await userEvent.click(screen.getByRole('button'));
       await waitFor(() => {
-        expect(onError).not.toHaveBeenCalled();
-        expect(onSuccess).toHaveBeenCalledTimes(1);
-        expect(onSuccess).toHaveBeenLastCalledWith({
+        expect(result).toEqual({
           kind: 'success',
           next: 'test-redirect-url',
         });
