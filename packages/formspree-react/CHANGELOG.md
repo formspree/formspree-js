@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.5.5
+
+### Patch Changes
+
+- 6739c4c: Fix: Stripe not working on @formspree/react
+
 ## 2.5.4
 
 ### Patch Changes
