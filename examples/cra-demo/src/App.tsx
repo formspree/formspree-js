@@ -1,9 +1,11 @@
-import { useState } from 'react';
 import { FormspreeProvider } from '@formspree/react';
-import PaymentForm from './PaymentForm';
-import SimpleForm from './SimpleForm';
-import RecaptchaForm from './RecaptchaForm';
+import { useState } from 'react';
+
+import { React19 } from './React19';
 import { WithReactHookForm } from './WithReactHookForm';
+import PaymentForm from './PaymentForm';
+import RecaptchaForm from './RecaptchaForm';
+import SimpleForm from './SimpleForm';
 
 enum Tab {
   React19 = 'react-19',
@@ -68,7 +70,7 @@ const App = () => {
         ) : tab === Tab.ReactHookForm ? (
           <WithReactHookForm />
         ) : tab === Tab.React19 ? (
-          <WithReactHookForm />
+          <React19 />
         ) : (
           <SimpleForm />
         )}
