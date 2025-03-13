@@ -1,6 +1,6 @@
 {
   "name": "@formspree/react",
-  "version": "2.5.5",
+  "version": "3.0.0",
   "private": false,
   "description": "The React component library for Formspree",
   "bugs": {
@@ -32,7 +32,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@formspree/core": "^3.0.4",
+    "@formspree/core": "^4.0.0",
     "@stripe/react-stripe-js": "^3.1.1",
     "@stripe/stripe-js": "^5.7.0"
   },
