@@ -102,20 +102,7 @@ const handleSubmit = async <T extends FieldValues>(
   }
 };
 
-const parseFormEndpoint = (
-  fullEndpoint: string
-): { formKey: string; endpoint: string } => {
-  const match = fullEndpoint.match(/(https?:\/\/[^/]+)\/f\/([a-zA-Z0-9]+)/);
-  if (!match) {
-    throw new Error(
-      'formEndpoint must be a valid Formspree URL (e.g., https://formspree.io/f/xyzabc)'
-    );
-  }
-  return {
-    endpoint: match[1],
-    formKey: match[2],
-  };
-};
+const DEFAULT_ENDPOINT = 'https://formspree.io';
 
 export const initForm = <T extends FieldValues = FieldValues>(
   config: FormConfig<T>
@@ -124,12 +111,13 @@ export const initForm = <T extends FieldValues = FieldValues>(
     throw new Error('You must provide a `formElement` in the config');
   }
 
-  if (!config.formEndpoint) {
-    throw new Error('You must provide a `formEndpoint` in the config');
+  if (!config.formId) {
+    throw new Error('You must provide a `formId` in the config');
   }
 
   const form = getFormElement(config.formElement);
-  const { formKey, endpoint } = parseFormEndpoint(config.formEndpoint);
+  const formKey = config.formId;
+  const endpoint = config.origin ?? DEFAULT_ENDPOINT;
   const client: Client = getDefaultClient();
 
   const context: FormContext<T> = {

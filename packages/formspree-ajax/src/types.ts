@@ -21,9 +21,14 @@ export interface FormConfig<T extends FieldValues = FieldValues> {
   formElement: FormElement;
 
   /**
-   * The Formspree form endpoint URL (e.g., "https://formspree.io/f/zkrvodeq").
+   * The Formspree form ID (e.g., "zkrvodeq").
    */
-  formEndpoint: string;
+  formId: string;
+
+  /**
+   * The Formspree API origin URL. Defaults to "https://formspree.io".
+   */
+  origin?: string;
 
   /**
    * Extra data to include with form submissions. Can be a static object or a function
