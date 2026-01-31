@@ -1,0 +1,45 @@
+{
+  "name": "@formspree/ajax",
+  "version": "1.0.0",
+  "private": false,
+  "description": "The AJAX library for Formspree",
+  "homepage": "https://formspree.io",
+  "bugs": {
+    "url": "https://github.com/formspree/formspree-js/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/formspree/formspree-js.git"
+  },
+  "license": "MIT",
+  "contributors": [
+    "Derrick Reimer",
+    "Cole Krumbholz",
+    "Ismail Ghallou"
+  ],
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --minify",
+    "clean": "rm -rf dist && rm -rf node_modules",
+    "dev": "tsup src/index.ts --format esm,cjs --dts --sourcemap --watch",
+    "lint": "eslint ./src ./test",
+    "test": "jest",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@formspree/core": "^4.0.0"
+  },
+  "peerDependencies": {
+    "@formspree/core": "^4.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}
