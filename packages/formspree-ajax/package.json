@@ -13,9 +13,7 @@
   },
   "license": "MIT",
   "contributors": [
-    "Derrick Reimer",
-    "Cole Krumbholz",
-    "Ismail Ghallou"
+    "Cole Krumbholz"
   ],
   "sideEffects": false,
   "main": "./dist/index.js",
