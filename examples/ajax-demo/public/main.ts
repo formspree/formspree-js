@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import { initForm } from '@formspree/ajax';
 
 const messageEl = document.getElementById('message') as HTMLDivElement;

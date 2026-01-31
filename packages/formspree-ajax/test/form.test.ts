@@ -58,7 +58,7 @@ describe('initForm', () => {
     it('accepts an HTMLFormElement directly', () => {
       const handle = initForm({
         formElement: form,
-        formEndpoint: 'https://formspree.io/f/xyzabc',
+        formId: 'xyzabc',
       });
 
       expect(handle).toBeDefined();
@@ -69,7 +69,7 @@ describe('initForm', () => {
     it('accepts a CSS selector string', () => {
       const handle = initForm({
         formElement: '#test-form',
-        formEndpoint: 'https://formspree.io/f/xyzabc',
+        formId: 'xyzabc',
       });
 
       expect(handle).toBeDefined();
@@ -80,7 +80,7 @@ describe('initForm', () => {
       expect(() =>
         initForm({
           formElement: '#non-existent-form',
-          formEndpoint: 'https://formspree.io/f/xyzabc',
+          formId: 'xyzabc',
         })
       ).toThrow('Element "#non-existent-form" not found');
     });
@@ -93,7 +93,7 @@ describe('initForm', () => {
       expect(() =>
         initForm({
           formElement: '#not-a-form',
-          formEndpoint: 'https://formspree.io/f/xyzabc',
+          formId: 'xyzabc',
         })
       ).toThrow('Element "#not-a-form" is not a form element');
     });
@@ -104,63 +104,18 @@ describe('initForm', () => {
       expect(() =>
         initForm({
           formElement: undefined as unknown as string,
-          formEndpoint: 'https://formspree.io/f/xyzabc',
+          formId: 'xyzabc',
         })
       ).toThrow('You must provide a `formElement` in the config');
     });
 
-    it('throws when formEndpoint is not provided', () => {
+    it('throws when formId is not provided', () => {
       expect(() =>
         initForm({
           formElement: form,
-          formEndpoint: undefined as unknown as string,
+          formId: undefined as unknown as string,
         })
-      ).toThrow('You must provide a `formEndpoint` in the config');
-    });
-  });
-
-  describe('formEndpoint parsing', () => {
-    it('extracts form key from standard formspree.io URL', () => {
-      const onInit = jest.fn();
-      const handle = initForm({
-        formElement: form,
-        formEndpoint: 'https://formspree.io/f/xyzabc',
-        onInit,
-      });
-
-      expect(onInit).toHaveBeenCalledWith(
-        expect.objectContaining({
-          formKey: 'xyzabc',
-        })
-      );
-      handle.destroy();
-    });
-
-    it('extracts form key from URL without https', () => {
-      const onInit = jest.fn();
-      const handle = initForm({
-        formElement: form,
-        formEndpoint: 'http://formspree.io/f/abc123',
-        onInit,
-      });
-
-      expect(onInit).toHaveBeenCalledWith(
-        expect.objectContaining({
-          formKey: 'abc123',
-        })
-      );
-      handle.destroy();
-    });
-
-    it('throws when formEndpoint is not a valid Formspree URL', () => {
-      expect(() =>
-        initForm({
-          formElement: form,
-          formEndpoint: 'https://example.com/form',
-        })
-      ).toThrow(
-        'formEndpoint must be a valid Formspree URL (e.g., https://formspree.io/f/xyzabc)'
-      );
+      ).toThrow('You must provide a `formId` in the config');
     });
   });
 
@@ -169,7 +124,7 @@ describe('initForm', () => {
       const onInit = jest.fn();
       const handle = initForm({
         formElement: form,
-        formEndpoint: 'https://formspree.io/f/xyzabc',
+        formId: 'xyzabc',
         onInit,
       });
 
@@ -181,7 +136,7 @@ describe('initForm', () => {
           client: expect.any(Object),
           config: expect.objectContaining({
             formElement: form,
-            formEndpoint: 'https://formspree.io/f/xyzabc',
+            formId: 'xyzabc',
           }),
         })
       );
@@ -196,7 +151,7 @@ describe('initForm', () => {
 
       initForm({
         formElement: form,
-        formEndpoint: 'https://formspree.io/f/xyzabc',
+        formId: 'xyzabc',
       });
 
       expect(submitButton.disabled).toBe(false);
@@ -207,7 +162,7 @@ describe('initForm', () => {
     it('prevents default form submission', () => {
       const handle = initForm({
         formElement: form,
-        formEndpoint: 'https://formspree.io/f/xyzabc',
+        formId: 'xyzabc',
       });
 
       mockClient.submitForm.mockResolvedValue({ kind: 'success', next: '' });
@@ -224,7 +179,7 @@ describe('initForm', () => {
       const onSubmit = jest.fn();
       const handle = initForm({
         formElement: form,
-        formEndpoint: 'https://formspree.io/f/xyzabc',
+        formId: 'xyzabc',
         onSubmit,
       });
 
@@ -245,7 +200,7 @@ describe('initForm', () => {
     it('disables submit buttons during submission', async () => {
       const handle = initForm({
         formElement: form,
-        formEndpoint: 'https://formspree.io/f/xyzabc',
+        formId: 'xyzabc',
       });
 
       let resolveSubmit: (value: { kind: string }) => void;
@@ -278,7 +233,7 @@ describe('initForm', () => {
       const onSuccess = jest.fn();
       const handle = initForm({
         formElement: form,
-        formEndpoint: 'https://formspree.io/f/xyzabc',
+        formId: 'xyzabc',
         onSuccess,
       });
 
@@ -298,7 +253,7 @@ describe('initForm', () => {
     it('uses default onSuccess when not provided', async () => {
       const handle = initForm({
         formElement: form,
-        formEndpoint: 'https://formspree.io/f/xyzabc',
+        formId: 'xyzabc',
       });
 
       mockClient.submitForm.mockResolvedValue({ kind: 'success', next: '' });
@@ -316,7 +271,7 @@ describe('initForm', () => {
       const onError = jest.fn();
       const handle = initForm({
         formElement: form,
-        formEndpoint: 'https://formspree.io/f/xyzabc',
+        formId: 'xyzabc',
         onError,
       });
 
@@ -341,7 +296,7 @@ describe('initForm', () => {
       const onFailure = jest.fn();
       const handle = initForm({
         formElement: form,
-        formEndpoint: 'https://formspree.io/f/xyzabc',
+        formId: 'xyzabc',
         onFailure,
       });
 
@@ -363,7 +318,7 @@ describe('initForm', () => {
     it('includes static extra data in submission', async () => {
       const handle = initForm({
         formElement: form,
-        formEndpoint: 'https://formspree.io/f/xyzabc',
+        formId: 'xyzabc',
         data: { source: 'website', campaign: 'summer2024' },
       });
 
@@ -388,7 +343,7 @@ describe('initForm', () => {
       const dataFn = jest.fn().mockReturnValue({ timestamp: '12345' });
       const handle = initForm({
         formElement: form,
-        formEndpoint: 'https://formspree.io/f/xyzabc',
+        formId: 'xyzabc',
         data: dataFn,
       });
 
@@ -409,7 +364,7 @@ describe('initForm', () => {
     it('skips null and undefined values in extra data', async () => {
       const handle = initForm({
         formElement: form,
-        formEndpoint: 'https://formspree.io/f/xyzabc',
+        formId: 'xyzabc',
         data: {
           included: 'yes',
           nullValue: null,
@@ -436,7 +391,7 @@ describe('initForm', () => {
 
       const handle = initForm({
         formElement: form,
-        formEndpoint: 'https://formspree.io/f/xyzabc',
+        formId: 'xyzabc',
         debug: true,
       });
 
@@ -454,7 +409,7 @@ describe('initForm', () => {
 
       const handle = initForm({
         formElement: form,
-        formEndpoint: 'https://formspree.io/f/xyzabc',
+        formId: 'xyzabc',
         debug: true,
       });
 
@@ -482,7 +437,7 @@ describe('initForm', () => {
 
       const handle = initForm({
         formElement: form,
-        formEndpoint: 'https://formspree.io/f/xyzabc',
+        formId: 'xyzabc',
         debug: true,
       });
 
@@ -505,7 +460,7 @@ describe('initForm', () => {
 
       const handle = initForm({
         formElement: form,
-        formEndpoint: 'https://formspree.io/f/xyzabc',
+        formId: 'xyzabc',
         debug: true,
       });
 
@@ -529,7 +484,7 @@ describe('initForm', () => {
       const onSubmit = jest.fn();
       const handle = initForm({
         formElement: form,
-        formEndpoint: 'https://formspree.io/f/xyzabc',
+        formId: 'xyzabc',
         onSubmit,
       });
 
@@ -560,7 +515,7 @@ describe('initForm', () => {
 
       const handle = initForm({
         formElement: form,
-        formEndpoint: 'https://formspree.io/f/xyzabc',
+        formId: 'xyzabc',
       });
 
       let resolveSubmit: (value: { kind: string }) => void;
