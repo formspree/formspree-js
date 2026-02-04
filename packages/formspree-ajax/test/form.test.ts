@@ -19,6 +19,7 @@ jest.mock('@formspree/core', () => {
       kind: 'error',
       getFormErrors: () => [],
       getAllFieldErrors: () => [],
+      getFieldErrors: () => [],
     })),
   };
 });
@@ -475,6 +476,230 @@ describe('initForm', () => {
       );
 
       consoleErrorSpy.mockRestore();
+      handle.destroy();
+    });
+  });
+
+  describe('error rendering', () => {
+    it('renders errors to data-fs-error elements', async () => {
+      // Add error containers
+      const emailError = document.createElement('span');
+      emailError.dataset.fsError = 'email';
+      form.appendChild(emailError);
+
+      const handle = initForm({
+        formElement: form,
+        formId: 'xyzabc',
+      });
+
+      mockClient.submitForm.mockResolvedValue({
+        kind: 'error',
+        getFormErrors: () => [],
+        getAllFieldErrors: () => [
+          ['email', [{ code: 'TYPE_EMAIL', message: 'is invalid' }]],
+        ],
+        getFieldErrors: (field: string) =>
+          field === 'email'
+            ? [{ code: 'TYPE_EMAIL', message: 'is invalid' }]
+            : [],
+      });
+
+      form.dispatchEvent(new Event('submit'));
+      await flushPromises();
+
+      expect(emailError.textContent).toBe('This field is invalid');
+      handle.destroy();
+    });
+
+    it('clears errors before submission', async () => {
+      const emailError = document.createElement('span');
+      emailError.dataset.fsError = 'email';
+      emailError.textContent = 'Previous error';
+      form.appendChild(emailError);
+
+      const handle = initForm({
+        formElement: form,
+        formId: 'xyzabc',
+      });
+
+      mockClient.submitForm.mockResolvedValue({ kind: 'success', next: '' });
+
+      form.dispatchEvent(new Event('submit'));
+      await flushPromises();
+
+      // Error should be cleared (form replaced by success message in this case)
+      handle.destroy();
+    });
+
+    it('uses prettyName from fields config', async () => {
+      const emailError = document.createElement('span');
+      emailError.dataset.fsError = 'email';
+      form.appendChild(emailError);
+
+      const handle = initForm({
+        formElement: form,
+        formId: 'xyzabc',
+        fields: {
+          email: { prettyName: 'Email address' },
+        },
+      });
+
+      mockClient.submitForm.mockResolvedValue({
+        kind: 'error',
+        getFormErrors: () => [],
+        getAllFieldErrors: () => [
+          ['email', [{ code: 'TYPE_EMAIL', message: 'is invalid' }]],
+        ],
+        getFieldErrors: (field: string) =>
+          field === 'email'
+            ? [{ code: 'TYPE_EMAIL', message: 'is invalid' }]
+            : [],
+      });
+
+      form.dispatchEvent(new Event('submit'));
+      await flushPromises();
+
+      expect(emailError.textContent).toBe('Email address is invalid');
+      handle.destroy();
+    });
+
+    it('uses custom error messages from fields config', async () => {
+      const emailError = document.createElement('span');
+      emailError.dataset.fsError = 'email';
+      form.appendChild(emailError);
+
+      const handle = initForm({
+        formElement: form,
+        formId: 'xyzabc',
+        fields: {
+          email: {
+            errorMessages: {
+              typeEmail: 'Please enter a valid email address',
+            },
+          },
+        },
+      });
+
+      mockClient.submitForm.mockResolvedValue({
+        kind: 'error',
+        getFormErrors: () => [],
+        getAllFieldErrors: () => [
+          ['email', [{ code: 'TYPE_EMAIL', message: 'is invalid' }]],
+        ],
+        getFieldErrors: (field: string) =>
+          field === 'email'
+            ? [{ code: 'TYPE_EMAIL', message: 'is invalid' }]
+            : [],
+      });
+
+      form.dispatchEvent(new Event('submit'));
+      await flushPromises();
+
+      expect(emailError.textContent).toBe('Please enter a valid email address');
+      handle.destroy();
+    });
+
+    it('clears error elements when no errors for that field', async () => {
+      const emailError = document.createElement('span');
+      emailError.dataset.fsError = 'email';
+      form.appendChild(emailError);
+
+      const nameError = document.createElement('span');
+      nameError.dataset.fsError = 'name';
+      nameError.textContent = 'Should be cleared';
+      form.appendChild(nameError);
+
+      const handle = initForm({
+        formElement: form,
+        formId: 'xyzabc',
+      });
+
+      mockClient.submitForm.mockResolvedValue({
+        kind: 'error',
+        getFormErrors: () => [],
+        getAllFieldErrors: () => [
+          ['email', [{ code: 'TYPE_EMAIL', message: 'is invalid' }]],
+        ],
+        getFieldErrors: (field: string) =>
+          field === 'email'
+            ? [{ code: 'TYPE_EMAIL', message: 'is invalid' }]
+            : [],
+      });
+
+      form.dispatchEvent(new Event('submit'));
+      await flushPromises();
+
+      expect(emailError.textContent).toBe('This field is invalid');
+      expect(nameError.innerHTML).toBe('');
+      handle.destroy();
+    });
+  });
+
+  describe('customizable functions', () => {
+    it('uses custom enable function', () => {
+      const customEnable = jest.fn();
+      const handle = initForm({
+        formElement: form,
+        formId: 'xyzabc',
+        enable: customEnable,
+      });
+
+      expect(customEnable).toHaveBeenCalledWith(
+        expect.objectContaining({ form })
+      );
+      handle.destroy();
+    });
+
+    it('uses custom disable function', async () => {
+      const customDisable = jest.fn();
+      const handle = initForm({
+        formElement: form,
+        formId: 'xyzabc',
+        disable: customDisable,
+      });
+
+      mockClient.submitForm.mockResolvedValue({ kind: 'success', next: '' });
+
+      form.dispatchEvent(new Event('submit'));
+      await flushPromises();
+
+      expect(customDisable).toHaveBeenCalledWith(
+        expect.objectContaining({ form })
+      );
+      handle.destroy();
+    });
+
+    it('uses custom renderErrors function', async () => {
+      const customRenderErrors = jest.fn();
+      const handle = initForm({
+        formElement: form,
+        formId: 'xyzabc',
+        renderErrors: customRenderErrors,
+      });
+
+      const errorResult = {
+        kind: 'error',
+        getFormErrors: () => [],
+        getAllFieldErrors: () => [],
+        getFieldErrors: () => [],
+      };
+      mockClient.submitForm.mockResolvedValue(errorResult);
+
+      form.dispatchEvent(new Event('submit'));
+      await flushPromises();
+
+      // Called twice: once to clear (null), once with error
+      expect(customRenderErrors).toHaveBeenCalledTimes(2);
+      expect(customRenderErrors).toHaveBeenNthCalledWith(
+        1,
+        expect.objectContaining({ form }),
+        null
+      );
+      expect(customRenderErrors).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({ form }),
+        errorResult
+      );
       handle.destroy();
     });
   });

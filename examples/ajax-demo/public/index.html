@@ -156,6 +156,14 @@
     .note strong {
       color: #333;
     }
+
+    .field-error {
+      color: #dc3545;
+      font-size: 12px;
+      margin-top: 4px;
+      display: block;
+      min-height: 16px;
+    }
   </style>
 </head>
 <body>
@@ -175,6 +183,7 @@
           required
           placeholder="Your name"
         >
+        <span class="field-error" data-fs-error="name"></span>
       </div>
 
       <div class="form-group">
@@ -186,6 +195,7 @@
           required
           placeholder="your.email@example.com"
         >
+        <span class="field-error" data-fs-error="email"></span>
       </div>
 
       <div class="form-group">
@@ -196,6 +206,7 @@
           required
           placeholder="Write your message here..."
         ></textarea>
+        <span class="field-error" data-fs-error="message"></span>
       </div>
 
       <button type="submit" id="submit-btn">

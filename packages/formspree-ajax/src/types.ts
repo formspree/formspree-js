@@ -11,6 +11,58 @@ import type {
 export type FormElement = HTMLFormElement | string;
 
 /**
+ * Custom error messages for field validation errors.
+ * Keys should be camelCase versions of error codes (e.g., 'typeEmail' for TYPE_EMAIL).
+ */
+export type ErrorMessages = Partial<Record<CamelCaseErrorCode, string>>;
+
+/**
+ * Camel case versions of field error codes for use in errorMessages config.
+ */
+export type CamelCaseErrorCode =
+  | 'requiredFieldEmpty'
+  | 'requiredFieldMissing'
+  | 'stripeClientError'
+  | 'stripeScaError'
+  | 'typeEmail'
+  | 'typeNumeric'
+  | 'typeText'
+  | 'unspecified';
+
+/**
+ * Configuration for a specific form field.
+ * @template T - The type of field values for the form.
+ */
+export interface FieldConfig {
+  /**
+   * A human-readable name for the field, used as a prefix in error messages.
+   * If not provided, defaults to "This field".
+   */
+  prettyName?: string;
+
+  /**
+   * Custom error messages keyed by camelCase error code.
+   * If provided, these override the default error messages.
+   * @example
+   * ```ts
+   * errorMessages: {
+   *   typeEmail: 'Please enter a valid email address',
+   *   requiredFieldEmpty: 'Email is required'
+   * }
+   * ```
+   */
+  errorMessages?: ErrorMessages;
+}
+
+/**
+ * Configuration for form fields, keyed by field name.
+ * @template T - The type of field values for the form.
+ */
+export type FieldsConfig<T extends FieldValues = FieldValues> = Partial<
+  Record<keyof T, FieldConfig>
+>;
+
+/**
  * Configuration options for initializing a Formspree form.
  * @template T - The type of field values for the form, defaults to FieldValues.
  */
@@ -35,6 +87,11 @@ export interface FormConfig<T extends FieldValues = FieldValues> {
    * that returns data based on the form context.
    */
   data?: ExtraData<T>;
+
+  /**
+   * Configuration for individual form fields, including custom error messages and pretty names.
+   */
+  fields?: FieldsConfig<T>;
 
   /**
    * When true, enables debug logging for form submissions.
@@ -73,6 +130,32 @@ export interface FormConfig<T extends FieldValues = FieldValues> {
    * @param error - The unexpected error that occurred.
    */
   onFailure?: (context: FormContext<T>, error: unknown) => void;
+
+  /**
+   * Custom function to enable submit buttons. If not provided, the default implementation
+   * enables all disabled submit buttons within the form.
+   * @param context - The form context containing form element and configuration.
+   */
+  enable?: (context: FormContext<T>) => void;
+
+  /**
+   * Custom function to disable submit buttons. If not provided, the default implementation
+   * disables all enabled submit buttons within the form.
+   * @param context - The form context containing form element and configuration.
+   */
+  disable?: (context: FormContext<T>) => void;
+
+  /**
+   * Custom function to render validation errors in the DOM. If not provided, the default
+   * implementation finds elements with `data-fs-error="fieldName"` and populates
+   * them with error messages.
+   * @param context - The form context containing form element and configuration.
+   * @param error - The submission error, or null to clear errors.
+   */
+  renderErrors?: (
+    context: FormContext<T>,
+    error: SubmissionError<T> | null
+  ) => void;
 }
 
 /**

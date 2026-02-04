@@ -4,9 +4,27 @@ import {
   appendExtraData,
   type Client,
   type FieldValues,
+  type SubmissionError,
   type SubmissionSuccess,
 } from '@formspree/core';
-import type { FormConfig, FormContext, FormElement, FormHandle } from './types';
+import type {
+  CamelCaseErrorCode,
+  FormConfig,
+  FormContext,
+  FormElement,
+  FormHandle,
+} from './types';
+
+/**
+ * Converts a SCREAMING_SNAKE_CASE string to camelCase.
+ */
+const toCamelCase = (str: string): CamelCaseErrorCode => {
+  return str
+    .toLowerCase()
+    .replace(/_([a-z])/g, (_, letter) =>
+      letter.toUpperCase()
+    ) as CamelCaseErrorCode;
+};
 
 const getFormElement = (elementOrSelector: FormElement): HTMLFormElement => {
   if (typeof elementOrSelector === 'string') {
@@ -32,8 +50,13 @@ const defaultOnSuccess = <T extends FieldValues>(
   form.parentNode?.replaceChild(replacement, form);
 };
 
-const enableSubmitButtons = (form: HTMLFormElement): void => {
-  const buttons = form.querySelectorAll<HTMLButtonElement>(
+/**
+ * Default implementation to enable submit buttons.
+ */
+const defaultEnable = <T extends FieldValues>(
+  context: FormContext<T>
+): void => {
+  const buttons = context.form.querySelectorAll<HTMLButtonElement>(
     "[type='submit']:disabled"
   );
   buttons.forEach((button) => {
@@ -41,8 +64,13 @@ const enableSubmitButtons = (form: HTMLFormElement): void => {
   });
 };
 
-const disableSubmitButtons = (form: HTMLFormElement): void => {
-  const buttons = form.querySelectorAll<HTMLButtonElement>(
+/**
+ * Default implementation to disable submit buttons.
+ */
+const defaultDisable = <T extends FieldValues>(
+  context: FormContext<T>
+): void => {
+  const buttons = context.form.querySelectorAll<HTMLButtonElement>(
     "[type='submit']:enabled"
   );
   buttons.forEach((button) => {
@@ -50,13 +78,67 @@ const disableSubmitButtons = (form: HTMLFormElement): void => {
   });
 };
 
+/**
+ * Default implementation to render validation errors in the DOM.
+ * Finds elements with `data-fs-error="fieldName"` and populates them with error messages.
+ */
+const defaultRenderErrors = <T extends FieldValues>(
+  context: FormContext<T>,
+  error: SubmissionError<T> | null
+): void => {
+  const { form, config } = context;
+  const elements = form.querySelectorAll<HTMLElement>('[data-fs-error]');
+  const fields = config.fields;
+
+  elements.forEach((element) => {
+    const fieldName = element.dataset.fsError;
+
+    if (!fieldName) {
+      element.innerHTML = '';
+      return;
+    }
+
+    if (!error) {
+      element.innerHTML = '';
+      return;
+    }
+
+    const fieldErrors = error.getFieldErrors(fieldName as keyof T);
+
+    if (fieldErrors.length === 0) {
+      element.innerHTML = '';
+      return;
+    }
+
+    const firstError = fieldErrors[0];
+    const fieldConfig = fields?.[fieldName as keyof T];
+    const errorMessages = fieldConfig?.errorMessages ?? {};
+    const prettyName = fieldConfig?.prettyName ?? 'This field';
+    const code = toCamelCase(firstError.code);
+    const customMessage = errorMessages[code];
+    const fullMessage = customMessage ?? `${prettyName} ${firstError.message}`;
+
+    element.textContent = fullMessage;
+  });
+};
+
 const handleSubmit = async <T extends FieldValues>(
   context: FormContext<T>
 ): Promise<void> => {
-  const { form, formKey, endpoint, client, config } = context;
-  const { debug, data, onSubmit, onSuccess, onError, onFailure } = config;
+  const { formKey, endpoint, client, config } = context;
+  const {
+    debug,
+    data,
+    onSubmit,
+    onSuccess,
+    onError,
+    onFailure,
+    enable = defaultEnable,
+    disable = defaultDisable,
+    renderErrors = defaultRenderErrors,
+  } = config;
 
-  const formData = new FormData(form);
+  const formData = new FormData(context.form);
 
   if (data) {
     const extraData = typeof data === 'function' ? data(context) : data;
@@ -67,11 +149,13 @@ const handleSubmit = async <T extends FieldValues>(
     }
   }
 
-  disableSubmitButtons(form);
+  // Clear visible errors before submitting
+  renderErrors(context, null);
+  disable(context);
   onSubmit?.(context);
 
   if (debug) {
-    console.log('[formspree-ajax] Submitting form', { formKey, formData });
+    log('Submitting form', { formKey, formData });
   }
 
   try {
@@ -82,12 +166,13 @@ const handleSubmit = async <T extends FieldValues>(
 
     if (isSubmissionError(result)) {
       if (debug) {
-        console.log('[formspree-ajax] Submission error', result);
+        log('Submission error', result);
       }
+      renderErrors(context, result);
       onError?.(context, result);
     } else {
       if (debug) {
-        console.log('[formspree-ajax] Submission success', result);
+        log('Submission success', result);
       }
       const successHandler = onSuccess ?? defaultOnSuccess;
       successHandler(context, result);
@@ -98,8 +183,12 @@ const handleSubmit = async <T extends FieldValues>(
     }
     onFailure?.(context, err);
   } finally {
-    enableSubmitButtons(form);
+    enable(context);
   }
+};
+
+const log = (message: string, data?: unknown): void => {
+  console.log(`[formspree-ajax] ${message}`, data ?? '');
 };
 
 const DEFAULT_ENDPOINT = 'https://formspree.io';
@@ -128,8 +217,10 @@ export const initForm = <T extends FieldValues = FieldValues>(
     config,
   };
 
+  const enable = config.enable ?? defaultEnable;
+
   if (config.debug) {
-    console.log('[formspree-ajax] Initializing form', context);
+    log('Initializing form', context);
   }
 
   const submitHandler = (event: Event): void => {
@@ -138,7 +229,7 @@ export const initForm = <T extends FieldValues = FieldValues>(
   };
 
   form.addEventListener('submit', submitHandler);
-  enableSubmitButtons(form);
+  enable(context);
   config.onInit?.(context);
 
   return {
