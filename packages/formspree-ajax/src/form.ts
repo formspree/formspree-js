@@ -229,9 +229,45 @@ const log = (message: string, data?: unknown): void => {
 
 const DEFAULT_ENDPOINT = 'https://formspree.io';
 
+/**
+ * Flag to track whether default styles have been injected.
+ */
+let stylesInjected = false;
+
+/**
+ * Injects default Formspree styles into the document head.
+ * Only runs once per page load.
+ */
+const injectDefaultStyles = (): void => {
+  if (stylesInjected || typeof document === 'undefined') {
+    return;
+  }
+
+  const styleElement = document.createElement('style');
+  styleElement.setAttribute('data-formspree-styles', '');
+  styleElement.textContent = `
+    [${DataAttributes.ERROR}] {
+      color: #dc3545;
+      font-size: 12px;
+      margin-top: 4px;
+      display: block;
+      min-height: 16px;
+    }
+
+    [${DataAttributes.FIELD}][aria-invalid="true"] {
+      border-color: #dc3545;
+    }
+  `;
+
+  document.head.appendChild(styleElement);
+  stylesInjected = true;
+};
+
 export const initForm = <T extends FieldValues = FieldValues>(
   config: FormConfig<T>
 ): FormHandle => {
+  injectDefaultStyles();
+
   if (!config.formElement) {
     throw new Error('You must provide a `formElement` in the config');
   }
