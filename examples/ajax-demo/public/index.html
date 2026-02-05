@@ -164,6 +164,10 @@
       display: block;
       min-height: 16px;
     }
+
+    [data-fs-field][aria-invalid="true"] {
+      border-color: #dc3545;
+    }
   </style>
 </head>
 <body>
@@ -180,8 +184,8 @@
           type="text"
           id="name"
           name="name"
-          required
           placeholder="Your name"
+          data-fs-field="name"
         >
         <span class="field-error" data-fs-error="name"></span>
       </div>
@@ -192,8 +196,8 @@
           type="email"
           id="email"
           name="email"
-          required
           placeholder="your.email@example.com"
+          data-fs-field="email"
         >
         <span class="field-error" data-fs-error="email"></span>
       </div>
@@ -203,13 +207,13 @@
         <textarea
           id="message-field"
           name="message"
-          required
           placeholder="Write your message here..."
+          data-fs-field="message"
         ></textarea>
         <span class="field-error" data-fs-error="message"></span>
       </div>
 
-      <button type="submit" id="submit-btn">
+      <button type="submit" id="submit-btn" data-fs-submit-btn>
         Send Message
       </button>
     </form>

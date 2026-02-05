@@ -6,6 +6,53 @@ import type {
 } from '@formspree/core';
 
 /**
+ * Data attributes used by @formspree/ajax for DOM element identification.
+ * These attributes enable declarative form behavior without JavaScript configuration.
+ */
+export const DataAttributes = {
+  /**
+   * Marks an element to display validation errors for a specific field.
+   * The attribute value should be the field name.
+   *
+   * @example
+   * ```html
+   * <input type="email" name="email" />
+   * <span data-fs-error="email"></span>
+   * ```
+   */
+  ERROR: 'data-fs-error',
+
+  /**
+   * Marks an input element to receive `aria-invalid="true"` when validation fails.
+   * The attribute value should be the field name. Use CSS to style invalid fields.
+   *
+   * @example
+   * ```html
+   * <input type="email" name="email" data-fs-field="email" />
+   * ```
+   *
+   * @example CSS for styling invalid fields
+   * ```css
+   * [data-fs-field][aria-invalid="true"] {
+   *   border-color: red;
+   * }
+   * ```
+   */
+  FIELD: 'data-fs-field',
+
+  /**
+   * Marks a button to be automatically disabled during form submission
+   * and re-enabled when the submission completes.
+   *
+   * @example
+   * ```html
+   * <button type="submit" data-fs-submit-btn>Send</button>
+   * ```
+   */
+  SUBMIT_BTN: 'data-fs-submit-btn',
+} as const;
+
+/**
  * Represents a form element, either as a direct HTMLFormElement reference or a CSS selector string.
  */
 export type FormElement = HTMLFormElement | string;

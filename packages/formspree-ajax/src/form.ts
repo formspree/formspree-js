@@ -7,12 +7,13 @@ import {
   type SubmissionError,
   type SubmissionSuccess,
 } from '@formspree/core';
-import type {
-  CamelCaseErrorCode,
-  FormConfig,
-  FormContext,
-  FormElement,
-  FormHandle,
+import {
+  DataAttributes,
+  type CamelCaseErrorCode,
+  type FormConfig,
+  type FormContext,
+  type FormElement,
+  type FormHandle,
 } from './types';
 
 /**
@@ -52,12 +53,13 @@ const defaultOnSuccess = <T extends FieldValues>(
 
 /**
  * Default implementation to enable submit buttons.
+ * Finds buttons with `type="submit"` or `data-fs-submit-btn` attribute.
  */
 const defaultEnable = <T extends FieldValues>(
   context: FormContext<T>
 ): void => {
   const buttons = context.form.querySelectorAll<HTMLButtonElement>(
-    "[type='submit']:disabled"
+    `[type='submit']:disabled, [${DataAttributes.SUBMIT_BTN}]:disabled`
   );
   buttons.forEach((button) => {
     button.disabled = false;
@@ -66,12 +68,13 @@ const defaultEnable = <T extends FieldValues>(
 
 /**
  * Default implementation to disable submit buttons.
+ * Finds buttons with `type="submit"` or `data-fs-submit-btn` attribute.
  */
 const defaultDisable = <T extends FieldValues>(
   context: FormContext<T>
 ): void => {
   const buttons = context.form.querySelectorAll<HTMLButtonElement>(
-    "[type='submit']:enabled"
+    `[type='submit']:enabled, [${DataAttributes.SUBMIT_BTN}]:enabled`
   );
   buttons.forEach((button) => {
     button.disabled = true;
@@ -80,17 +83,22 @@ const defaultDisable = <T extends FieldValues>(
 
 /**
  * Default implementation to render validation errors in the DOM.
- * Finds elements with `data-fs-error="fieldName"` and populates them with error messages.
+ * - Finds elements with `data-fs-error="fieldName"` and populates them with error messages.
+ * - Finds elements with `data-fs-field="fieldName"` and sets `aria-invalid="true"` on error.
  */
 const defaultRenderErrors = <T extends FieldValues>(
   context: FormContext<T>,
   error: SubmissionError<T> | null
 ): void => {
   const { form, config } = context;
-  const elements = form.querySelectorAll<HTMLElement>('[data-fs-error]');
   const fields = config.fields;
 
-  elements.forEach((element) => {
+  // Handle error message elements
+  const errorElements = form.querySelectorAll<HTMLElement>(
+    `[${DataAttributes.ERROR}]`
+  );
+
+  errorElements.forEach((element) => {
     const fieldName = element.dataset.fsError;
 
     if (!fieldName) {
@@ -119,6 +127,34 @@ const defaultRenderErrors = <T extends FieldValues>(
     const fullMessage = customMessage ?? `${prettyName} ${firstError.message}`;
 
     element.textContent = fullMessage;
+  });
+
+  // Handle field elements (aria-invalid)
+  const fieldElements = form.querySelectorAll<HTMLElement>(
+    `[${DataAttributes.FIELD}]`
+  );
+
+  fieldElements.forEach((element) => {
+    const fieldName = element.dataset.fsField;
+
+    if (!fieldName) {
+      element.removeAttribute('aria-invalid');
+      return;
+    }
+
+    if (!error) {
+      element.removeAttribute('aria-invalid');
+      return;
+    }
+
+    const fieldErrors = error.getFieldErrors(fieldName as keyof T);
+
+    if (fieldErrors.length === 0) {
+      element.removeAttribute('aria-invalid');
+      return;
+    }
+
+    element.setAttribute('aria-invalid', 'true');
   });
 };
 
