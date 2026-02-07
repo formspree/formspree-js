@@ -14,6 +14,7 @@ import {
   type FormContext,
   type FormElement,
   type FormHandle,
+  type MessageType,
 } from './types';
 
 /**
@@ -158,6 +159,58 @@ const defaultRenderErrors = <T extends FieldValues>(
   });
 };
 
+/**
+ * Finds the message element for a form.
+ * Searches inside the form first, then in the form's parent container.
+ */
+const findMessageElement = (form: HTMLFormElement): HTMLElement | null => {
+  return (
+    form.querySelector<HTMLElement>(`[${DataAttributes.MESSAGE}]`) ??
+    form.parentElement?.querySelector<HTMLElement>(
+      `[${DataAttributes.MESSAGE}]`
+    ) ??
+    null
+  );
+};
+
+/**
+ * Default implementation to render a form-level message in the DOM.
+ * Sets the text content and `data-fs-message-type` attribute on the message element.
+ */
+const defaultRenderMessage = <T extends FieldValues>(
+  context: FormContext<T>,
+  type: MessageType | null,
+  message: string | null
+): void => {
+  const messageEl = findMessageElement(context.form);
+  if (!messageEl) return;
+
+  if (type === null) {
+    messageEl.textContent = '';
+    messageEl.removeAttribute('data-fs-message-type');
+  } else {
+    messageEl.textContent = message ?? '';
+    messageEl.setAttribute('data-fs-message-type', type);
+  }
+};
+
+/**
+ * Builds a human-readable error message from a SubmissionError.
+ * Concatenates form-level errors and field-level errors.
+ */
+const buildErrorMessage = <T extends FieldValues>(
+  error: SubmissionError<T>
+): string => {
+  const formErrors = error.getFormErrors().map((e) => e.message);
+  const fieldErrors = error
+    .getAllFieldErrors()
+    .flatMap(([, errors]) => errors.map((e) => e.message));
+  return (
+    [...formErrors, ...fieldErrors].join(', ') ||
+    'There was an error submitting the form.'
+  );
+};
+
 const handleSubmit = async <T extends FieldValues>(
   context: FormContext<T>
 ): Promise<void> => {
@@ -172,6 +225,7 @@ const handleSubmit = async <T extends FieldValues>(
     enable = defaultEnable,
     disable = defaultDisable,
     renderErrors = defaultRenderErrors,
+    renderMessage = defaultRenderMessage,
   } = config;
 
   const formData = new FormData(context.form);
@@ -185,8 +239,9 @@ const handleSubmit = async <T extends FieldValues>(
     }
   }
 
-  // Clear visible errors before submitting
+  // Clear visible errors and messages before submitting
   renderErrors(context, null);
+  renderMessage(context, null, null);
   disable(context);
   onSubmit?.(context);
 
@@ -205,18 +260,30 @@ const handleSubmit = async <T extends FieldValues>(
         log('Submission error', result);
       }
       renderErrors(context, result);
+      renderMessage(context, 'error', buildErrorMessage(result));
       onError?.(context, result);
     } else {
       if (debug) {
         log('Submission success', result);
       }
-      const successHandler = onSuccess ?? defaultOnSuccess;
-      successHandler(context, result);
+      renderMessage(context, 'success', 'Thank you!');
+      if (onSuccess) {
+        onSuccess(context, result);
+      } else if (findMessageElement(context.form)) {
+        context.form.reset();
+      } else {
+        defaultOnSuccess(context, result);
+      }
     }
   } catch (err) {
     if (debug) {
       console.error('[formspree-ajax] Unexpected error', err);
     }
+    renderMessage(
+      context,
+      'error',
+      'An unexpected error occurred. Please try again.'
+    );
     onFailure?.(context, err);
   } finally {
     enable(context);
@@ -256,6 +323,28 @@ const injectDefaultStyles = (): void => {
 
     [${DataAttributes.FIELD}][aria-invalid="true"] {
       border-color: #dc3545;
+    }
+
+    [${DataAttributes.MESSAGE}] {
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      display: none;
+    }
+
+    [${DataAttributes.MESSAGE}][data-fs-message-type="success"] {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+      display: block;
+    }
+
+    [${DataAttributes.MESSAGE}][data-fs-message-type="error"] {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+      display: block;
     }
   `;
 

@@ -442,7 +442,12 @@ describe('initForm', () => {
         debug: true,
       });
 
-      mockClient.submitForm.mockResolvedValue({ kind: 'error' });
+      mockClient.submitForm.mockResolvedValue({
+        kind: 'error',
+        getFormErrors: () => [],
+        getAllFieldErrors: () => [],
+        getFieldErrors: () => [],
+      });
 
       form.dispatchEvent(new Event('submit'));
       await flushPromises();

@@ -50,12 +50,31 @@ export const DataAttributes = {
    * ```
    */
   SUBMIT_BTN: 'data-fs-submit-btn',
+
+  /**
+   * Marks an element to display form-level success or error messages.
+   * The element's visibility and styling are controlled via the `data-fs-message-type`
+   * attribute, which is set programmatically to "success" or "error".
+   *
+   * @example
+   * ```html
+   * <div data-fs-message></div>
+   * ```
+   */
+  MESSAGE: 'data-fs-message',
 } as const;
 
 /**
  * Represents a form element, either as a direct HTMLFormElement reference or a CSS selector string.
  */
 export type FormElement = HTMLFormElement | string;
+
+/**
+ * The type of form-level message to display.
+ * - `'success'` — shown after a successful submission
+ * - `'error'` — shown after a validation or unexpected error
+ */
+export type MessageType = 'success' | 'error';
 
 /**
  * Custom error messages for field validation errors.
@@ -202,6 +221,20 @@ export interface FormConfig<T extends FieldValues = FieldValues> {
   renderErrors?: (
     context: FormContext<T>,
     error: SubmissionError<T> | null
+  ) => void;
+
+  /**
+   * Custom function to render a form-level message (success or error) in the DOM.
+   * If not provided, the default implementation finds an element with `data-fs-message`
+   * and sets its text content and `data-fs-message-type` attribute.
+   * @param context - The form context containing form element and configuration.
+   * @param type - The message type ('success' or 'error'), or null to clear the message.
+   * @param message - The message text to display, or null to clear the message.
+   */
+  renderMessage?: (
+    context: FormContext<T>,
+    type: MessageType | null,
+    message: string | null
   ) => void;
 }
 

@@ -106,28 +106,6 @@
       transform: none;
     }
 
-    .message {
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      font-size: 14px;
-      display: none;
-    }
-
-    .message.success {
-      background: #d4edda;
-      color: #155724;
-      border: 1px solid #c3e6cb;
-      display: block;
-    }
-
-    .message.error {
-      background: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
-      display: block;
-    }
-
     .spinner {
       display: inline-block;
       width: 14px;
@@ -163,7 +141,7 @@
     <h1>Contact Form</h1>
     <p class="subtitle">Pure JavaScript AJAX form powered by Formspree</p>
 
-    <div id="message" class="message"></div>
+    <div data-fs-message></div>
 
     <form id="contact-form">
       <div class="form-group">
