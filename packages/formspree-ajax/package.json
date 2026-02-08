@@ -15,17 +15,23 @@
   "contributors": [
     "Cole Krumbholz"
   ],
-  "sideEffects": false,
+  "sideEffects": [
+    "./dist/global.js",
+    "./src/global.ts"
+  ],
   "main": "./dist/index.js",
+  "unpkg": "./dist/global.js",
   "module": "./dist/index.mjs",
+  "browser": "./dist/global.js",
   "types": "./dist/index.d.ts",
   "files": [
     "dist/**"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --dts --minify",
+    "build": "tsup",
     "clean": "rm -rf dist && rm -rf node_modules",
-    "dev": "tsup src/index.ts --format esm,cjs --dts --sourcemap --watch",
+    "demo": "npm run build && npm run --prefix ../../examples/ajax-demo dev",
+    "dev": "tsup --watch",
     "lint": "eslint ./src ./test",
     "test": "jest",
     "typecheck": "tsc --noEmit"

@@ -34,3 +34,5 @@ yarn-error.log*
 .vscode
 
 .local-dev
+
+.claude

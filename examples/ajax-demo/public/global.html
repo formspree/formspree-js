@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Formspree AJAX Demo</title>
+  <title>Formspree AJAX - Script Tag Demo</title>
   <style>
     * {
       margin: 0;
@@ -13,7 +13,7 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
       min-height: 100vh;
       display: flex;
       align-items: center;
@@ -40,6 +40,18 @@
       color: #666;
       margin-bottom: 30px;
       font-size: 14px;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #f5576c;
+      color: white;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-left: 8px;
+      vertical-align: middle;
     }
 
     .form-group {
@@ -70,7 +82,7 @@
     input[type="email"]:focus,
     textarea:focus {
       outline: none;
-      border-color: #667eea;
+      border-color: #f5576c;
     }
 
     textarea {
@@ -81,7 +93,7 @@
     button {
       width: 100%;
       padding: 14px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
       color: white;
       border: none;
       border-radius: 8px;
@@ -93,7 +105,7 @@
 
     button:hover {
       transform: translateY(-2px);
-      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+      box-shadow: 0 10px 20px rgba(245, 87, 108, 0.4);
     }
 
     button:active {
@@ -104,22 +116,6 @@
       opacity: 0.6;
       cursor: not-allowed;
       transform: none;
-    }
-
-    .spinner {
-      display: inline-block;
-      width: 14px;
-      height: 14px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-top-color: white;
-      border-radius: 50%;
-      animation: spin 0.6s linear infinite;
-      margin-right: 8px;
-      vertical-align: middle;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
     }
 
     .note {
@@ -134,16 +130,37 @@
     .note strong {
       color: #333;
     }
+
+    .note code {
+      background: #e9ecef;
+      padding: 2px 4px;
+      border-radius: 3px;
+      font-size: 11px;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 20px;
+      color: #f5576c;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Contact Form</h1>
-    <p class="subtitle">Pure JavaScript AJAX form powered by Formspree</p>
+    <a href="/" class="back-link">&larr; ESM Demo</a>
+
+    <h1>Newsletter Signup <span class="badge">Script Tag</span></h1>
+    <p class="subtitle">Using <code>window.formspree</code> global API &mdash; no bundler required</p>
 
     <div data-fs-message></div>
 
-    <form id="contact-form">
+    <form id="newsletter-form">
       <div class="form-group">
         <label for="name">Name</label>
         <input
@@ -153,7 +170,7 @@
           placeholder="Your name"
           data-fs-field="name"
         >
-        <span class="field-error" data-fs-error="name"></span>
+        <span data-fs-error="name"></span>
       </div>
 
       <div class="form-group">
@@ -165,32 +182,62 @@
           placeholder="your.email@example.com"
           data-fs-field="email"
         >
-        <span class="field-error" data-fs-error="email"></span>
+        <span data-fs-error="email"></span>
       </div>
 
       <div class="form-group">
-        <label for="message">Message</label>
+        <label for="message">Message (optional)</label>
         <textarea
-          id="message-field"
+          id="message"
           name="message"
-          placeholder="Write your message here..."
+          placeholder="Anything you'd like to share..."
           data-fs-field="message"
         ></textarea>
-        <span class="field-error" data-fs-error="message"></span>
+        <span data-fs-error="message"></span>
       </div>
 
-      <button type="submit" id="submit-btn" data-fs-submit-btn>
-        Send Message
+      <button type="submit" data-fs-submit-btn>
+        Subscribe
       </button>
     </form>
 
     <div class="note">
-      <strong>Note:</strong> Set <code>VITE_FORMSPREE_FORM_ID</code> in <code>.env.local</code> or replace <code>YOUR_FORM_ID</code> in <code>main.ts</code> with your actual Formspree form ID.
-      <br><br>
-      <a href="/global.html">See the Script Tag demo &rarr;</a>
+      <strong>How it works:</strong> Load <code>global.js</code> via a script tag.
+      It sets up <code>window.formspree()</code>, then call it to initialize your form.
+      No bundler needed!
     </div>
   </div>
 
-  <script type="module" src="/main.ts"></script>
+  <!--
+    Production usage:
+
+    <script src="https://unpkg.com/@formspree/ajax@1/dist/global.js"></script>
+    <script>
+      formspree('form', '#newsletter-form', { formId: 'YOUR_FORM_ID' });
+    </script>
+
+    In this Vite demo, global.js is loaded via a module entry that aliases to the source.
+  -->
+
+  <!-- Step 1: Load the library -->
+  <script type="module" src="/global-entry.ts"></script>
+
+  <!-- Step 2: Initialize the form -->
+  <script type="module">
+    formspree('form', '#newsletter-form', {
+      formId: 'meekngvn',
+      debug: true,
+      fields: {
+        name: { prettyName: 'Name' },
+        email: {
+          prettyName: 'Email',
+          errorMessages: {
+            typeEmail: 'Please enter a valid email',
+            requiredFieldEmpty: 'Email is required',
+          },
+        },
+      },
+    });
+  </script>
 </body>
 </html>
