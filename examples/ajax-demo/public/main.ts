@@ -24,10 +24,10 @@ initForm({
     },
     email: {
       prettyName: 'Email',
-      errorMessages: {
-        typeEmail: 'Please enter a valid email address',
-        requiredFieldEmpty: 'Please enter your email',
-      },
+      // get it working with the default error messages
+      // errorMessages: {
+      //   "TYPE_EMAIL": "Email not valid",
+      // },
     },
     message: {
       prettyName: 'Message',

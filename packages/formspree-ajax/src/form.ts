@@ -194,6 +194,9 @@ const defaultRenderMessage = <T extends FieldValues>(
   }
 };
 
+// FORM ERRORS SHOULD DISPLAY ON TOP LEVEL
+// FIELD ERRORS SHOULD DISPLAY BELOW THE FIELD
+
 /**
  * Builds a human-readable error message from a SubmissionError.
  * Concatenates form-level errors and field-level errors.

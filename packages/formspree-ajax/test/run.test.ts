@@ -19,99 +19,69 @@ describe('run', () => {
     warnSpy.mockRestore();
   });
 
-  it('calls initForm with config for ("form", "init", config)', () => {
+  it('calls initForm with a valid config', () => {
     const config = { formElement: '#contact-form', formId: 'xyzabc123' };
-    run('form', 'init', config);
+    run(config);
 
     expect(mockedInitForm).toHaveBeenCalledTimes(1);
     expect(mockedInitForm).toHaveBeenCalledWith(config);
     expect(warnSpy).not.toHaveBeenCalled();
   });
 
-  it('handles # selector shorthand: ("form", "#selector", config)', () => {
-    const config = { formId: 'abc123' };
-    run('form', '#my-form', config);
-
-    expect(mockedInitForm).toHaveBeenCalledTimes(1);
-    expect(mockedInitForm).toHaveBeenCalledWith({
+  it('passes through extra config properties', () => {
+    const config = {
+      formElement: '#contact-form',
       formId: 'abc123',
-      formElement: '#my-form',
-    });
-    expect(warnSpy).not.toHaveBeenCalled();
+      debug: true,
+      fields: { email: { prettyName: 'Email' } },
+    };
+    run(config);
+
+    expect(mockedInitForm).toHaveBeenCalledWith(config);
   });
 
-  it('handles . selector shorthand: ("form", ".selector", config)', () => {
-    const config = { formId: 'abc123' };
-    run('form', '.contact-form', config);
-
-    expect(mockedInitForm).toHaveBeenCalledTimes(1);
-    expect(mockedInitForm).toHaveBeenCalledWith({
-      formId: 'abc123',
-      formElement: '.contact-form',
-    });
-    expect(warnSpy).not.toHaveBeenCalled();
-  });
-
-  it('shorthand overrides formElement in config', () => {
-    const config = { formId: 'abc123', formElement: '#old-selector' };
-    run('form', '#new-selector', config);
-
-    expect(mockedInitForm).toHaveBeenCalledWith(
-      expect.objectContaining({ formElement: '#new-selector' })
-    );
-  });
-
-  it('warns on unknown resource', () => {
-    run('widget', 'init', { formElement: '#f', formId: 'x' });
+  it('warns when config is not provided', () => {
+    run(undefined);
 
     expect(mockedInitForm).not.toHaveBeenCalled();
     expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining('Unknown resource')
+      expect.stringContaining('config object is required')
     );
   });
 
-  it('warns on unknown action', () => {
-    run('form', 'destroy', { formElement: '#f', formId: 'x' });
+  it('warns when config is not an object', () => {
+    run('not-an-object');
 
     expect(mockedInitForm).not.toHaveBeenCalled();
     expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining('Unknown action')
+      expect.stringContaining('config object is required')
     );
   });
 
-  it('warns when second argument is not a string', () => {
-    run('form', 42, { formElement: '#f', formId: 'x' });
+  it('warns when formElement is missing', () => {
+    run({ formId: 'abc123' });
 
     expect(mockedInitForm).not.toHaveBeenCalled();
     expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining('Second argument must be a string')
+      expect.stringContaining('"formElement" is required')
     );
   });
 
-  it('warns when config is missing for "init" action', () => {
-    run('form', 'init');
+  it('warns when formId is missing', () => {
+    run({ formElement: '#my-form' });
 
     expect(mockedInitForm).not.toHaveBeenCalled();
     expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining('Config object is required')
+      expect.stringContaining('"formId" is required')
     );
   });
 
-  it('warns when config is missing for selector shorthand', () => {
-    run('form', '#my-form');
+  it('warns when config is null', () => {
+    run(null);
 
     expect(mockedInitForm).not.toHaveBeenCalled();
     expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining('Config object is required')
-    );
-  });
-
-  it('warns when config is not an object for "init" action', () => {
-    run('form', 'init', 'not-an-object');
-
-    expect(mockedInitForm).not.toHaveBeenCalled();
-    expect(warnSpy).toHaveBeenCalledWith(
-      expect.stringContaining('Config object is required')
+      expect.stringContaining('config object is required')
     );
   });
 });
