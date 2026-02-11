@@ -116,7 +116,11 @@ export type MessageType = 'success' | 'error';
  * @template T - The type of field values for the form, defaults to FieldValues.
  */
 export interface FormConfig<T extends FieldValues = FieldValues> {
-  // TODO: add a project id
+  /**
+   * The Formspree project ID. When provided, submissions are sent to
+   * `/p/{projectId}/f/{formId}` instead of `/f/{formId}`.
+   */
+  projectId?: string;
 
   /**
    * The form element to attach to, either as an HTMLFormElement or a CSS selector string.

@@ -1,4 +1,5 @@
 import {
+  createClient,
   getDefaultClient,
   isSubmissionError,
   appendExtraData,
@@ -421,7 +422,9 @@ export const initForm = <T extends FieldValues = FieldValues>(
   const form = getFormElement(config.formElement);
   const formKey = config.formId;
   const endpoint = config.origin ?? DEFAULT_ENDPOINT;
-  const client: Client = getDefaultClient();
+  const client: Client = config.projectId
+    ? createClient({ project: config.projectId })
+    : getDefaultClient();
 
   const context: FormContext<T> = {
     form,
