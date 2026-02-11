@@ -211,10 +211,15 @@ const handleSubmit = async <T extends FieldValues>(
   const formData = new FormData(context.form);
 
   if (data) {
-    const extraData = typeof data === 'function' ? data(context) : data;
-    for (const [key, value] of Object.entries(extraData)) {
-      if (value !== undefined && value !== null) {
-        appendExtraData(formData, key, String(value));
+    for (const [key, value] of Object.entries(data)) {
+      let resolved: string | undefined;
+      if (typeof value === 'function') {
+        resolved = await value();
+      } else {
+        resolved = value;
+      }
+      if (resolved !== undefined) {
+        appendExtraData(formData, key, resolved);
       }
     }
   }

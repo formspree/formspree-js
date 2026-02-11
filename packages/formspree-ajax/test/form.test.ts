@@ -320,7 +320,7 @@ describe('initForm', () => {
   });
 
   describe('extra data', () => {
-    it('includes static extra data in submission', async () => {
+    it('includes static string values', async () => {
       const handle = initForm({
         formElement: form,
         formId: 'xyzabc',
@@ -344,37 +344,13 @@ describe('initForm', () => {
       handle.destroy();
     });
 
-    it('includes dynamic extra data from function', async () => {
-      const dataFn = jest.fn().mockReturnValue({ timestamp: '12345' });
-      const handle = initForm({
-        formElement: form,
-        formId: 'xyzabc',
-        data: dataFn,
-      });
-
-      mockClient.submitForm.mockResolvedValue({ kind: 'success', next: '' });
-
-      form.dispatchEvent(new Event('submit'));
-      await flushPromises();
-
-      expect(dataFn).toHaveBeenCalledWith(
-        expect.objectContaining({ form, formKey: 'xyzabc' })
-      );
-
-      const submittedFormData = mockClient.submitForm.mock.calls[0][1];
-      expect(submittedFormData.get('timestamp')).toBe('12345');
-      handle.destroy();
-    });
-
-    it('skips null and undefined values in extra data', async () => {
+    it('resolves function values', async () => {
       const handle = initForm({
         formElement: form,
         formId: 'xyzabc',
         data: {
-          included: 'yes',
-          nullValue: null,
-          undefinedValue: undefined,
-        } as Record<string, string | null | undefined>,
+          fnToString: () => 'fn-value',
+        },
       });
 
       mockClient.submitForm.mockResolvedValue({ kind: 'success', next: '' });
@@ -383,9 +359,82 @@ describe('initForm', () => {
       await flushPromises();
 
       const submittedFormData = mockClient.submitForm.mock.calls[0][1];
-      expect(submittedFormData.get('included')).toBe('yes');
-      expect(submittedFormData.has('nullValue')).toBe(false);
-      expect(submittedFormData.has('undefinedValue')).toBe(false);
+      expect(submittedFormData.get('fnToString')).toBe('fn-value');
+      handle.destroy();
+    });
+
+    it('resolves async function values', async () => {
+      const handle = initForm({
+        formElement: form,
+        formId: 'xyzabc',
+        data: {
+          asyncValue: async () => 'async-result',
+        },
+      });
+
+      mockClient.submitForm.mockResolvedValue({ kind: 'success', next: '' });
+
+      form.dispatchEvent(new Event('submit'));
+      await flushPromises();
+
+      const submittedFormData = mockClient.submitForm.mock.calls[0][1];
+      expect(submittedFormData.get('asyncValue')).toBe('async-result');
+      handle.destroy();
+    });
+
+    it('skips undefined values from all sources', async () => {
+      const handle = initForm({
+        formElement: form,
+        formId: 'xyzabc',
+        data: {
+          justString: 'included',
+          justUndefined: undefined,
+          fnToUndefined: () => undefined,
+          asyncFnToUndefined: async () => undefined,
+        },
+      });
+
+      mockClient.submitForm.mockResolvedValue({ kind: 'success', next: '' });
+
+      form.dispatchEvent(new Event('submit'));
+      await flushPromises();
+
+      const submittedFormData = mockClient.submitForm.mock.calls[0][1];
+      expect(submittedFormData.get('justString')).toBe('included');
+      expect(submittedFormData.has('justUndefined')).toBe(false);
+      expect(submittedFormData.has('fnToUndefined')).toBe(false);
+      expect(submittedFormData.has('asyncFnToUndefined')).toBe(false);
+      handle.destroy();
+    });
+
+    it('appends all extra data types together', async () => {
+      const handle = initForm({
+        formElement: form,
+        formId: 'xyzabc',
+        data: {
+          justString: 'just-string',
+          justUndefined: undefined,
+          fnToString: () => 'fn-to-string',
+          fnToUndefined: () => undefined,
+          asyncFnToString: async () => 'async-fn-to-string',
+          asyncFnToUndefined: async () => undefined,
+        },
+      });
+
+      mockClient.submitForm.mockResolvedValue({ kind: 'success', next: '' });
+
+      form.dispatchEvent(new Event('submit'));
+      await flushPromises();
+
+      const submittedFormData = mockClient.submitForm.mock.calls[0][1];
+      expect(submittedFormData.get('justString')).toBe('just-string');
+      expect(submittedFormData.get('fnToString')).toBe('fn-to-string');
+      expect(submittedFormData.get('asyncFnToString')).toBe(
+        'async-fn-to-string'
+      );
+      expect(submittedFormData.has('justUndefined')).toBe(false);
+      expect(submittedFormData.has('fnToUndefined')).toBe(false);
+      expect(submittedFormData.has('asyncFnToUndefined')).toBe(false);
       handle.destroy();
     });
   });
@@ -633,6 +682,171 @@ describe('initForm', () => {
 
       expect(emailError.textContent).toBe('is invalid');
       expect(nameError.innerHTML).toBe('');
+      handle.destroy();
+    });
+  });
+
+  describe('message rendering', () => {
+    it('shows success message on data-fs-message after successful submission', async () => {
+      const messageEl = document.createElement('div');
+      messageEl.setAttribute('data-fs-message', '');
+      container.appendChild(messageEl);
+
+      const handle = initForm({
+        formElement: form,
+        formId: 'xyzabc',
+        onSuccess: ({ form }) => {
+          form.reset();
+        },
+      });
+
+      mockClient.submitForm.mockResolvedValue({ kind: 'success', next: '' });
+
+      form.dispatchEvent(new Event('submit'));
+      await flushPromises();
+
+      expect(messageEl.textContent).toBe('Thank you!');
+      expect(messageEl.getAttribute('data-fs-message-type')).toBe('success');
+      handle.destroy();
+    });
+
+    it('shows only form errors on data-fs-message (not field errors)', async () => {
+      const messageEl = document.createElement('div');
+      messageEl.setAttribute('data-fs-message', '');
+      container.appendChild(messageEl);
+
+      const handle = initForm({
+        formElement: form,
+        formId: 'xyzabc',
+      });
+
+      mockClient.submitForm.mockResolvedValue({
+        kind: 'error',
+        getFormErrors: () => [
+          { code: 'INACTIVE', message: 'Form is disabled' },
+        ],
+        getAllFieldErrors: () => [
+          ['email', [{ code: 'TYPE_EMAIL', message: 'must be an email' }]],
+        ],
+        getFieldErrors: (field: string) =>
+          field === 'email'
+            ? [{ code: 'TYPE_EMAIL', message: 'must be an email' }]
+            : [],
+      });
+
+      form.dispatchEvent(new Event('submit'));
+      await flushPromises();
+
+      // data-fs-message should only show form-level errors
+      expect(messageEl.textContent).toBe('Form is disabled');
+      expect(messageEl.getAttribute('data-fs-message-type')).toBe('error');
+      handle.destroy();
+    });
+
+    it('shows fallback message when only field errors exist', async () => {
+      const messageEl = document.createElement('div');
+      messageEl.setAttribute('data-fs-message', '');
+      container.appendChild(messageEl);
+
+      const handle = initForm({
+        formElement: form,
+        formId: 'xyzabc',
+      });
+
+      mockClient.submitForm.mockResolvedValue({
+        kind: 'error',
+        getFormErrors: () => [],
+        getAllFieldErrors: () => [
+          ['email', [{ code: 'TYPE_EMAIL', message: 'must be an email' }]],
+        ],
+        getFieldErrors: (field: string) =>
+          field === 'email'
+            ? [{ code: 'TYPE_EMAIL', message: 'must be an email' }]
+            : [],
+      });
+
+      form.dispatchEvent(new Event('submit'));
+      await flushPromises();
+
+      // No form errors, so fallback message is shown
+      expect(messageEl.textContent).toBe(
+        'There was an error submitting the form.'
+      );
+      expect(messageEl.getAttribute('data-fs-message-type')).toBe('error');
+      handle.destroy();
+    });
+
+    it('displays form errors and field errors in separate elements', async () => {
+      // This mirrors the React useForm test: both form + field errors returned
+      const messageEl = document.createElement('div');
+      messageEl.setAttribute('data-fs-message', '');
+      container.appendChild(messageEl);
+
+      const emailError = document.createElement('span');
+      emailError.dataset.fsError = 'email';
+      form.appendChild(emailError);
+
+      const emailInput = form.querySelector(
+        'input[name="email"]'
+      ) as HTMLInputElement;
+      emailInput.setAttribute('data-fs-field', '');
+
+      const handle = initForm({
+        formElement: form,
+        formId: 'xyzabc',
+      });
+
+      mockClient.submitForm.mockResolvedValue({
+        kind: 'error',
+        getFormErrors: () => [{ code: 'UNSPECIFIED', message: 'forbidden' }],
+        getAllFieldErrors: () => [
+          ['email', [{ code: 'TYPE_EMAIL', message: 'should be an email' }]],
+        ],
+        getFieldErrors: (field: string) =>
+          field === 'email'
+            ? [{ code: 'TYPE_EMAIL', message: 'should be an email' }]
+            : [],
+      });
+
+      form.dispatchEvent(new Event('submit'));
+      await flushPromises();
+
+      // Form error in data-fs-message
+      expect(messageEl.textContent).toBe('forbidden');
+      expect(messageEl.getAttribute('data-fs-message-type')).toBe('error');
+
+      // Field error in data-fs-error span
+      expect(emailError.textContent).toBe('should be an email');
+
+      // Field marked invalid
+      expect(emailInput.getAttribute('aria-invalid')).toBe('true');
+
+      handle.destroy();
+    });
+
+    it('clears message before submission', async () => {
+      const messageEl = document.createElement('div');
+      messageEl.setAttribute('data-fs-message', '');
+      messageEl.textContent = 'Previous message';
+      messageEl.setAttribute('data-fs-message-type', 'error');
+      container.appendChild(messageEl);
+
+      const handle = initForm({
+        formElement: form,
+        formId: 'xyzabc',
+        onSuccess: ({ form }) => {
+          form.reset();
+        },
+      });
+
+      mockClient.submitForm.mockResolvedValue({ kind: 'success', next: '' });
+
+      form.dispatchEvent(new Event('submit'));
+      await flushPromises();
+
+      // Should now show success, not the old error
+      expect(messageEl.textContent).toBe('Thank you!');
+      expect(messageEl.getAttribute('data-fs-message-type')).toBe('success');
       handle.destroy();
     });
   });

@@ -100,7 +100,7 @@ export interface FormConfig<T extends FieldValues = FieldValues> {
    * Extra data to include with form submissions. Can be a static object or a function
    * that returns data based on the form context.
    */
-  data?: ExtraData<T>;
+  data?: ExtraData;
 
   /**
    * When true, enables debug logging for form submissions.
@@ -182,14 +182,24 @@ export interface FormConfig<T extends FieldValues = FieldValues> {
 }
 
 /**
- * Extra data to be merged with form data on submission.
- * Can be a partial object of field values or a function that dynamically generates
- * extra data based on the form context.
- * @template T - The type of field values for the form.
+ * A single extra data value. Can be a static string, undefined (to skip),
+ * a function returning a string or undefined, or an async function.
  */
-export type ExtraData<T extends FieldValues = FieldValues> =
-  | Partial<T>
-  | ((context: FormContext<T>) => Partial<T>);
+export type ExtraDataValue =
+  | undefined
+  | string
+  | (() => string)
+  | (() => Promise<string>)
+  | (() => undefined)
+  | (() => Promise<undefined>);
+
+/**
+ * Extra data to be merged with form data on submission.
+ * Each key maps to an {@link ExtraDataValue}.
+ */
+export type ExtraData = {
+  [key: string]: ExtraDataValue;
+};
 
 /**
  * Context object passed to form lifecycle callbacks.
