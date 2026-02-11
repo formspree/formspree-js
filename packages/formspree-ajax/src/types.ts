@@ -24,11 +24,11 @@ export const DataAttributes = {
 
   /**
    * Marks an input element to receive `aria-invalid="true"` when validation fails.
-   * The attribute value should be the field name. Use CSS to style invalid fields.
+   * The field name is read from the element's `name` attribute.
    *
    * @example
    * ```html
-   * <input type="email" name="email" data-fs-field="email" />
+   * <input type="email" name="email" data-fs-field />
    * ```
    *
    * @example CSS for styling invalid fields

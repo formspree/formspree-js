@@ -107,22 +107,6 @@
       transform: none;
     }
 
-    .spinner {
-      display: inline-block;
-      width: 14px;
-      height: 14px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-top-color: white;
-      border-radius: 50%;
-      animation: spin 0.6s linear infinite;
-      margin-right: 8px;
-      vertical-align: middle;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
     .note {
       margin-top: 20px;
       padding: 12px;
@@ -152,7 +136,7 @@
           id="name"
           name="name"
           placeholder="Your name"
-          data-fs-field="name"
+          data-fs-field
         >
         <span class="field-error" data-fs-error="name"></span>
       </div>
@@ -164,7 +148,7 @@
           id="email"
           name="email"
           placeholder="your.email@example.com"
-          data-fs-field="email"
+          data-fs-field
         >
         <span class="field-error" data-fs-error="email"></span>
       </div>
@@ -175,7 +159,7 @@
           id="message-field"
           name="message"
           placeholder="Write your message here..."
-          data-fs-field="message"
+          data-fs-field
         ></textarea>
         <span class="field-error" data-fs-error="message"></span>
       </div>

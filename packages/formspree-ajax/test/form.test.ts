@@ -198,7 +198,7 @@ describe('initForm', () => {
       handle.destroy();
     });
 
-    it('disables submit buttons during submission', async () => {
+    it('disables submit buttons and shows spinner during submission', async () => {
       const handle = initForm({
         formElement: form,
         formId: 'xyzabc',
@@ -215,18 +215,22 @@ describe('initForm', () => {
         'button[type="submit"]'
       ) as HTMLButtonElement;
       expect(submitButton.disabled).toBe(false);
+      const originalText = submitButton.textContent;
 
       form.dispatchEvent(new Event('submit'));
 
-      // Button should be disabled during submission
+      // Button should be disabled with spinner during submission
       expect(submitButton.disabled).toBe(true);
+      expect(submitButton.innerHTML).toContain('fs-spinner');
+      expect(submitButton.textContent).toContain('Sending...');
 
       // Resolve the submission
       resolveSubmit!({ kind: 'success' });
       await flushPromises();
 
-      // Button should be re-enabled after submission
+      // Button should be re-enabled with original text after submission
       expect(submitButton.disabled).toBe(false);
+      expect(submitButton.textContent).toBe(originalText);
       handle.destroy();
     });
 
@@ -536,6 +540,67 @@ describe('initForm', () => {
       handle.destroy();
     });
 
+    it('sets aria-invalid on data-fs-field elements when field has errors', async () => {
+      // Add data-fs-field marker attribute to existing inputs
+      const emailInput = form.querySelector(
+        'input[name="email"]'
+      ) as HTMLInputElement;
+      emailInput.setAttribute('data-fs-field', '');
+
+      const nameInput = form.querySelector(
+        'input[name="name"]'
+      ) as HTMLInputElement;
+      nameInput.setAttribute('data-fs-field', '');
+
+      const handle = initForm({
+        formElement: form,
+        formId: 'xyzabc',
+      });
+
+      mockClient.submitForm.mockResolvedValue({
+        kind: 'error',
+        getFormErrors: () => [],
+        getAllFieldErrors: () => [
+          ['email', [{ code: 'TYPE_EMAIL', message: 'is invalid' }]],
+        ],
+        getFieldErrors: (field: string) =>
+          field === 'email'
+            ? [{ code: 'TYPE_EMAIL', message: 'is invalid' }]
+            : [],
+      });
+
+      form.dispatchEvent(new Event('submit'));
+      await flushPromises();
+
+      // Email should be marked invalid
+      expect(emailInput.getAttribute('aria-invalid')).toBe('true');
+      // Name should NOT be marked invalid (no errors for it)
+      expect(nameInput.hasAttribute('aria-invalid')).toBe(false);
+      handle.destroy();
+    });
+
+    it('removes aria-invalid when errors are cleared', async () => {
+      const emailInput = form.querySelector(
+        'input[name="email"]'
+      ) as HTMLInputElement;
+      emailInput.setAttribute('data-fs-field', '');
+      emailInput.setAttribute('aria-invalid', 'true');
+
+      const handle = initForm({
+        formElement: form,
+        formId: 'xyzabc',
+      });
+
+      mockClient.submitForm.mockResolvedValue({ kind: 'success', next: '' });
+
+      form.dispatchEvent(new Event('submit'));
+      await flushPromises();
+
+      // aria-invalid should be removed after successful submission
+      expect(emailInput.hasAttribute('aria-invalid')).toBe(false);
+      handle.destroy();
+    });
+
     it('clears error elements when no errors for that field', async () => {
       const emailError = document.createElement('span');
       emailError.dataset.fsError = 'email';
@@ -668,7 +733,7 @@ describe('initForm', () => {
   });
 
   describe('multiple submit buttons', () => {
-    it('disables and re-enables all submit buttons', async () => {
+    it('disables and re-enables all submit buttons with spinner', async () => {
       // Add another submit button
       const button2 = document.createElement('button');
       button2.type = 'submit';
@@ -690,23 +755,27 @@ describe('initForm', () => {
       const buttons = form.querySelectorAll('button[type="submit"]');
       expect(buttons).toHaveLength(2);
 
+      const originalTexts = Array.from(buttons).map((btn) => btn.textContent);
+
       buttons.forEach((btn) => {
         expect((btn as HTMLButtonElement).disabled).toBe(false);
       });
 
       form.dispatchEvent(new Event('submit'));
 
-      // All buttons should be disabled during submission
+      // All buttons should be disabled with spinner during submission
       buttons.forEach((btn) => {
         expect((btn as HTMLButtonElement).disabled).toBe(true);
+        expect((btn as HTMLButtonElement).innerHTML).toContain('fs-spinner');
       });
 
       resolveSubmit!({ kind: 'success' });
       await flushPromises();
 
-      // All buttons should be re-enabled after submission
-      buttons.forEach((btn) => {
+      // All buttons should be re-enabled with original text after submission
+      buttons.forEach((btn, i) => {
         expect((btn as HTMLButtonElement).disabled).toBe(false);
+        expect((btn as HTMLButtonElement).textContent).toBe(originalTexts[i]);
       });
 
       handle.destroy();

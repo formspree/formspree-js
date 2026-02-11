@@ -169,7 +169,7 @@
           id="name"
           name="name"
           placeholder="Your name"
-          data-fs-field="name"
+          data-fs-field
         >
         <span data-fs-error="name"></span>
       </div>
@@ -192,7 +192,7 @@
           id="message"
           name="message"
           placeholder="Anything you'd like to share..."
-          data-fs-field="message"
+          data-fs-field
         ></textarea>
         <span data-fs-error="message"></span>
       </div>
@@ -230,16 +230,6 @@
       formElement: '#newsletter-form',
       formId: 'meekngvn',
       debug: true,
-      fields: {
-        name: { prettyName: 'Name' },
-        email: {
-          prettyName: 'Email',
-          errorMessages: {
-            typeEmail: 'Please enter a valid email',
-            requiredFieldEmpty: 'Email is required',
-          },
-        },
-      },
     });
   </script>
 </body>

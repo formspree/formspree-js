@@ -42,7 +42,7 @@ const defaultOnSuccess = <T extends FieldValues>(
 
 /**
  * Default implementation to enable submit buttons.
- * Finds buttons with `type="submit"` or `data-fs-submit-btn` attribute.
+ * Restores original button text and re-enables the button.
  */
 const defaultEnable = <T extends FieldValues>(
   context: FormContext<T>
@@ -51,13 +51,18 @@ const defaultEnable = <T extends FieldValues>(
     `[type='submit']:disabled, [${DataAttributes.SUBMIT_BTN}]:disabled`
   );
   buttons.forEach((button) => {
+    const originalText = button.dataset.fsOriginalText;
+    if (originalText) {
+      button.textContent = originalText;
+      delete button.dataset.fsOriginalText;
+    }
     button.disabled = false;
   });
 };
 
 /**
  * Default implementation to disable submit buttons.
- * Finds buttons with `type="submit"` or `data-fs-submit-btn` attribute.
+ * Saves original button text, shows a loading spinner, and disables the button.
  */
 const defaultDisable = <T extends FieldValues>(
   context: FormContext<T>
@@ -66,6 +71,8 @@ const defaultDisable = <T extends FieldValues>(
     `[type='submit']:enabled, [${DataAttributes.SUBMIT_BTN}]:enabled`
   );
   buttons.forEach((button) => {
+    button.dataset.fsOriginalText = button.textContent ?? '';
+    button.innerHTML = '<span class="fs-spinner"></span>Sending...';
     button.disabled = true;
   });
 };
@@ -115,7 +122,7 @@ const defaultRenderErrors = <T extends FieldValues>(
   );
 
   fieldElements.forEach((element) => {
-    const fieldName = element.dataset.fsField;
+    const fieldName = element.getAttribute('name');
 
     if (!fieldName) {
       element.removeAttribute('aria-invalid');
@@ -318,6 +325,22 @@ const injectDefaultStyles = (): void => {
       color: #721c24;
       border: 1px solid #f5c6cb;
       display: block;
+    }
+
+    .fs-spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: fs-spin 0.6s linear infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    @keyframes fs-spin {
+      to { transform: rotate(360deg); }
     }
   `;
 
