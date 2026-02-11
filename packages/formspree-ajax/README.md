@@ -101,8 +101,8 @@ const handle = initForm({
   // Custom rendering (override defaults)
   enable: (context) => {},
   disable: (context) => {},
-  renderErrors: (context, error) => {},
-  renderMessage: (context, type, message) => {},
+  renderFieldErrors: (context, error) => {},
+  renderFormMessage: (context, type, message) => {},
 });
 
 // Clean up when done

@@ -743,10 +743,14 @@ describe('initForm', () => {
       handle.destroy();
     });
 
-    it('shows fallback message when only field errors exist', async () => {
+    it('does not show form message when only field errors exist', async () => {
       const messageEl = document.createElement('div');
       messageEl.setAttribute('data-fs-message', '');
       container.appendChild(messageEl);
+
+      const emailError = document.createElement('span');
+      emailError.dataset.fsError = 'email';
+      form.appendChild(emailError);
 
       const handle = initForm({
         formElement: form,
@@ -768,11 +772,12 @@ describe('initForm', () => {
       form.dispatchEvent(new Event('submit'));
       await flushPromises();
 
-      // No form errors, so fallback message is shown
-      expect(messageEl.textContent).toBe(
-        'There was an error submitting the form.'
-      );
-      expect(messageEl.getAttribute('data-fs-message-type')).toBe('error');
+      // No form errors, so no form message is shown
+      expect(messageEl.textContent).toBe('');
+      expect(messageEl.hasAttribute('data-fs-message-type')).toBe(false);
+
+      // Field errors are still rendered
+      expect(emailError.textContent).toBe('must be an email');
       handle.destroy();
     });
 
@@ -885,19 +890,23 @@ describe('initForm', () => {
       handle.destroy();
     });
 
-    it('uses custom renderErrors function', async () => {
+    it('uses custom renderFieldErrors function', async () => {
       const customRenderErrors = jest.fn();
       const handle = initForm({
         formElement: form,
         formId: 'xyzabc',
-        renderErrors: customRenderErrors,
+        renderFieldErrors: customRenderErrors,
       });
 
       const errorResult = {
         kind: 'error',
         getFormErrors: () => [],
-        getAllFieldErrors: () => [],
-        getFieldErrors: () => [],
+        getAllFieldErrors: () => [
+          ['email', [{ code: 'TYPE_EMAIL', message: 'must be an email' }]],
+        ],
+        getFieldErrors: () => [
+          { code: 'TYPE_EMAIL', message: 'must be an email' },
+        ],
       };
       mockClient.submitForm.mockResolvedValue(errorResult);
 

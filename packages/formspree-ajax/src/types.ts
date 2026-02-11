@@ -128,6 +128,24 @@ export interface FormConfig<T extends FieldValues = FieldValues> {
 
   /**
    * Callback invoked when the form submission fails with validation errors.
+   *
+   * The Formspree API returns errors in the following format:
+   * ```json
+   * {
+   *   "error": "Validation errors",
+   *   "errors": [
+   *     { "code": "TYPE_EMAIL", "field": "email", "message": "should be an email" },
+   *     { "code": "EMPTY", "message": "empty form" }
+   *   ]
+   * }
+   * ```
+   *
+   * These are parsed into a `SubmissionError` object with two categories:
+   *
+   * **Form errors** — errors without a `field` property (access via `error.getFormErrors()`):
+   * **Field errors** — errors with a `field` property (access via `error.getFieldErrors(field)` or `error.getAllFieldErrors()`):
+   *
+   * @see https://help.formspree.io/hc/en-us/articles/360055613373-The-Formspree-React-library#errorcodes
    * @param context - The form context containing form element and configuration.
    * @param error - The submission error details from Formspree.
    */
@@ -155,26 +173,35 @@ export interface FormConfig<T extends FieldValues = FieldValues> {
   disable?: (context: FormContext<T>) => void;
 
   /**
-   * Custom function to render validation errors in the DOM. If not provided, the default
-   * implementation finds elements with `data-fs-error="fieldName"` and populates
-   * them with error messages.
+   * Custom function to render field-level validation errors in the DOM.
+   * Only called when the API response contains field errors (errors with a `field` property).
+   *
+   * If not provided, the default implementation:
+   * - Finds elements with `data-fs-error="fieldName"` and sets their text to the first error message
+   * - Sets `aria-invalid="true"` on `data-fs-field` inputs whose `name` matches an errored field
+   *
+   * Called with `null` to clear errors before each submission.
+   *
    * @param context - The form context containing form element and configuration.
-   * @param error - The submission error, or null to clear errors.
+   * @param error - The submission error containing field errors (use `error.getFieldErrors(field)`
+   *   or `error.getAllFieldErrors()`), or `null` to clear errors.
    */
-  renderErrors?: (
+  renderFieldErrors?: (
     context: FormContext<T>,
     error: SubmissionError<T> | null
   ) => void;
 
   /**
    * Custom function to render a form-level message (success or error) in the DOM.
+   * Only called for form errors (errors without a `field` property) or on success.
+   *
    * If not provided, the default implementation finds an element with `data-fs-message`
    * and sets its text content and `data-fs-message-type` attribute.
    * @param context - The form context containing form element and configuration.
    * @param type - The message type ('success' or 'error'), or null to clear the message.
    * @param message - The message text to display, or null to clear the message.
    */
-  renderMessage?: (
+  renderFormMessage?: (
     context: FormContext<T>,
     type: MessageType | null,
     message: string | null
