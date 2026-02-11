@@ -36,10 +36,7 @@
     "test": "jest",
     "typecheck": "tsc --noEmit"
   },
-  "devDependencies": {
-    "@formspree/core": "^4.0.0"
-  },
-  "peerDependencies": {
+  "dependencies": {
     "@formspree/core": "^4.0.0"
   },
   "publishConfig": {

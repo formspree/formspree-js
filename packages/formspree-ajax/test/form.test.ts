@@ -198,7 +198,7 @@ describe('initForm', () => {
       handle.destroy();
     });
 
-    it('disables submit buttons and shows spinner during submission', async () => {
+    it('disables submit buttons during submission', async () => {
       const handle = initForm({
         formElement: form,
         formId: 'xyzabc',
@@ -219,10 +219,8 @@ describe('initForm', () => {
 
       form.dispatchEvent(new Event('submit'));
 
-      // Button should be disabled with spinner during submission
+      // Button should be disabled during submission
       expect(submitButton.disabled).toBe(true);
-      expect(submitButton.innerHTML).toContain('fs-spinner');
-      expect(submitButton.textContent).toContain('Sending...');
 
       // Resolve the submission
       resolveSubmit!({ kind: 'success' });
@@ -566,6 +564,7 @@ describe('initForm', () => {
       await flushPromises();
 
       expect(emailError.textContent).toBe('is invalid');
+      expect(emailError.hasAttribute('data-fs-active')).toBe(true);
       handle.destroy();
     });
 
@@ -650,14 +649,14 @@ describe('initForm', () => {
       handle.destroy();
     });
 
-    it('clears error elements when no errors for that field', async () => {
+    it('hides error elements when no errors for that field', async () => {
       const emailError = document.createElement('span');
       emailError.dataset.fsError = 'email';
       form.appendChild(emailError);
 
       const nameError = document.createElement('span');
       nameError.dataset.fsError = 'name';
-      nameError.textContent = 'Should be cleared';
+      nameError.textContent = 'Please enter your name';
       form.appendChild(nameError);
 
       const handle = initForm({
@@ -680,17 +679,21 @@ describe('initForm', () => {
       form.dispatchEvent(new Event('submit'));
       await flushPromises();
 
+      // Email error shown with server message
       expect(emailError.textContent).toBe('is invalid');
-      expect(nameError.innerHTML).toBe('');
+      expect(emailError.hasAttribute('data-fs-active')).toBe(true);
+      // Name error hidden but user content preserved
+      expect(nameError.textContent).toBe('Please enter your name');
+      expect(nameError.hasAttribute('data-fs-active')).toBe(false);
       handle.destroy();
     });
   });
 
   describe('message rendering', () => {
-    it('shows success message on data-fs-message after successful submission', async () => {
-      const messageEl = document.createElement('div');
-      messageEl.setAttribute('data-fs-message', '');
-      container.appendChild(messageEl);
+    it('shows success message on data-fs-success after successful submission', async () => {
+      const successEl = document.createElement('div');
+      successEl.setAttribute('data-fs-success', '');
+      container.appendChild(successEl);
 
       const handle = initForm({
         formElement: form,
@@ -705,15 +708,15 @@ describe('initForm', () => {
       form.dispatchEvent(new Event('submit'));
       await flushPromises();
 
-      expect(messageEl.textContent).toBe('Thank you!');
-      expect(messageEl.getAttribute('data-fs-message-type')).toBe('success');
+      expect(successEl.textContent).toBe('Thank you!');
+      expect(successEl.hasAttribute('data-fs-active')).toBe(true);
       handle.destroy();
     });
 
-    it('shows only form errors on data-fs-message (not field errors)', async () => {
-      const messageEl = document.createElement('div');
-      messageEl.setAttribute('data-fs-message', '');
-      container.appendChild(messageEl);
+    it('shows only form errors on data-fs-error (not field errors)', async () => {
+      const formErrorEl = document.createElement('div');
+      formErrorEl.setAttribute('data-fs-error', '');
+      container.appendChild(formErrorEl);
 
       const handle = initForm({
         formElement: form,
@@ -737,16 +740,20 @@ describe('initForm', () => {
       form.dispatchEvent(new Event('submit'));
       await flushPromises();
 
-      // data-fs-message should only show form-level errors
-      expect(messageEl.textContent).toBe('Form is disabled');
-      expect(messageEl.getAttribute('data-fs-message-type')).toBe('error');
+      // data-fs-error (form-level) should show form-level errors
+      expect(formErrorEl.textContent).toBe('Form is disabled');
+      expect(formErrorEl.hasAttribute('data-fs-active')).toBe(true);
       handle.destroy();
     });
 
     it('does not show form message when only field errors exist', async () => {
-      const messageEl = document.createElement('div');
-      messageEl.setAttribute('data-fs-message', '');
-      container.appendChild(messageEl);
+      const formErrorEl = document.createElement('div');
+      formErrorEl.setAttribute('data-fs-error', '');
+      container.appendChild(formErrorEl);
+
+      const successEl = document.createElement('div');
+      successEl.setAttribute('data-fs-success', '');
+      container.appendChild(successEl);
 
       const emailError = document.createElement('span');
       emailError.dataset.fsError = 'email';
@@ -772,20 +779,20 @@ describe('initForm', () => {
       form.dispatchEvent(new Event('submit'));
       await flushPromises();
 
-      // No form errors, so no form message is shown
-      expect(messageEl.textContent).toBe('');
-      expect(messageEl.hasAttribute('data-fs-message-type')).toBe(false);
+      // No form errors, so form-level elements should not be active
+      expect(formErrorEl.hasAttribute('data-fs-active')).toBe(false);
+      expect(successEl.hasAttribute('data-fs-active')).toBe(false);
 
       // Field errors are still rendered
       expect(emailError.textContent).toBe('must be an email');
+      expect(emailError.hasAttribute('data-fs-active')).toBe(true);
       handle.destroy();
     });
 
     it('displays form errors and field errors in separate elements', async () => {
-      // This mirrors the React useForm test: both form + field errors returned
-      const messageEl = document.createElement('div');
-      messageEl.setAttribute('data-fs-message', '');
-      container.appendChild(messageEl);
+      const formErrorEl = document.createElement('div');
+      formErrorEl.setAttribute('data-fs-error', '');
+      container.appendChild(formErrorEl);
 
       const emailError = document.createElement('span');
       emailError.dataset.fsError = 'email';
@@ -816,12 +823,13 @@ describe('initForm', () => {
       form.dispatchEvent(new Event('submit'));
       await flushPromises();
 
-      // Form error in data-fs-message
-      expect(messageEl.textContent).toBe('forbidden');
-      expect(messageEl.getAttribute('data-fs-message-type')).toBe('error');
+      // Form error in data-fs-error (form-level)
+      expect(formErrorEl.textContent).toBe('forbidden');
+      expect(formErrorEl.hasAttribute('data-fs-active')).toBe(true);
 
-      // Field error in data-fs-error span
+      // Field error in data-fs-error="email" span
       expect(emailError.textContent).toBe('should be an email');
+      expect(emailError.hasAttribute('data-fs-active')).toBe(true);
 
       // Field marked invalid
       expect(emailInput.getAttribute('aria-invalid')).toBe('true');
@@ -829,12 +837,18 @@ describe('initForm', () => {
       handle.destroy();
     });
 
-    it('clears message before submission', async () => {
-      const messageEl = document.createElement('div');
-      messageEl.setAttribute('data-fs-message', '');
-      messageEl.textContent = 'Previous message';
-      messageEl.setAttribute('data-fs-message-type', 'error');
-      container.appendChild(messageEl);
+    it('clears previous messages before submission', async () => {
+      // Simulate a previous error state
+      const formErrorEl = document.createElement('div');
+      formErrorEl.setAttribute('data-fs-error', '');
+      formErrorEl.setAttribute('data-fs-active', '');
+      formErrorEl.textContent = 'Previous error';
+      formErrorEl.setAttribute('data-fs-server-content', '');
+      container.appendChild(formErrorEl);
+
+      const successEl = document.createElement('div');
+      successEl.setAttribute('data-fs-success', '');
+      container.appendChild(successEl);
 
       const handle = initForm({
         formElement: form,
@@ -849,9 +863,148 @@ describe('initForm', () => {
       form.dispatchEvent(new Event('submit'));
       await flushPromises();
 
-      // Should now show success, not the old error
-      expect(messageEl.textContent).toBe('Thank you!');
-      expect(messageEl.getAttribute('data-fs-message-type')).toBe('success');
+      // Previous error should be cleared
+      expect(formErrorEl.hasAttribute('data-fs-active')).toBe(false);
+      expect(formErrorEl.textContent).toBe('');
+
+      // Success should now be shown
+      expect(successEl.textContent).toBe('Thank you!');
+      expect(successEl.hasAttribute('data-fs-active')).toBe(true);
+      handle.destroy();
+    });
+  });
+
+  describe('content preservation', () => {
+    it('preserves user content in field error elements', async () => {
+      const emailError = document.createElement('span');
+      emailError.dataset.fsError = 'email';
+      emailError.textContent = 'Please enter a valid email';
+      form.appendChild(emailError);
+
+      const handle = initForm({
+        formElement: form,
+        formId: 'xyzabc',
+      });
+
+      mockClient.submitForm.mockResolvedValue({
+        kind: 'error',
+        getFormErrors: () => [],
+        getAllFieldErrors: () => [
+          ['email', [{ code: 'TYPE_EMAIL', message: 'is invalid' }]],
+        ],
+        getFieldErrors: (field: string) =>
+          field === 'email'
+            ? [{ code: 'TYPE_EMAIL', message: 'is invalid' }]
+            : [],
+      });
+
+      form.dispatchEvent(new Event('submit'));
+      await flushPromises();
+
+      // User content preserved, not overridden by server message
+      expect(emailError.textContent).toBe('Please enter a valid email');
+      expect(emailError.hasAttribute('data-fs-active')).toBe(true);
+      handle.destroy();
+    });
+
+    it('preserves user content in success element', async () => {
+      const successEl = document.createElement('div');
+      successEl.setAttribute('data-fs-success', '');
+      successEl.textContent = 'Thanks for reaching out!';
+      container.appendChild(successEl);
+
+      const handle = initForm({
+        formElement: form,
+        formId: 'xyzabc',
+        onSuccess: ({ form }) => {
+          form.reset();
+        },
+      });
+
+      mockClient.submitForm.mockResolvedValue({ kind: 'success', next: '' });
+
+      form.dispatchEvent(new Event('submit'));
+      await flushPromises();
+
+      // User content preserved
+      expect(successEl.textContent).toBe('Thanks for reaching out!');
+      expect(successEl.hasAttribute('data-fs-active')).toBe(true);
+      handle.destroy();
+    });
+
+    it('preserves user content in form error element', async () => {
+      const formErrorEl = document.createElement('div');
+      formErrorEl.setAttribute('data-fs-error', '');
+      formErrorEl.textContent = 'Whoops! Something went wrong.';
+      container.appendChild(formErrorEl);
+
+      const handle = initForm({
+        formElement: form,
+        formId: 'xyzabc',
+      });
+
+      mockClient.submitForm.mockResolvedValue({
+        kind: 'error',
+        getFormErrors: () => [
+          { code: 'INACTIVE', message: 'Form is disabled' },
+        ],
+        getAllFieldErrors: () => [],
+        getFieldErrors: () => [],
+      });
+
+      form.dispatchEvent(new Event('submit'));
+      await flushPromises();
+
+      // User content preserved, not overridden by server message
+      expect(formErrorEl.textContent).toBe('Whoops! Something went wrong.');
+      expect(formErrorEl.hasAttribute('data-fs-active')).toBe(true);
+      handle.destroy();
+    });
+
+    it('clears server-injected content when hiding elements', async () => {
+      const emailError = document.createElement('span');
+      emailError.dataset.fsError = 'email';
+      form.appendChild(emailError);
+
+      const handle = initForm({
+        formElement: form,
+        formId: 'xyzabc',
+        onSuccess: ({ form }) => {
+          form.reset();
+        },
+      });
+
+      // First submission: error for email
+      mockClient.submitForm.mockResolvedValueOnce({
+        kind: 'error',
+        getFormErrors: () => [],
+        getAllFieldErrors: () => [
+          ['email', [{ code: 'TYPE_EMAIL', message: 'is invalid' }]],
+        ],
+        getFieldErrors: (field: string) =>
+          field === 'email'
+            ? [{ code: 'TYPE_EMAIL', message: 'is invalid' }]
+            : [],
+      });
+
+      form.dispatchEvent(new Event('submit'));
+      await flushPromises();
+
+      expect(emailError.textContent).toBe('is invalid');
+      expect(emailError.hasAttribute('data-fs-active')).toBe(true);
+
+      // Second submission: success (no errors)
+      mockClient.submitForm.mockResolvedValueOnce({
+        kind: 'success',
+        next: '',
+      });
+
+      form.dispatchEvent(new Event('submit'));
+      await flushPromises();
+
+      // Server-injected content should be cleared
+      expect(emailError.textContent).toBe('');
+      expect(emailError.hasAttribute('data-fs-active')).toBe(false);
       handle.destroy();
     });
   });
@@ -956,7 +1109,7 @@ describe('initForm', () => {
   });
 
   describe('multiple submit buttons', () => {
-    it('disables and re-enables all submit buttons with spinner', async () => {
+    it('disables and re-enables all submit buttons', async () => {
       // Add another submit button
       const button2 = document.createElement('button');
       button2.type = 'submit';
@@ -986,10 +1139,9 @@ describe('initForm', () => {
 
       form.dispatchEvent(new Event('submit'));
 
-      // All buttons should be disabled with spinner during submission
+      // All buttons should be disabled during submission
       buttons.forEach((btn) => {
         expect((btn as HTMLButtonElement).disabled).toBe(true);
-        expect((btn as HTMLButtonElement).innerHTML).toContain('fs-spinner');
       });
 
       resolveSubmit!({ kind: 'success' });

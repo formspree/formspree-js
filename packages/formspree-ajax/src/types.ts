@@ -11,16 +11,48 @@ import type {
  */
 export const DataAttributes = {
   /**
-   * Marks an element to display validation errors for a specific field.
-   * The attribute value should be the field name.
+   * Marks an element to display errors.
    *
-   * @example
+   * **With a value** (`data-fs-error="fieldName"`) — displays field-level validation errors
+   * for the named field. If the element has content, it is shown/hidden as-is.
+   * If the element is empty, the error message from the API is injected.
+   *
+   * **Without a value** (`data-fs-error`) — displays form-level errors (errors without
+   * a `field` property in the API response). Same content policy applies.
+   *
+   * Elements are hidden by default and shown via the `data-fs-active` attribute.
+   *
+   * @example Field-level error
    * ```html
    * <input type="email" name="email" />
    * <span data-fs-error="email"></span>
    * ```
+   *
+   * @example Form-level error with custom message
+   * ```html
+   * <div data-fs-error>Whoops! Something went wrong.</div>
+   * ```
    */
   ERROR: 'data-fs-error',
+
+  /**
+   * Marks an element to display a success message after a successful submission.
+   * If the element has content, it is shown/hidden as-is. If the element is empty,
+   * a default "Thank you!" message is injected.
+   *
+   * Elements are hidden by default and shown via the `data-fs-active` attribute.
+   *
+   * @example With custom message
+   * ```html
+   * <div data-fs-success>Thanks for reaching out!</div>
+   * ```
+   *
+   * @example Without content (uses default message)
+   * ```html
+   * <div data-fs-success></div>
+   * ```
+   */
+  SUCCESS: 'data-fs-success',
 
   /**
    * Marks an input element to receive `aria-invalid="true"` when validation fails.
@@ -52,16 +84,19 @@ export const DataAttributes = {
   SUBMIT_BTN: 'data-fs-submit-btn',
 
   /**
-   * Marks an element to display form-level success or error messages.
-   * The element's visibility and styling are controlled via the `data-fs-message-type`
-   * attribute, which is set programmatically to "success" or "error".
+   * Programmatically set on `data-fs-error` and `data-fs-success` elements to
+   * control their visibility. Added when the element should be shown, removed
+   * when it should be hidden.
    *
-   * @example
-   * ```html
-   * <div data-fs-message></div>
+   * @example CSS (default styles are injected automatically)
+   * ```css
+   * [data-fs-error]:not([data-fs-active]),
+   * [data-fs-success]:not([data-fs-active]) {
+   *   display: none;
+   * }
    * ```
    */
-  MESSAGE: 'data-fs-message',
+  ACTIVE: 'data-fs-active',
 } as const;
 
 /**
@@ -81,6 +116,8 @@ export type MessageType = 'success' | 'error';
  * @template T - The type of field values for the form, defaults to FieldValues.
  */
 export interface FormConfig<T extends FieldValues = FieldValues> {
+  // TODO: add a project id
+
   /**
    * The form element to attach to, either as an HTMLFormElement or a CSS selector string.
    */
@@ -177,7 +214,9 @@ export interface FormConfig<T extends FieldValues = FieldValues> {
    * Only called when the API response contains field errors (errors with a `field` property).
    *
    * If not provided, the default implementation:
-   * - Finds elements with `data-fs-error="fieldName"` and sets their text to the first error message
+   * - Finds elements with `data-fs-error="fieldName"` and shows them (with `data-fs-active`)
+   * - If the element is empty, sets its text to the first error message from the API
+   * - If the element already has content, shows it as-is without overriding
    * - Sets `aria-invalid="true"` on `data-fs-field` inputs whose `name` matches an errored field
    *
    * Called with `null` to clear errors before each submission.
@@ -192,14 +231,20 @@ export interface FormConfig<T extends FieldValues = FieldValues> {
   ) => void;
 
   /**
-   * Custom function to render a form-level message (success or error) in the DOM.
-   * Only called for form errors (errors without a `field` property) or on success.
+   * Custom function to render form-level messages (success or error) in the DOM.
+   * Called on success (to show `data-fs-success`) or on form-level errors (to show `data-fs-error`).
    *
-   * If not provided, the default implementation finds an element with `data-fs-message`
-   * and sets its text content and `data-fs-message-type` attribute.
+   * If not provided, the default implementation:
+   * - On success: shows the `data-fs-success` element (with `data-fs-active`)
+   * - On error: shows the `data-fs-error` element (without a value, i.e. form-level)
+   * - If the element is empty, sets its text to the provided message
+   * - If the element already has content, shows it as-is without overriding
+   *
+   * Called with `null` to clear messages before each submission.
+   *
    * @param context - The form context containing form element and configuration.
-   * @param type - The message type ('success' or 'error'), or null to clear the message.
-   * @param message - The message text to display, or null to clear the message.
+   * @param type - The message type ('success' or 'error'), or null to clear messages.
+   * @param message - The message text to display (used only if the element is empty), or null to clear.
    */
   renderFormMessage?: (
     context: FormContext<T>,

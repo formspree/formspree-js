@@ -159,7 +159,8 @@
     <h1>Newsletter Signup <span class="badge">Script Tag</span></h1>
     <p class="subtitle">Using <code>window.formspree</code> global API &mdash; no bundler required</p>
 
-    <div data-fs-message></div>
+    <div data-fs-success>Custom success message.</div>
+    <div data-fs-error>Whoops! Something went wrong.</div>
 
     <form id="newsletter-form">
       <div class="form-group">
@@ -171,7 +172,7 @@
           placeholder="Your name"
           data-fs-field
         >
-        <span data-fs-error="name"></span>
+        <span data-fs-error="name">same policy here too</span>
       </div>
 
       <div class="form-group">

@@ -30,6 +30,38 @@ const getFormElement = (elementOrSelector: FormElement): HTMLFormElement => {
   return elementOrSelector;
 };
 
+/**
+ * Internal marker attribute. Set on elements whose text content was injected
+ * by the library (i.e. the element was originally empty). Used to know when
+ * it is safe to clear the text on hide — user-provided content is never cleared.
+ */
+const SERVER_CONTENT_ATTR = 'data-fs-server-content';
+
+/**
+ * Shows an element by setting `data-fs-active`.
+ * If the element is empty and a message is provided, the message is injected
+ * and the element is marked with `data-fs-server-content` so it can be cleared later.
+ */
+const showElement = (element: HTMLElement, message?: string): void => {
+  if (message && element.textContent?.trim() === '') {
+    element.textContent = message;
+    element.setAttribute(SERVER_CONTENT_ATTR, '');
+  }
+  element.setAttribute(DataAttributes.ACTIVE, '');
+};
+
+/**
+ * Hides an element by removing `data-fs-active`.
+ * If the text was injected by the library, it is cleared.
+ */
+const hideElement = (element: HTMLElement): void => {
+  element.removeAttribute(DataAttributes.ACTIVE);
+  if (element.hasAttribute(SERVER_CONTENT_ATTR)) {
+    element.textContent = '';
+    element.removeAttribute(SERVER_CONTENT_ATTR);
+  }
+};
+
 const defaultOnSuccess = <T extends FieldValues>(
   context: FormContext<T>,
   _result: SubmissionSuccess
@@ -72,23 +104,25 @@ const defaultDisable = <T extends FieldValues>(
   );
   buttons.forEach((button) => {
     button.dataset.fsOriginalText = button.textContent ?? '';
-    button.innerHTML = '<span class="fs-spinner"></span>Sending...';
     button.disabled = true;
   });
 };
 
 /**
- * Default implementation to render validation errors in the DOM.
- * - Finds elements with `data-fs-error="fieldName"` and populates them with error messages.
- * - Finds elements with `data-fs-field="fieldName"` and sets `aria-invalid="true"` on error.
+ * Default implementation to render field-level validation errors in the DOM.
+ *
+ * - Finds elements with `data-fs-error="fieldName"` and shows/hides them.
+ *   If the element is empty, injects the first error message from the API.
+ *   If the element has user-provided content, shows it as-is.
+ * - Sets `aria-invalid="true"` on `data-fs-field` inputs whose `name` matches an errored field.
  */
-const defaultRenderErrors = <T extends FieldValues>(
+const defaultRenderFieldErrors = <T extends FieldValues>(
   context: FormContext<T>,
   error: SubmissionError<T> | null
 ): void => {
   const { form } = context;
 
-  // Handle error message elements
+  // Handle field error elements (data-fs-error="fieldName")
   const errorElements = form.querySelectorAll<HTMLElement>(
     `[${DataAttributes.ERROR}]`
   );
@@ -96,24 +130,22 @@ const defaultRenderErrors = <T extends FieldValues>(
   errorElements.forEach((element) => {
     const fieldName = element.dataset.fsError;
 
-    if (!fieldName) {
-      element.innerHTML = '';
-      return;
-    }
+    // Skip form-level error elements (no value) — handled by renderFormMessage
+    if (!fieldName) return;
 
     if (!error) {
-      element.innerHTML = '';
+      hideElement(element);
       return;
     }
 
     const fieldErrors = error.getFieldErrors(fieldName as keyof T);
 
     if (fieldErrors.length === 0) {
-      element.innerHTML = '';
+      hideElement(element);
       return;
     }
 
-    element.textContent = fieldErrors[0].message;
+    showElement(element, fieldErrors[0].message);
   });
 
   // Handle field elements (aria-invalid)
@@ -146,37 +178,62 @@ const defaultRenderErrors = <T extends FieldValues>(
 };
 
 /**
- * Finds the message element for a form.
- * Searches inside the form first, then in the form's parent container.
+ * Finds an element by attribute, searching inside the form first,
+ * then in the form's parent container.
  */
-const findMessageElement = (form: HTMLFormElement): HTMLElement | null => {
+const findElement = (
+  form: HTMLFormElement,
+  selector: string
+): HTMLElement | null => {
   return (
-    form.querySelector<HTMLElement>(`[${DataAttributes.MESSAGE}]`) ??
-    form.parentElement?.querySelector<HTMLElement>(
-      `[${DataAttributes.MESSAGE}]`
-    ) ??
+    form.querySelector<HTMLElement>(selector) ??
+    form.parentElement?.querySelector<HTMLElement>(selector) ??
     null
   );
 };
 
 /**
- * Default implementation to render a form-level message in the DOM.
- * Sets the text content and `data-fs-message-type` attribute on the message element.
+ * Finds the success element (`data-fs-success`) for a form.
  */
-const defaultRenderMessage = <T extends FieldValues>(
+const findSuccessElement = (form: HTMLFormElement): HTMLElement | null => {
+  return findElement(form, `[${DataAttributes.SUCCESS}]`);
+};
+
+/**
+ * Finds the form-level error element (`data-fs-error` without a value) for a form.
+ */
+const findFormErrorElement = (form: HTMLFormElement): HTMLElement | null => {
+  return findElement(form, `[${DataAttributes.ERROR}=""]`);
+};
+
+/**
+ * Default implementation to render form-level messages in the DOM.
+ *
+ * - On success: shows the `data-fs-success` element.
+ * - On error: shows the `data-fs-error` element (without a value).
+ * - If the element is empty, injects the provided message.
+ * - If the element has user-provided content, shows it as-is.
+ */
+const defaultRenderFormMessage = <T extends FieldValues>(
   context: FormContext<T>,
   type: MessageType | null,
   message: string | null
 ): void => {
-  const messageEl = findMessageElement(context.form);
-  if (!messageEl) return;
+  const successEl = findSuccessElement(context.form);
+  const formErrorEl = findFormErrorElement(context.form);
 
   if (type === null) {
-    messageEl.textContent = '';
-    messageEl.removeAttribute('data-fs-message-type');
+    if (successEl) hideElement(successEl);
+    if (formErrorEl) hideElement(formErrorEl);
+    return;
+  }
+
+  if (type === 'success') {
+    if (formErrorEl) hideElement(formErrorEl);
+    if (successEl) showElement(successEl, message ?? undefined);
   } else {
-    messageEl.textContent = message ?? '';
-    messageEl.setAttribute('data-fs-message-type', type);
+    if (successEl) hideElement(successEl);
+    if (formErrorEl) showElement(formErrorEl, message ?? undefined);
   }
 };
 
@@ -204,8 +261,8 @@ const handleSubmit = async <T extends FieldValues>(
     onFailure,
     enable = defaultEnable,
     disable = defaultDisable,
-    renderFieldErrors = defaultRenderErrors,
-    renderFormMessage = defaultRenderMessage,
+    renderFieldErrors = defaultRenderFieldErrors,
+    renderFormMessage = defaultRenderFormMessage,
   } = config;
 
   const formData = new FormData(context.form);
@@ -258,7 +315,7 @@ const handleSubmit = async <T extends FieldValues>(
       renderFormMessage(context, 'success', 'Thank you!');
       if (onSuccess) {
         onSuccess(context, result);
-      } else if (findMessageElement(context.form)) {
+      } else if (findSuccessElement(context.form)) {
         context.form.reset();
       } else {
         defaultOnSuccess(context, result);
@@ -302,38 +359,43 @@ const injectDefaultStyles = (): void => {
   const styleElement = document.createElement('style');
   styleElement.setAttribute('data-formspree-styles', '');
   styleElement.textContent = `
-    [${DataAttributes.ERROR}] {
-      color: #dc3545;
-      font-size: 12px;
-      margin-top: 4px;
+    [${DataAttributes.ERROR}],
+    [${DataAttributes.SUCCESS}] {
+      display: none;
+    }
+
+    [${DataAttributes.ERROR}][${DataAttributes.ACTIVE}] {
       display: block;
-      min-height: 16px;
+      color: #dc3545;
     }
 
-    [${DataAttributes.FIELD}][aria-invalid="true"] {
-      border-color: #dc3545;
-    }
-
-    [${DataAttributes.MESSAGE}] {
+    [${DataAttributes.ERROR}=""][${DataAttributes.ACTIVE}] {
       padding: 12px;
       border-radius: 8px;
       margin-bottom: 20px;
       font-size: 14px;
-      display: none;
+      background: #f8d7da;
+      border: 1px solid #f5c6cb;
     }
 
-    [${DataAttributes.MESSAGE}][data-fs-message-type="success"] {
+    [${DataAttributes.ERROR}]:not([${DataAttributes.ERROR}=""])[${DataAttributes.ACTIVE}] {
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    [${DataAttributes.SUCCESS}][${DataAttributes.ACTIVE}] {
+      display: block;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
       background: #d4edda;
       color: #155724;
       border: 1px solid #c3e6cb;
-      display: block;
     }
 
-    [${DataAttributes.MESSAGE}][data-fs-message-type="error"] {
-      background: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
-      display: block;
+    [${DataAttributes.FIELD}][aria-invalid="true"] {
+      border-color: #dc3545;
     }
 
     .fs-spinner {

@@ -44,7 +44,8 @@ initForm({
 ### HTML
 
 ```html
-<div data-fs-message></div>
+<div data-fs-success></div>
+<div data-fs-error></div>
 
 <form id="contact-form">
   <label for="email">Email</label>
@@ -61,12 +62,13 @@ That's it. The library handles submission, validation errors, loading state, and
 
 These HTML attributes enable declarative form behavior without additional JavaScript:
 
-| Attribute                   | Element                 | Description                                                                                                                                    |
-| --------------------------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| `data-fs-error="fieldName"` | `<span>`, `<div>`       | Displays the first validation error for the named field.                                                                                       |
-| `data-fs-field`             | `<input>`, `<textarea>` | Marks an input to receive `aria-invalid="true"` on error. The field name is read from the element's `name` attribute.                          |
-| `data-fs-submit-btn`        | `<button>`              | Automatically disabled with a spinner during submission and re-enabled on completion.                                                          |
-| `data-fs-message`           | `<div>`                 | Displays form-level success or error messages. Visibility is controlled by a `data-fs-message-type` attribute set to `"success"` or `"error"`. |
+| Attribute                   | Element                 | Description                                                                                                                                      |
+| --------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `data-fs-error="fieldName"` | `<span>`, `<div>`       | Displays field-level validation errors. If empty, the API error message is injected. If it has content, it is shown/hidden as-is.                |
+| `data-fs-error`             | `<div>`                 | Displays form-level errors (without a value). Same content policy: empty elements get the server message, elements with content are shown as-is. |
+| `data-fs-success`           | `<div>`                 | Displays a success message after submission. Empty elements get "Thank you!", elements with content are shown as-is.                             |
+| `data-fs-field`             | `<input>`, `<textarea>` | Marks an input to receive `aria-invalid="true"` on error. The field name is read from the element's `name` attribute.                            |
+| `data-fs-submit-btn`        | `<button>`              | Automatically disabled during submission and re-enabled on completion.                                                                           |
 
 ## Configuration
 
@@ -125,13 +127,14 @@ The `context` object contains: `form` (HTMLFormElement), `formKey`, `endpoint`, 
 
 The library provides sensible defaults out of the box:
 
-- **Submit button** — Disabled with a loading spinner during submission, re-enabled on completion.
-- **Field errors** — Populated into `data-fs-error="fieldName"` elements using the API error message.
+- **Submit button** — Disabled during submission, re-enabled on completion.
+- **Field errors** — Populated into `data-fs-error="fieldName"` elements. If the element is empty, the API error message is injected. If it has content, it is shown/hidden as-is.
 - **Field validation** — `aria-invalid="true"` is set on `data-fs-field` inputs when their field has errors.
-- **Form message** — Success ("Thank you!") or form-level error messages displayed in `data-fs-message` elements.
-- **Success without message element** — If no `data-fs-message` element exists and no `onSuccess` callback is provided, the form is replaced with a "Thank you!" message.
-- **Success with message element** — If a `data-fs-message` element exists and no `onSuccess` callback is provided, the form is reset after success.
-- **Default styles** — Basic styles for error messages, invalid fields, message banners, and the loading spinner are automatically injected.
+- **Success message** — The `data-fs-success` element is shown with "Thank you!" (or preserved user content).
+- **Form errors** — The `data-fs-error` element (without a value) is shown with the form-level error message (or preserved user content).
+- **Success without data-fs-success** — If no `data-fs-success` element exists and no `onSuccess` callback is provided, the form is replaced with a "Thank you!" message.
+- **Success with data-fs-success** — If a `data-fs-success` element exists and no `onSuccess` callback is provided, the form is reset after success.
+- **Default styles** — Basic styles for error messages, invalid fields, and message banners are automatically injected.
 
 ## Extra Data
 
@@ -166,13 +169,13 @@ Default styles are injected automatically. You can override them with your own C
 }
 
 /* Success message banner */
-[data-fs-message][data-fs-message-type='success'] {
+[data-fs-success][data-fs-active] {
   background: #d4edda;
   color: #155724;
 }
 
-/* Error message banner */
-[data-fs-message][data-fs-message-type='error'] {
+/* Form-level error banner */
+[data-fs-error=''][data-fs-active] {
   background: #f8d7da;
   color: #721c24;
 }
