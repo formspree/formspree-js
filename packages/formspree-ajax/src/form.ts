@@ -397,22 +397,6 @@ const injectDefaultStyles = (): void => {
     [${DataAttributes.FIELD}][aria-invalid="true"] {
       border-color: #dc3545;
     }
-
-    .fs-spinner {
-      display: inline-block;
-      width: 14px;
-      height: 14px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-top-color: white;
-      border-radius: 50%;
-      animation: fs-spin 0.6s linear infinite;
-      margin-right: 8px;
-      vertical-align: middle;
-    }
-
-    @keyframes fs-spin {
-      to { transform: rotate(360deg); }
-    }
   `;
 
   document.head.appendChild(styleElement);
