@@ -512,7 +512,7 @@ describe('initForm', () => {
       form.dispatchEvent(new Event('submit'));
       await flushPromises();
 
-      expect(emailError.textContent).toBe('This field is invalid');
+      expect(emailError.textContent).toBe('is invalid');
       handle.destroy();
     });
 
@@ -533,74 +533,6 @@ describe('initForm', () => {
       await flushPromises();
 
       // Error should be cleared (form replaced by success message in this case)
-      handle.destroy();
-    });
-
-    it('uses prettyName from fields config', async () => {
-      const emailError = document.createElement('span');
-      emailError.dataset.fsError = 'email';
-      form.appendChild(emailError);
-
-      const handle = initForm({
-        formElement: form,
-        formId: 'xyzabc',
-        fields: {
-          email: { prettyName: 'Email address' },
-        },
-      });
-
-      mockClient.submitForm.mockResolvedValue({
-        kind: 'error',
-        getFormErrors: () => [],
-        getAllFieldErrors: () => [
-          ['email', [{ code: 'TYPE_EMAIL', message: 'is invalid' }]],
-        ],
-        getFieldErrors: (field: string) =>
-          field === 'email'
-            ? [{ code: 'TYPE_EMAIL', message: 'is invalid' }]
-            : [],
-      });
-
-      form.dispatchEvent(new Event('submit'));
-      await flushPromises();
-
-      expect(emailError.textContent).toBe('Email address is invalid');
-      handle.destroy();
-    });
-
-    it('uses custom error messages from fields config', async () => {
-      const emailError = document.createElement('span');
-      emailError.dataset.fsError = 'email';
-      form.appendChild(emailError);
-
-      const handle = initForm({
-        formElement: form,
-        formId: 'xyzabc',
-        fields: {
-          email: {
-            errorMessages: {
-              typeEmail: 'Please enter a valid email address',
-            },
-          },
-        },
-      });
-
-      mockClient.submitForm.mockResolvedValue({
-        kind: 'error',
-        getFormErrors: () => [],
-        getAllFieldErrors: () => [
-          ['email', [{ code: 'TYPE_EMAIL', message: 'is invalid' }]],
-        ],
-        getFieldErrors: (field: string) =>
-          field === 'email'
-            ? [{ code: 'TYPE_EMAIL', message: 'is invalid' }]
-            : [],
-      });
-
-      form.dispatchEvent(new Event('submit'));
-      await flushPromises();
-
-      expect(emailError.textContent).toBe('Please enter a valid email address');
       handle.destroy();
     });
 
@@ -634,7 +566,7 @@ describe('initForm', () => {
       form.dispatchEvent(new Event('submit'));
       await flushPromises();
 
-      expect(emailError.textContent).toBe('This field is invalid');
+      expect(emailError.textContent).toBe('is invalid');
       expect(nameError.innerHTML).toBe('');
       handle.destroy();
     });

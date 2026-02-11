@@ -15,27 +15,6 @@ initForm({
   formElement: '#contact-form',
   formId: import.meta.env.VITE_FORMSPREE_FORM_ID,
   debug: true,
-  fields: {
-    name: {
-      prettyName: 'Name',
-      errorMessages: {
-        requiredFieldEmpty: 'Please enter your name',
-      },
-    },
-    email: {
-      prettyName: 'Email',
-      // get it working with the default error messages
-      // errorMessages: {
-      //   "TYPE_EMAIL": "Email not valid",
-      // },
-    },
-    message: {
-      prettyName: 'Message',
-      errorMessages: {
-        requiredFieldEmpty: 'Please enter a message',
-      },
-    },
-  },
   onInit: () => {
     console.log('Form initialized');
   },

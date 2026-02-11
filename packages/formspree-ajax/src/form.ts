@@ -9,24 +9,12 @@ import {
 } from '@formspree/core';
 import {
   DataAttributes,
-  type CamelCaseErrorCode,
   type FormConfig,
   type FormContext,
   type FormElement,
   type FormHandle,
   type MessageType,
 } from './types';
-
-/**
- * Converts a SCREAMING_SNAKE_CASE string to camelCase.
- */
-const toCamelCase = (str: string): CamelCaseErrorCode => {
-  return str
-    .toLowerCase()
-    .replace(/_([a-z])/g, (_, letter) =>
-      letter.toUpperCase()
-    ) as CamelCaseErrorCode;
-};
 
 const getFormElement = (elementOrSelector: FormElement): HTMLFormElement => {
   if (typeof elementOrSelector === 'string') {
@@ -91,8 +79,7 @@ const defaultRenderErrors = <T extends FieldValues>(
   context: FormContext<T>,
   error: SubmissionError<T> | null
 ): void => {
-  const { form, config } = context;
-  const fields = config.fields;
+  const { form } = context;
 
   // Handle error message elements
   const errorElements = form.querySelectorAll<HTMLElement>(
@@ -119,15 +106,7 @@ const defaultRenderErrors = <T extends FieldValues>(
       return;
     }
 
-    const firstError = fieldErrors[0];
-    const fieldConfig = fields?.[fieldName as keyof T];
-    const errorMessages = fieldConfig?.errorMessages ?? {};
-    const prettyName = fieldConfig?.prettyName ?? 'This field';
-    const code = toCamelCase(firstError.code);
-    const customMessage = errorMessages[code];
-    const fullMessage = customMessage ?? `${prettyName} ${firstError.message}`;
-
-    element.textContent = fullMessage;
+    element.textContent = fieldErrors[0].message;
   });
 
   // Handle field elements (aria-invalid)
@@ -194,24 +173,15 @@ const defaultRenderMessage = <T extends FieldValues>(
   }
 };
 
-// FORM ERRORS SHOULD DISPLAY ON TOP LEVEL
-// FIELD ERRORS SHOULD DISPLAY BELOW THE FIELD
-
 /**
  * Builds a human-readable error message from a SubmissionError.
- * Concatenates form-level errors and field-level errors.
+ * Only includes form-level errors; field errors are displayed inline via `data-fs-error` elements.
  */
 const buildErrorMessage = <T extends FieldValues>(
   error: SubmissionError<T>
 ): string => {
   const formErrors = error.getFormErrors().map((e) => e.message);
-  const fieldErrors = error
-    .getAllFieldErrors()
-    .flatMap(([, errors]) => errors.map((e) => e.message));
-  return (
-    [...formErrors, ...fieldErrors].join(', ') ||
-    'There was an error submitting the form.'
-  );
+  return formErrors.join(', ') || 'There was an error submitting the form.';
 };
 
 const handleSubmit = async <T extends FieldValues>(
