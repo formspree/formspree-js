@@ -145,6 +145,13 @@ export interface FormConfig<T extends FieldValues = FieldValues> {
   debug?: boolean;
 
   /**
+   * When true, injects default CSS styles for error messages, success banners,
+   * invalid field borders, and the loading spinner. Set to `false` to provide
+   * your own styles. Defaults to `true`.
+   */
+  useDefaultStyles?: boolean;
+
+  /**
    * Callback invoked when the form is initialized.
    * @param context - The form context containing form element and configuration.
    */

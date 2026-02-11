@@ -422,7 +422,9 @@ const injectDefaultStyles = (): void => {
 export const initForm = <T extends FieldValues = FieldValues>(
   config: FormConfig<T>
 ): FormHandle => {
-  injectDefaultStyles();
+  if (config.useDefaultStyles !== false) {
+    injectDefaultStyles();
+  }
 
   if (!config.formElement) {
     throw new Error('You must provide a `formElement` in the config');
