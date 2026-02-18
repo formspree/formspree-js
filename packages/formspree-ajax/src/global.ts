@@ -27,6 +27,10 @@ window.formspree = (...args: unknown[]) => {
 // Flush queued calls once the DOM is ready
 onReady(() => {
   for (const args of queue) {
-    run(args[0], args[1]);
+    try {
+      run(args[0], args[1]);
+    } catch (err) {
+      console.error('[formspree] Failed to initialize form from queue:', err);
+    }
   }
 });

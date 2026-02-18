@@ -23,8 +23,12 @@ import {
 } from './utils';
 
 const handleSubmit = async <T extends FieldValues>(
-  context: FormContext<T>
+  context: FormContext<T>,
+  guard: { submitting: boolean }
 ): Promise<void> => {
+  if (guard.submitting) return;
+  guard.submitting = true;
+
   const { formKey, endpoint, client, config } = context;
   const {
     debug,
@@ -39,6 +43,13 @@ const handleSubmit = async <T extends FieldValues>(
     renderSuccess = defaultRenderSuccess,
     renderFormError = defaultRenderFormError,
   } = config;
+
+  // Clear visible errors and messages before submitting
+  renderFieldErrors(context, null);
+  renderSuccess(context, null);
+  renderFormError(context, null);
+  disable(context);
+  onSubmit?.(context);
 
   const formData = new FormData(context.form);
 
@@ -55,13 +66,6 @@ const handleSubmit = async <T extends FieldValues>(
       }
     }
   }
-
-  // Clear visible errors and messages before submitting
-  renderFieldErrors(context, null);
-  renderSuccess(context, null);
-  renderFormError(context, null);
-  disable(context);
-  onSubmit?.(context);
 
   if (debug) {
     log('Submitting form', { formKey, formData });
@@ -104,6 +108,7 @@ const handleSubmit = async <T extends FieldValues>(
     renderFormError(context, 'An unexpected error occurred. Please try again.');
     onFailure?.(context, err);
   } finally {
+    guard.submitting = false;
     enable(context);
   }
 };
@@ -144,9 +149,11 @@ export const initForm = <T extends FieldValues = FieldValues>(
     log('Initializing form', context);
   }
 
+  const guard = { submitting: false };
+
   const submitHandler = (event: Event): void => {
     event.preventDefault();
-    handleSubmit(context);
+    handleSubmit(context, guard);
   };
 
   form.addEventListener('submit', submitHandler);
