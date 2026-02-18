@@ -105,13 +105,6 @@ export const DataAttributes = {
 export type FormElement = HTMLFormElement | string;
 
 /**
- * The type of form-level message to display.
- * - `'success'` — shown after a successful submission
- * - `'error'` — shown after a validation or unexpected error
- */
-export type MessageType = 'success' | 'error';
-
-/**
  * Configuration options for initializing a Formspree form.
  * @template T - The type of field values for the form, defaults to FieldValues.
  */
@@ -242,26 +235,36 @@ export interface FormConfig<T extends FieldValues = FieldValues> {
   ) => void;
 
   /**
-   * Custom function to render form-level messages (success or error) in the DOM.
-   * Called on success (to show `data-fs-success`) or on form-level errors (to show `data-fs-error`).
+   * Custom function to render a success message in the DOM.
+   * Called after a successful form submission.
    *
    * If not provided, the default implementation:
-   * - On success: shows the `data-fs-success` element (with `data-fs-active`)
-   * - On error: shows the `data-fs-error` element (without a value, i.e. form-level)
+   * - Shows the `data-fs-success` element (with `data-fs-active`)
    * - If the element is empty, sets its text to the provided message
    * - If the element already has content, shows it as-is without overriding
    *
-   * Called with `null` to clear messages before each submission.
+   * Called with `null` to clear the success message before each submission.
    *
    * @param context - The form context containing form element and configuration.
-   * @param type - The message type ('success' or 'error'), or null to clear messages.
    * @param message - The message text to display (used only if the element is empty), or null to clear.
    */
-  renderFormMessage?: (
-    context: FormContext<T>,
-    type: MessageType | null,
-    message: string | null
-  ) => void;
+  renderSuccess?: (context: FormContext<T>, message: string | null) => void;
+
+  /**
+   * Custom function to render form-level errors in the DOM.
+   * Called when the API response contains form-level errors (errors without a `field` property).
+   *
+   * If not provided, the default implementation:
+   * - Shows the `data-fs-error` element (without a value, i.e. form-level)
+   * - If the element is empty, sets its text to the provided message
+   * - If the element already has content, shows it as-is without overriding
+   *
+   * Called with `null` to clear the form error before each submission.
+   *
+   * @param context - The form context containing form element and configuration.
+   * @param message - The error message to display (used only if the element is empty), or null to clear.
+   */
+  renderFormError?: (context: FormContext<T>, message: string | null) => void;
 }
 
 /**

@@ -11,8 +11,8 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'public/index.html'),
-        global: resolve(__dirname, 'public/global.html')
+        packages: resolve(__dirname, 'public/index-packages.html'),
+        cdn: resolve(__dirname, 'public/index-cdn.html')
       }
     }
   },

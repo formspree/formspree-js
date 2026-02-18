@@ -13,7 +13,8 @@
   },
   "license": "MIT",
   "contributors": [
-    "Cole Krumbholz"
+    "Cole Krumbholz",
+    "Larissa Oliveira"
   ],
   "sideEffects": [
     "./dist/global.js",

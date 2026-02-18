@@ -21,12 +21,12 @@ const queue: unknown[][] = (window.formspree && window.formspree.q) || [];
 
 // Replace the stub with the real dispatcher
 window.formspree = (...args: unknown[]) => {
-  run(args[0]);
+  run(args[0], args[1]);
 };
 
 // Flush queued calls once the DOM is ready
 onReady(() => {
   for (const args of queue) {
-    run(args[0]);
+    run(args[0], args[1]);
   }
 });

@@ -26,7 +26,7 @@ describe('global', () => {
     (window as unknown as Record<string, unknown>).formspree = stub;
 
     // Queue a call before load
-    stub({ formElement: '#queued-form', formId: 'abc' });
+    stub('initForm', { formElement: '#queued-form', formId: 'abc' });
     expect(stub.q).toHaveLength(1);
 
     // Load the global module
@@ -37,7 +37,7 @@ describe('global', () => {
 
     // The queued call should have been flushed via run()
     expect(mockRun).toHaveBeenCalledTimes(1);
-    expect(mockRun).toHaveBeenCalledWith({
+    expect(mockRun).toHaveBeenCalledWith('initForm', {
       formElement: '#queued-form',
       formId: 'abc',
     });
@@ -48,12 +48,12 @@ describe('global', () => {
     jest.runAllTimers();
 
     // Call directly after library has loaded
-    window.formspree({
+    window.formspree('initForm', {
       formElement: '#direct-form',
       formId: 'def',
     });
 
-    expect(mockRun).toHaveBeenCalledWith({
+    expect(mockRun).toHaveBeenCalledWith('initForm', {
       formElement: '#direct-form',
       formId: 'def',
     });
@@ -68,7 +68,7 @@ describe('global', () => {
     // No queued calls, so run should not have been called
     expect(mockRun).not.toHaveBeenCalled();
 
-    window.formspree({
+    window.formspree('initForm', {
       formElement: '#new-form',
       formId: 'ghi',
     });

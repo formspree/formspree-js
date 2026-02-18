@@ -2,19 +2,32 @@ import { initForm } from './form';
 import type { FormConfig } from './types';
 
 /**
- * Entry point for the `window.formspree(...)` global API.
+ * Command dispatcher for the `window.formspree(...)` global API.
  *
- * Accepts a config object with required `formElement` and `formId`,
- * then delegates to {@link initForm}.
+ * Routes calls like `formspree('initForm', config)` to {@link initForm}.
+ * The first argument selects the command; the second provides its options.
  *
  * @example
  * ```js
- * formspree({ formElement: '#contact-form', formId: 'xyzabc123' });
+ * formspree('initForm', { formElement: '#contact-form', formId: 'xyzabc123' });
  * ```
  *
- * @param config - The configuration object passed to `window.formspree(...)`.
+ * @param command - The command name. Currently only `"initForm"` is supported.
+ * @param config - The configuration object for the command.
  */
-export const run = (config: unknown): void => {
+export const run = (command: unknown, config: unknown): void => {
+  if (typeof command !== 'string') {
+    console.warn('[formspree] First argument must be a command string.');
+    return;
+  }
+
+  if (command !== 'initForm') {
+    console.warn(
+      `[formspree] Unknown command: "${command}". Expected "initForm".`
+    );
+    return;
+  }
+
   if (!config || typeof config !== 'object') {
     console.warn('[formspree] A config object is required.');
     return;

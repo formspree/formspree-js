@@ -14,7 +14,8 @@ import {
   defaultEnable,
   defaultOnSuccess,
   defaultRenderFieldErrors,
-  defaultRenderFormMessage,
+  defaultRenderFormError,
+  defaultRenderSuccess,
   findSuccessElement,
   getFormElement,
   injectDefaultStyles,
@@ -35,7 +36,8 @@ const handleSubmit = async <T extends FieldValues>(
     enable = defaultEnable,
     disable = defaultDisable,
     renderFieldErrors = defaultRenderFieldErrors,
-    renderFormMessage = defaultRenderFormMessage,
+    renderSuccess = defaultRenderSuccess,
+    renderFormError = defaultRenderFormError,
   } = config;
 
   const formData = new FormData(context.form);
@@ -56,7 +58,8 @@ const handleSubmit = async <T extends FieldValues>(
 
   // Clear visible errors and messages before submitting
   renderFieldErrors(context, null);
-  renderFormMessage(context, null, null);
+  renderSuccess(context, null);
+  renderFormError(context, null);
   disable(context);
   onSubmit?.(context);
 
@@ -78,14 +81,14 @@ const handleSubmit = async <T extends FieldValues>(
         renderFieldErrors(context, result);
       }
       if (result.getFormErrors().length > 0) {
-        renderFormMessage(context, 'error', buildErrorMessage(result));
+        renderFormError(context, buildErrorMessage(result));
       }
       onError?.(context, result);
     } else {
       if (debug) {
         log('Submission success', result);
       }
-      renderFormMessage(context, 'success', 'Thank you!');
+      renderSuccess(context, 'Thank you!');
       if (onSuccess) {
         onSuccess(context, result);
       } else if (findSuccessElement(context.form)) {
@@ -98,11 +101,7 @@ const handleSubmit = async <T extends FieldValues>(
     if (debug) {
       console.error('[formspree-ajax] Unexpected error', err);
     }
-    renderFormMessage(
-      context,
-      'error',
-      'An unexpected error occurred. Please try again.'
-    );
+    renderFormError(context, 'An unexpected error occurred. Please try again.');
     onFailure?.(context, err);
   } finally {
     enable(context);

@@ -21,7 +21,7 @@ describe('run', () => {
 
   it('calls initForm with a valid config', () => {
     const config = { formElement: '#contact-form', formId: 'xyzabc123' };
-    run(config);
+    run('initForm', config);
 
     expect(mockedInitForm).toHaveBeenCalledTimes(1);
     expect(mockedInitForm).toHaveBeenCalledWith(config);
@@ -33,15 +33,32 @@ describe('run', () => {
       formElement: '#contact-form',
       formId: 'abc123',
       debug: true,
-      fields: { email: { prettyName: 'Email' } },
     };
-    run(config);
+    run('initForm', config);
 
     expect(mockedInitForm).toHaveBeenCalledWith(config);
   });
 
+  it('warns when command is not a string', () => {
+    run(42, { formElement: '#f', formId: 'x' });
+
+    expect(mockedInitForm).not.toHaveBeenCalled();
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining('First argument must be a command string')
+    );
+  });
+
+  it('warns on unknown command', () => {
+    run('destroy', { formElement: '#f', formId: 'x' });
+
+    expect(mockedInitForm).not.toHaveBeenCalled();
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Unknown command')
+    );
+  });
+
   it('warns when config is not provided', () => {
-    run(undefined);
+    run('initForm', undefined);
 
     expect(mockedInitForm).not.toHaveBeenCalled();
     expect(warnSpy).toHaveBeenCalledWith(
@@ -50,7 +67,7 @@ describe('run', () => {
   });
 
   it('warns when config is not an object', () => {
-    run('not-an-object');
+    run('initForm', 'not-an-object');
 
     expect(mockedInitForm).not.toHaveBeenCalled();
     expect(warnSpy).toHaveBeenCalledWith(
@@ -59,7 +76,7 @@ describe('run', () => {
   });
 
   it('warns when formElement is missing', () => {
-    run({ formId: 'abc123' });
+    run('initForm', { formId: 'abc123' });
 
     expect(mockedInitForm).not.toHaveBeenCalled();
     expect(warnSpy).toHaveBeenCalledWith(
@@ -68,7 +85,7 @@ describe('run', () => {
   });
 
   it('warns when formId is missing', () => {
-    run({ formElement: '#my-form' });
+    run('initForm', { formElement: '#my-form' });
 
     expect(mockedInitForm).not.toHaveBeenCalled();
     expect(warnSpy).toHaveBeenCalledWith(
@@ -77,7 +94,7 @@ describe('run', () => {
   });
 
   it('warns when config is null', () => {
-    run(null);
+    run('initForm', null);
 
     expect(mockedInitForm).not.toHaveBeenCalled();
     expect(warnSpy).toHaveBeenCalledWith(

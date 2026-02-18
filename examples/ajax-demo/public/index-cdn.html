@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formspree AJAX - CDN Demo</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="container">
+    <a href="/index-packages.html" class="back-link">&larr; Package Demo</a>
+
+    <h1>Contact Form <span class="badge">CDN</span></h1>
+    <p class="subtitle">Using <code>window.formspree()</code> global API &mdash; no bundler required</p>
+
+    <div data-fs-success>Thanks for reaching out! We'll get back to you soon.</div>
+    <div data-fs-error>Something went wrong. Please try again.</div>
+
+    <form id="contact-form">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          placeholder="Your name"
+          data-fs-field
+        >
+        <span data-fs-error="name"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          placeholder="your.email@example.com"
+          data-fs-field
+        >
+        <span data-fs-error="email"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="message">Message</label>
+        <textarea
+          id="message-field"
+          name="message"
+          placeholder="Write your message here..."
+          data-fs-field
+        ></textarea>
+        <span data-fs-error="message"></span>
+      </div>
+
+      <button type="submit" data-fs-submit-btn>
+        Send Message
+      </button>
+    </form>
+
+    <div class="note">
+      <strong>How it works:</strong> Load <code>global.js</code> via a script tag.
+      It sets up <code>window.formspree()</code>, then call it to initialize your form.
+      No bundler needed!
+    </div>
+  </div>
+
+  <!--
+    Production usage:
+
+    <script>
+      window.formspree=window.formspree||function(){(formspree.q=formspree.q||[]).push(arguments)};
+      formspree('initForm', { formElement: '#contact-form', formId: 'YOUR_FORM_ID' });
+    </script>
+    <script src="https://unpkg.com/@formspree/ajax@1/dist/global.js" defer></script>
+
+    In this Vite demo, global.js is loaded via a module entry that aliases to the source.
+  -->
+
+  <!-- Step 1: Load the library -->
+  <script type="module" src="/global-entry.ts"></script>
+
+  <!-- Step 2: Initialize the form -->
+  <script type="module">
+    formspree('initForm', {
+      formElement: '#contact-form',
+      formId: 'YOUR_FORM_ID',
+      debug: true,
+    });
+  </script>
+</body>
+</html>

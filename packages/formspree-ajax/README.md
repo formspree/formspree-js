@@ -7,9 +7,9 @@ A vanilla JavaScript library for declarative form handling with [Formspree](http
 ### NPM / Yarn
 
 ```sh
-npm install @formspree/ajax @formspree/core
+npm install @formspree/ajax
 
-yarn add @formspree/ajax @formspree/core
+yarn add @formspree/ajax
 ```
 
 ### Script Tag (CDN)
@@ -23,7 +23,7 @@ No bundler needed. Add this snippet before the closing `</body>` tag:
     function () {
       (formspree.q = formspree.q || []).push(arguments);
     };
-  formspree({ formElement: '#my-form', formId: 'YOUR_FORM_ID' });
+  formspree('initForm', { formElement: '#my-form', formId: 'YOUR_FORM_ID' });
 </script>
 <script src="https://unpkg.com/@formspree/ajax@1/dist/global.js" defer></script>
 ```
@@ -104,7 +104,8 @@ const handle = initForm({
   enable: (context) => {},
   disable: (context) => {},
   renderFieldErrors: (context, error) => {},
-  renderFormMessage: (context, type, message) => {},
+  renderSuccess: (context, message) => {},
+  renderFormError: (context, message) => {},
 });
 
 // Clean up when done

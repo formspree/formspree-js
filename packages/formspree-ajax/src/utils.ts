@@ -3,12 +3,7 @@ import type {
   SubmissionError,
   SubmissionSuccess,
 } from '@formspree/core';
-import {
-  DataAttributes,
-  type FormContext,
-  type FormElement,
-  type MessageType,
-} from './types';
+import { DataAttributes, type FormContext, type FormElement } from './types';
 
 export const DEFAULT_ENDPOINT = 'https://formspree.io';
 
@@ -132,7 +127,7 @@ export const defaultRenderFieldErrors = <T extends FieldValues>(
   errorElements.forEach((element) => {
     const fieldName = element.dataset.fsError;
 
-    // Skip form-level error elements (no value) — handled by renderFormMessage
+    // Skip form-level error elements (no value) — handled by renderFormError
     if (!fieldName) return;
 
     if (!error) {
@@ -213,34 +208,45 @@ export const findFormErrorElement = (
 };
 
 /**
- * Default implementation to render form-level messages in the DOM.
- *
- * - On success: shows the `data-fs-success` element.
- * - On error: shows the `data-fs-error` element (without a value).
- * - If the element is empty, injects the provided message.
- * - If the element has user-provided content, shows it as-is.
+ * Default implementation to render a success message in the DOM.
+ * Shows the `data-fs-success` element and hides any form-level error.
+ * If the element is empty, injects the provided message.
  */
-export const defaultRenderFormMessage = <T extends FieldValues>(
+export const defaultRenderSuccess = <T extends FieldValues>(
   context: FormContext<T>,
-  type: MessageType | null,
   message: string | null
 ): void => {
   const successEl = findSuccessElement(context.form);
   const formErrorEl = findFormErrorElement(context.form);
 
-  if (type === null) {
+  if (message === null) {
     if (successEl) hideElement(successEl);
+    return;
+  }
+
+  if (formErrorEl) hideElement(formErrorEl);
+  if (successEl) showElement(successEl, message);
+};
+
+/**
+ * Default implementation to render form-level errors in the DOM.
+ * Shows the `data-fs-error` element (without a value) and hides any success message.
+ * If the element is empty, injects the provided message.
+ */
+export const defaultRenderFormError = <T extends FieldValues>(
+  context: FormContext<T>,
+  message: string | null
+): void => {
+  const successEl = findSuccessElement(context.form);
+  const formErrorEl = findFormErrorElement(context.form);
+
+  if (message === null) {
     if (formErrorEl) hideElement(formErrorEl);
     return;
   }
 
-  if (type === 'success') {
-    if (formErrorEl) hideElement(formErrorEl);
-    if (successEl) showElement(successEl, message ?? undefined);
-  } else {
-    if (successEl) hideElement(successEl);
-    if (formErrorEl) showElement(formErrorEl, message ?? undefined);
-  }
+  if (successEl) hideElement(successEl);
+  if (formErrorEl) showElement(formErrorEl, message);
 };
 
 /**

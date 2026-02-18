@@ -6,5 +6,4 @@ export {
   type FormContext,
   type FormElement,
   type FormHandle,
-  type MessageType,
 } from './types';
