@@ -25,7 +25,7 @@ No bundler needed. Add this snippet before the closing `</body>` tag:
     };
   formspree('initForm', { formElement: '#my-form', formId: 'YOUR_FORM_ID' });
 </script>
-<script src="https://unpkg.com/@formspree/ajax@1/dist/global.js" defer></script>
+<script src="https://unpkg.com/@formspree/ajax@1" defer></script>
 ```
 
 ## Quick Start

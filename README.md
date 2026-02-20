@@ -55,7 +55,7 @@ Or via CDN (no bundler needed):
     };
   formspree('initForm', { formElement: '#my-form', formId: 'YOUR_FORM_ID' });
 </script>
-<script src="https://unpkg.com/@formspree/ajax@1/dist/global.js" defer></script>
+<script src="https://unpkg.com/@formspree/ajax@1" defer></script>
 ```
 
 See the [@formspree/ajax README](./packages/formspree-ajax/README.md) for full documentation.
