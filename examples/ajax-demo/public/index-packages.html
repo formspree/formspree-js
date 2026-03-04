@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formspree AJAX - Package Demo</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Contact Form</h1>
+    <p class="subtitle">Using <code>initForm()</code> with a bundler</p>
+
+    <div data-fs-success>Thanks for reaching out! We'll get back to you soon.</div>
+    <div data-fs-error>Something went wrong. Please try again.</div>
+
+    <form id="contact-form">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          placeholder="Your name"
+          data-fs-field
+        >
+        <span data-fs-error="name"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          placeholder="your.email@example.com"
+          data-fs-field
+        >
+        <span data-fs-error="email"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="message">Message</label>
+        <textarea
+          id="message-field"
+          name="message"
+          placeholder="Write your message here..."
+          data-fs-field
+        ></textarea>
+        <span data-fs-error="message"></span>
+      </div>
+
+      <button type="submit" data-fs-submit-btn>
+        Send Message
+      </button>
+    </form>
+
+    <div class="note">
+      <strong>Note:</strong> Set <code>VITE_FORMSPREE_FORM_ID</code> in <code>.env.local</code> or replace <code>YOUR_FORM_ID</code> in <code>main.ts</code> with your actual Formspree form ID.
+      <br><br>
+      <a href="/index-cdn.html" class="back-link">See the Script Tag demo &rarr;</a>
+    </div>
+  </div>
+
+  <script type="module" src="/main.ts"></script>
+</body>
+</html>

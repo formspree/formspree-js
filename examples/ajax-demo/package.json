@@ -1,0 +1,19 @@
+{
+  "name": "@formspree/ajax-demo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Pure JavaScript AJAX example using Formspree",
+  "scripts": {
+    "build": "tsc && vite build",
+    "clean": "rm -rf dist && rm -rf node_modules",
+    "dev": "vite",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@formspree/ajax": "*"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "vite": "^6.0.6"
+  }
+}
