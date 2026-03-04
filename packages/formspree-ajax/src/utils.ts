@@ -71,11 +71,12 @@ export const defaultOnSuccess = <T extends FieldValues>(
 
 /**
  * Default implementation to enable submit buttons.
- * Restores original button text and re-enables the button.
+ * Restores original button text, re-enables the button, and clears aria-busy on the form.
  */
 export const defaultEnable = <T extends FieldValues>(
   context: FormContext<T>
 ): void => {
+  context.form.removeAttribute('aria-busy');
   const buttons = context.form.querySelectorAll<HTMLButtonElement>(
     `[type='submit']:disabled, [${DataAttributes.SUBMIT_BTN}]:disabled`
   );
@@ -91,11 +92,12 @@ export const defaultEnable = <T extends FieldValues>(
 
 /**
  * Default implementation to disable submit buttons.
- * Saves original button text, shows a loading spinner, and disables the button.
+ * Saves original button text, disables the button, and sets aria-busy on the form.
  */
 export const defaultDisable = <T extends FieldValues>(
   context: FormContext<T>
 ): void => {
+  context.form.setAttribute('aria-busy', 'true');
   const buttons = context.form.querySelectorAll<HTMLButtonElement>(
     `[type='submit']:enabled, [${DataAttributes.SUBMIT_BTN}]:enabled`
   );
