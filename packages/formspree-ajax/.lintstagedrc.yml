@@ -1,0 +1,7 @@
+package.json: yarn sort-package-json
+'*.{json,md,yml}': yarn prettier --write
+'*.{js,ts}':
+  - yarn prettier --write
+  # calling directly to eslint binary this instead of doing `yarn lint`
+  # because lint-staged will pass the list of files
+  - yarn eslint

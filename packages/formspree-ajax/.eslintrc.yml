@@ -4,6 +4,7 @@ extends:
 ignorePatterns:
   - jest.config.js
   - jest.setup.js
+  - tsup.config.ts
   - dist/
 parserOptions:
   project: './tsconfig.json'

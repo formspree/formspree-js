@@ -1,9 +1,9 @@
-/**
- * @formspree/ajax - Pure JavaScript AJAX library for Formspree
- *
- * A lightweight library for submitting forms to Formspree using pure JavaScript and TypeScript.
- * No front-end framework dependencies required.
- */
-
-export { FormspreeClient } from './client';
-export type { FormspreeClientConfig } from './types';
+export { initForm } from './form';
+export {
+  DataAttributes,
+  type ExtraData,
+  type FormConfig,
+  type FormContext,
+  type FormElement,
+  type FormHandle,
+} from './types';

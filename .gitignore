@@ -32,3 +32,10 @@ yarn-error.log*
 .turbo
 
 .vscode
+
+.local-dev
+
+.claude
+
+# playwright
+.playwright-mcp

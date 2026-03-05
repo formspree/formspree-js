@@ -11,6 +11,11 @@ jobs:
   release:
     name: Release
 
+    permissions:
+      contents: write
+      id-token: write
+      pull-requests: write
+
     # IMPORTANT: prevent this action from running on forks
     if: ${{ github.repository_owner == 'formspree' }}
 
@@ -40,4 +45,3 @@ jobs:
           publish: yarn release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

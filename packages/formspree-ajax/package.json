@@ -1,32 +1,38 @@
 {
   "name": "@formspree/ajax",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "private": false,
-  "description": "Pure JavaScript AJAX library for Formspree",
+  "description": "The AJAX library for Formspree",
   "homepage": "https://formspree.io",
   "bugs": {
-    "url": "https://github.com/formspree/formspree-ajax/issues"
+    "url": "https://github.com/formspree/formspree-js/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/formspree/formspree-ajax.git"
+    "url": "https://github.com/formspree/formspree-js.git"
   },
   "license": "MIT",
-  "author": "Formspree",
   "contributors": [
-    "Formspree"
+    "Cole Krumbholz",
+    "Larissa Oliveira"
   ],
-  "sideEffects": false,
+  "sideEffects": [
+    "./dist/global.js",
+    "./src/global.ts"
+  ],
   "main": "./dist/index.js",
+  "unpkg": "./dist/global.js",
   "module": "./dist/index.mjs",
+  "browser": "./dist/global.js",
   "types": "./dist/index.d.ts",
   "files": [
     "dist/**"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --dts --minify && node scripts/fix-dts.js",
+    "build": "tsup",
     "clean": "rm -rf dist && rm -rf node_modules",
-    "dev": "tsup src/index.ts --format esm,cjs --dts --sourcemap --watch",
+    "demo": "npm run build && npm run --prefix ../../examples/ajax-demo dev",
+    "dev": "tsup --watch",
     "lint": "eslint ./src ./test",
     "test": "jest",
     "typecheck": "tsc --noEmit"
@@ -36,6 +42,6 @@
   },
   "publishConfig": {
     "access": "public",
-    "registry": "https://registry.npmjs.org"
+    "registry": "https://registry.npmjs.org/"
   }
 }

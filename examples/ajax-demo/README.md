@@ -8,7 +8,7 @@ A pure JavaScript/TypeScript example demonstrating how to use `@formspree/ajax` 
 - No React, Vue, or other framework dependencies
 - Beautiful, responsive contact form UI
 - Loading states and error handling
-- Form validation
+- Form validation feedback
 - Success/error messages
 - Built with Vite for fast development
 
@@ -17,7 +17,7 @@ A pure JavaScript/TypeScript example demonstrating how to use `@formspree/ajax` 
 1. Install dependencies:
 
    ```bash
-   npm install
+   yarn install
    ```
 
 2. Get your Formspree form ID:
@@ -26,19 +26,20 @@ A pure JavaScript/TypeScript example demonstrating how to use `@formspree/ajax` 
    - Create a new form or use an existing one
    - Copy your form ID (e.g., `xyzabc123`)
 
-3. Update the form ID in `src/main.ts`:
-   ```typescript
-   const client = new FormspreeClient({
-     formId: 'YOUR_FORM_ID', // Replace with your actual form ID
-   });
+3. Create a `.env.local` file from the template:
+
+   ```bash
+   cp .env.local.template .env.local
    ```
+
+4. Update `VITE_FORMSPREE_FORM_ID` in `.env.local` with your form ID.
 
 ## Development
 
 Run the development server:
 
 ```bash
-npm run dev
+yarn dev
 ```
 
 The demo will be available at `http://localhost:5173`
@@ -48,40 +49,59 @@ The demo will be available at `http://localhost:5173`
 Build for production:
 
 ```bash
-npm run build
+yarn build
 ```
 
 The output will be in the `dist` directory.
 
 ## Usage
 
-### Basic Form Submission
+### Basic Form Initialization
 
 ```typescript
-import { FormspreeClient } from '@formspree/ajax';
+import { initForm } from '@formspree/ajax';
 
-const client = new FormspreeClient({
+initForm({
+  formElement: '#contact-form',
   formId: 'your-form-id',
+  onSuccess: ({ form }) => {
+    console.log('Success!');
+    form.reset();
+  },
+  onError: (_context, error) => {
+    const messages = error.getFormErrors().map((e) => e.message);
+    console.error('Validation errors:', messages);
+  },
+  onFailure: (_context, error) => {
+    console.error('Unexpected error:', error);
+  },
 });
-
-// Submit form element
-const form = document.getElementById('my-form');
-const response = await client.submitForm(form);
-
-if (response.ok) {
-  console.log('Success!');
-} else {
-  console.error('Error:', response.errors);
-}
 ```
 
-### Submit Data Object
+### With Extra Data
 
 ```typescript
-const response = await client.submit({
-  name: 'John Doe',
-  email: 'john@example.com',
-  message: 'Hello!',
+initForm({
+  formElement: '#contact-form',
+  formId: 'your-form-id',
+  data: {
+    source: 'website',
+    timestamp: new Date().toISOString(),
+  },
+  onSuccess: ({ form }) => {
+    form.reset();
+  },
+});
+```
+
+### Custom Origin (e.g., staging)
+
+```typescript
+initForm({
+  formElement: '#contact-form',
+  formId: 'your-form-id',
+  origin: 'https://staging.formspree.io',
+  debug: true,
 });
 ```
 
@@ -90,9 +110,9 @@ const response = await client.submit({
 ```
 ajax-demo/
 ├── public/
-│   └── index.html          # HTML form with styling
-├── src/
-│   └── main.ts             # TypeScript implementation
+│   ├── index.html      # HTML form with styling
+│   └── main.ts         # TypeScript implementation
+├── .env.local.template # Environment variables template
 ├── package.json
 ├── tsconfig.json
 ├── vite.config.ts

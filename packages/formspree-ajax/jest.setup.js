@@ -1,2 +1,2 @@
-// Add custom jest matchers from jest-dom
-import '@testing-library/jest-dom';
+// Fix: ReferenceError: Response is not defined
+import 'isomorphic-fetch';
