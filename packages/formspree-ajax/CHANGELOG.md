@@ -1,5 +1,11 @@
 # @formspree/ajax
 
+## 1.1.2
+
+### Patch Changes
+
+- 53bee95: Fix npm auth in release workflow
+
 ## 1.1.1
 
 ### Patch Changes
