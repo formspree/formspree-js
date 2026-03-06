@@ -24,27 +24,16 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 20.x
+      - name: Setup Node.js 24.x
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: 24.x
           registry-url: https://registry.npmjs.org
           cache: yarn
           cache-dependency-path: yarn.lock
 
       - name: Install Dependencies
         run: yarn install --frozen-lockfile
-
-      - name: Get npm OIDC token
-        id: npm-oidc
-        run: |
-          OIDC_TOKEN=$(curl -s -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
-            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=npm" | jq -r '.value')
-          NPM_TOKEN=$(curl -s -X POST https://registry.npmjs.org/-/v1/login/oauth/token \
-            -H "Content-Type: application/json" \
-            -d "{\"oidcToken\": \"$OIDC_TOKEN\"}" | jq -r '.token')
-          echo "::add-mask::$NPM_TOKEN"
-          echo "token=$NPM_TOKEN" >> $GITHUB_OUTPUT
 
       # This action will either create a new Release pull request with
       # all of the package versions and changelogs updated if there're
@@ -56,4 +45,3 @@ jobs:
           publish: yarn release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ steps.npm-oidc.outputs.token }}
