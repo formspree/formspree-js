@@ -1,5 +1,11 @@
 # @formspree/ajax
 
+## 1.1.4
+
+### Patch Changes
+
+- dd5b7d9: Fix npm publishing by passing OIDC token as NPM_TOKEN
+
 ## 1.1.3
 
 ### Patch Changes
