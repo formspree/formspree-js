@@ -1,5 +1,11 @@
 # @formspree/ajax
 
+## 1.1.5
+
+### Patch Changes
+
+- 2e1d1fa: Fix npm publishing by upgrading to Node 22 for OIDC trusted publishing support
+
 ## 1.1.4
 
 ### Patch Changes
