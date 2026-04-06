@@ -2,6 +2,14 @@
 
 The core client library for [Formspree](https://formspree.io).
 
+## Releasing
+
+Run the following to publish a new version:
+
+```
+npm run release
+```
+
 ## Help and Support
 
 For help and support please see the [Formspree docs](https://help.formspree.io).
