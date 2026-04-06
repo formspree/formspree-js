@@ -9,7 +9,11 @@ A monorepo containing libraries for seamless form integration with [Formspree](h
 Core submission client and types.
 
 ```sh
+npm install @formspree/core
+# or
 yarn add @formspree/core
+# or
+pnpm add @formspree/core
 ```
 
 ### [`@formspree/react`](./packages/formspree-react)
@@ -17,7 +21,11 @@ yarn add @formspree/core
 React hooks and components for Formspree. Supports React 16.8, 17, 18, and 19.
 
 ```sh
+npm install @formspree/react
+# or
 yarn add @formspree/react
+# or
+pnpm add @formspree/react
 ```
 
 ### [`@formspree/ajax`](./packages/formspree-ajax)
@@ -25,7 +33,11 @@ yarn add @formspree/react
 Vanilla JavaScript library for declarative form handling. No framework required.
 
 ```sh
+npm install @formspree/ajax
+# or
 yarn add @formspree/ajax
+# or
+pnpm add @formspree/ajax
 ```
 
 _`@formspree/core` is included as a dependency of both `@formspree/react` and `@formspree/ajax`, so you don't need to install it separately._
